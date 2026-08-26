@@ -544,8 +544,22 @@ async function applyOne(page, url, plan, cfg, opts) {
 
   await page.locator('button[type="submit"]').last().click();
   await page.waitForTimeout(6000);
+  // Greenhouse boards now gate submission behind an emailed 8-character code
+  // ("A verification code was sent to ..."). That is not a failure and not a
+  // captcha — it is a step the run cannot finish alone, so label it as itself.
+  const needsCode = await page.evaluate(() =>
+    /verification code was sent|enter the 8.character code/i.test(document.body.innerText) ||
+    !!document.querySelector('input[name*="verification" i], [aria-label*="security code" i]')
+  );
+  if (needsCode) {
+    return {
+      outcome: 'VERIFICATION_CODE',
+      detail: 'form complete; Greenhouse emailed an 8-character code that must be entered to submit',
+      shot: await shot('VERIFICATION_CODE'),
+    };
+  }
   const confirmed = await page.evaluate(() =>
-    /thank you|application (has been )?(submitted|received)|we have received/i.test(document.body.innerText)
+    /thank(s| you) for applying|got your application|thank you|application (has been )?(submitted|received)|we have received|successfully submitted/i.test(document.body.innerText)
   );
   const errs = await page.evaluate(() =>
     [...document.querySelectorAll('[class*="error"], [aria-invalid="true"]')]

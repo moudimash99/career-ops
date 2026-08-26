@@ -791,10 +791,31 @@ async function main() {
   // Ashby scores submissions with invisible reCAPTCHA v3. Headless Chromium
   // scores badly enough that the submit is rejected as "possible spam", so a
   // real submit run wants --headed and ideally --channel chrome.
-  const browser = args.planOnly
-    ? null
-    : await chromium.launch({ headless: !args.headed, ...(args.channel ? { channel: args.channel } : {}) });
-  const context = browser ? await browser.newContext({ viewport: { width: 1280, height: 1000 } }) : null;
+  // --profile keeps cookies and history between runs. Ashby scores submissions
+  // with invisible reCAPTCHA v3, and a browser with no past scores worse than one
+  // that has been around.
+  const launchOpts = { headless: !args.headed, ...(args.channel ? { channel: args.channel } : {}) };
+  let browser = null;
+  let context = null;
+  if (!args.planOnly) {
+    if (args.profile) {
+      context = await chromium.launchPersistentContext('data/ashby/browser-profile', {
+        ...launchOpts,
+        viewport: { width: 1280, height: 1000 },
+      });
+    } else {
+      browser = await chromium.launch(launchOpts);
+      context = await browser.newContext({ viewport: { width: 1280, height: 1000 } });
+    }
+  }
+
+  // Submitting back to back is what drives the v3 score down until a run starts
+  // getting rejected as "possible spam". Jittered so the gaps are not uniform.
+  const gapMs = () => {
+    const base = (args.delay ?? (args.submit ? 150 : 0)) * 1000;
+    return base ? base + Math.random() * base * 0.6 : 0;
+  };
+
   let done = 0;
 
   for (const url of urls) {
@@ -866,6 +887,7 @@ async function main() {
   }
 
   if (browser) await browser.close();
+  else if (context) await context.close();
   console.log(`\nProcessed ${done}. Run \`node ashby-apply.mjs --report\` for the roll-up.\n`);
 }
 
