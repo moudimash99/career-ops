@@ -869,4 +869,27 @@ async function main() {
   console.log(`\nProcessed ${done}. Run \`node ashby-apply.mjs --report\` for the roll-up.\n`);
 }
 
-main().catch((e) => { console.error(`\nfatal: ${e.message}\n`); process.exit(1); });
+// ---------------------------------------------------------------- staging API
+
+/** See greenhouse-apply.mjs prepareJob — same contract, Ashby schema. */
+export async function prepareJob(page, url, cfg) {
+  const parsed = parseUrl(url);
+  if (!parsed) return { outcome: 'NOT_SUPPORTED', detail: 'not an ashby url' };
+  const jp = await fetchSchema(parsed);
+  if (jp.dead) return { outcome: 'DEAD', detail: 'posting closed' };
+  const banned = blacklistedAs(parsed.org);
+  if (banned) return { outcome: 'BLACKLISTED', detail: banned };
+  const plan = { ...planAnswers(jp, cfg), key: parsed.key };
+  if (plan.blockers.length) {
+    return { outcome: 'UNANSWERABLE', detail: plan.blockers.join(' ; '), blockers: plan.blockers };
+  }
+  const result = await applyOne(page, url, plan, cfg, { submit: false });
+  return { ...result, company: parsed.org, title: jp.title };
+}
+
+export { loadConfig };
+
+// Only run the CLI when invoked directly — apply-stage.mjs imports prepareJob().
+if (process.argv[1] && process.argv[1].replace(/\\/g, '/').endsWith('ashby-apply.mjs')) {
+  main().catch((e) => { console.error(`\nfatal: ${e.message}\n`); process.exit(1); });
+}

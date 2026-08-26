@@ -736,4 +736,33 @@ async function main() {
   console.log(`\nProcessed ${done}. Run \`node greenhouse-apply.mjs --report\` for the roll-up.\n`);
 }
 
-main().catch((e) => { console.error(`\nfatal: ${e.message}\n`); process.exit(1); });
+// ---------------------------------------------------------------- staging API
+
+/**
+ * Fill and verify a job in a page someone else owns, without submitting.
+ *
+ * apply-stage.mjs uses this to hand a human a tab that is already complete. It
+ * deliberately returns rather than closing the page: the caller keeps it open.
+ */
+export async function prepareJob(page, url, cfg) {
+  const parsed = parseUrl(url);
+  if (!parsed) return { outcome: 'NOT_SUPPORTED', detail: 'not a greenhouse url' };
+  const schema = await fetchSchema(parsed);
+  if (schema.dead) return { outcome: 'DEAD', detail: 'posting closed' };
+  const banned = blacklistedAs(schema.company_name || parsed.boardToken);
+  if (banned) return { outcome: 'BLACKLISTED', detail: banned };
+  const plan = { ...planAnswers(schema, cfg), key: parsed.key };
+  if (plan.blockers.length) {
+    return { outcome: 'UNANSWERABLE', detail: plan.blockers.join(' ; '), blockers: plan.blockers };
+  }
+  const result = await applyOne(page, url, plan, cfg, { submit: false });
+  return { ...result, company: schema.company_name || parsed.boardToken, title: schema.title };
+}
+
+export { loadConfig };
+
+// Only run the CLI when invoked directly. apply-stage.mjs imports this module
+// for prepareJob(), and an unguarded call launches a whole run on import.
+if (process.argv[1] && process.argv[1].replace(/\\/g, '/').endsWith('greenhouse-apply.mjs')) {
+  main().catch((e) => { console.error(`\nfatal: ${e.message}\n`); process.exit(1); });
+}
