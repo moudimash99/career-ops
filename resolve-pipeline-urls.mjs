@@ -19,10 +19,15 @@
  */
 
 import fs from 'fs';
+import { chromium } from 'playwright';
 
 const PIPELINE = 'data/pipeline.md';
 const KNOWN = /greenhouse\.io|ashbyhq\.com|lever\.co/;
 const apply = process.argv.includes('--apply');
+
+// Aggregator pages (Welcome to the Jungle above all) render their apply link in
+// JS, so a plain fetch sees an empty shell. Those need a browser.
+const JS_RENDERED = /welcometothejungle\.com/;
 
 /** Vendor fingerprints, in the order they are worth trying. */
 async function resolve(url) {
@@ -79,6 +84,44 @@ async function verify(hit) {
   }
 }
 
+/**
+ * Follow an aggregator listing to whatever ATS its Apply button points at.
+ * Returns the outbound host as the vendor when it is one we do not adapt, so the
+ * report shows what is actually out there rather than just "unresolved".
+ */
+async function resolveInBrowser(url, ctx) {
+  const page = await ctx.newPage();
+  try {
+    await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 25000 });
+    await page.waitForTimeout(2500);
+    const href = await page.evaluate(() => {
+      const a = [...document.querySelectorAll('a')].find(
+        (a) => /apply|postuler/i.test(a.textContent || '') && a.href && !/welcometothejungle/.test(a.href)
+      );
+      return a ? a.href : null;
+    });
+    if (!href) return { error: 'applies natively on the aggregator (needs an account, sends no CV)' };
+    const host = new URL(href).hostname.replace(/^www\./, '');
+    if (/lever\.co/.test(host)) {
+      const m = href.match(/lever\.co\/([^/]+)\/([0-9a-f-]{36})/i);
+      return m ? { vendor: 'lever', url: `https://jobs.lever.co/${m[1]}/${m[2]}` } : { error: 'lever link not parseable' };
+    }
+    if (/greenhouse\.io/.test(host)) {
+      const m = href.match(/greenhouse\.io\/([^/]+)\/jobs\/(\d+)/);
+      return m ? { vendor: 'greenhouse', url: `https://boards.greenhouse.io/${m[1]}/jobs/${m[2]}` } : { error: 'greenhouse link not parseable' };
+    }
+    if (/ashbyhq\.com/.test(host)) {
+      const m = href.match(/ashbyhq\.com\/([^/]+)\/([0-9a-f-]{36})/i);
+      return m ? { vendor: 'ashby', url: `https://jobs.ashbyhq.com/${m[1]}/${m[2]}` } : { error: 'ashby link not parseable' };
+    }
+    return { error: `no adapter for ${host}` };
+  } catch (e) {
+    return { error: e.message.split(/\n/)[0].slice(0, 50) };
+  } finally {
+    await page.close().catch(() => {});
+  }
+}
+
 async function main() {
   const text = fs.readFileSync(PIPELINE, 'utf8').replace(/\r/g, '');
   const lines = text.split('\n');
@@ -96,6 +139,10 @@ async function main() {
   console.log(`\n${targets.length} pending row(s) on unadapted hosts\n`);
   if (!targets.length) return;
 
+  const needsBrowser = targets.some((t) => JS_RENDERED.test(t.url));
+  const browser = needsBrowser ? await chromium.launch({ headless: true }) : null;
+  const ctx = browser ? await browser.newContext() : null;
+
   const rewrites = [];
   const failures = [];
   let n = 0;
@@ -105,7 +152,7 @@ async function main() {
     for (;;) {
       const t = queue.shift();
       if (!t) return;
-      const hit = await resolve(t.url);
+      const hit = JS_RENDERED.test(t.url) ? await resolveInBrowser(t.url, ctx) : await resolve(t.url);
       if (hit.url && (await verify(hit))) {
         rewrites.push({ ...t, ...hit });
         console.log(`  ✓ ${t.company.padEnd(22)} -> ${hit.vendor}`);
@@ -116,14 +163,18 @@ async function main() {
     }
   };
   await Promise.all(Array.from({ length: 5 }, worker));
+  if (browser) await browser.close();
 
   const byVendor = {};
   for (const r of rewrites) byVendor[r.vendor] = (byVendor[r.vendor] || 0) + 1;
   console.log(`\n  resolved  ${rewrites.length}`);
   for (const [v, c] of Object.entries(byVendor)) console.log(`     ${String(c).padStart(3)}  ${v}`);
   console.log(`  unresolved ${failures.length}`);
-  for (const f of failures.slice(0, 8)) console.log(`     ${f.company.padEnd(22)} ${f.error}`);
-  if (failures.length > 8) console.log(`     ...and ${failures.length - 8} more`);
+  const reasons = {};
+  for (const f of failures) reasons[f.error] = (reasons[f.error] || 0) + 1;
+  for (const [r, c] of Object.entries(reasons).sort((a, b) => b[1] - a[1]).slice(0, 12)) {
+    console.log(`     ${String(c).padStart(3)}  ${r}`);
+  }
 
   if (!apply) {
     console.log('\nDry run — nothing written. Re-run with --apply.\n');
