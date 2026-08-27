@@ -1,0 +1,18 @@
+═══════════════════════════════════════════════════
+ career-ops apply — 5 Tech Company Applications
+ (Veepee, Pennylane, Scaleway, Owkin)
+═══════════════════════════════════════════════════
+
+▶ Opening [1/5] Veepee - SRE - DataPlatform...
+  📎 CV PDF uploaded automatically.
+  ✅ Fields populated. Left for you: Check boxes, Captcha, Submit.
+▶ Opening [2/5] Pennylane - Senior Data Engineer...
+file:///C:/Users/Moudimash99/Documents/Coding/career-ops/apply-tech.mjs:68
+            const input = await page.$(`#${CSS.escape(forAttr)}`);
+                                           ^
+
+ReferenceError: CSS is not defined
+    at fillStandardFields (file:///C:/Users/Moudimash99/Documents/Coding/career-ops/apply-tech.mjs:68:44)
+    at async file:///C:/Users/Moudimash99/Documents/Coding/career-ops/apply-tech.mjs:133:5
+
+Node.js v24.16.0

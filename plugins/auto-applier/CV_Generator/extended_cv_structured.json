@@ -1,0 +1,786 @@
+{
+  "identity": {
+    "name": "MACHAKA Mohammad",
+    "headline": "Software Developer"
+  },
+  "profile_long": [
+    "Systems-minded software & cloud engineer transitioning into Systems Engineering through the ISAE-SUPAERO Mastère Spécialisé® SEN (2025–2026), and an AWS Certified Solutions Architect – Associate (SAA-C03). I design and evolve data-intensive, real-time platforms with clear interfaces, measurable SLOs, and strong observability, bridging MBSE thinking (requirements, ICDs, trade-offs, V-model, lifecycle per ISO/IEC 15288) with hands-on delivery across AWS/Kubernetes/Terraform and C++/Python/TypeScript stacks.",
+    "My recent work has centered on geospatial/EO pipelines and on-demand tile services: orchestrating ingestion and processing (Airflow, Rasterio/GDAL, STAC), dynamic rendering (Google Earth Engine + FastAPI), and operating them at scale with IaC, GitOps CI/CD, prometheus/grafana dashboards, and defensive caching. I care about latency, cost, and reliability as first-class design variables and routinely translate stakeholder needs into testable requirements, acceptance criteria, and runbooks. Earlier roles in software architecture and AI/CV pipelines sharpened my ability to reason about performance (multithreading, GPU offload), fault modes, and deployment automation across heterogeneous environments (AWS/Azure, containers, microservices).",
+    "I thrive where systems architecture meets product reality: decomposing ambiguous problems, making trade studies explicit, specifying interfaces, and then shipping maintainable services with clean code, repeatable deploys, and actionable telemetry. I’m targeting roles in Systems Engineering, Software/Cloud Architecture, or hybrid positions that blend MBSE + real-time data + cloud—especially in aerospace, autonomy, mapping, or other mission-critical domains."
+  ],
+  "contact": {
+    "Phone": "+33 (0) 7 53 37 78 23",
+    "Address": "16 Rue du Touch, 31170 Tournefeuille, France",
+    "Email": "machaka.mohammad@gmail.com",
+    "LinkedIn": "Mohammad Machaka"
+  },
+  "personal_data": {
+    "Date of Birth": "10/06/1999",
+    "Nationality": "Lebanese",
+    "Visa Status": "Student Titre de Sejour",
+    "Marital Status": "Married"
+  },
+  "education_program": {
+    "institution": "ISAE-SUPAERO",
+    "program": "Advanced Master in Systems Engineering (SEN)",
+    "level": "Advanced Master (Bac+6)",
+    "language": "English",
+    "location": "Toulouse, France",
+    "period": "2025–2026",
+    "duration_months": 12,
+    "structure": {
+      "semester_1_contact_hours": 580,
+      "integrated_team_project_ects": 9,
+      "semester_2_thesis_months": 4.5
+    },
+    "modules": [
+      {
+        "code": "IS540",
+        "title": "Systems Engineering Introduction",
+        "hours": 15,
+        "ects": 1,
+        "topics": [
+          "systems theory",
+          "aircraft overview"
+        ]
+      },
+      {
+        "code": "IS547",
+        "title": "Requirements Engineering",
+        "hours": 37,
+        "ects": 4,
+        "topics": [
+          "stakeholder needs",
+          "requirements quality",
+          "verification"
+        ]
+      },
+      {
+        "code": "IS548",
+        "title": "System Design & Architecture",
+        "hours": 45,
+        "ects": 4,
+        "topics": [
+          "interfaces",
+          "emergent behavior",
+          "concept development"
+        ]
+      },
+      {
+        "code": "IS549",
+        "title": "Intro to Verification & Validation",
+        "hours": 11,
+        "ects": 1,
+        "topics": [
+          "V&V process",
+          "evidence"
+        ]
+      },
+      {
+        "code": "IS546",
+        "title": "Optimize/Decide/Justify/V&V",
+        "hours": 15,
+        "ects": 3,
+        "topics": [
+          "multi-criteria decision",
+          "optimization"
+        ]
+      },
+      {
+        "code": "IS543",
+        "title": "Systems Modeling & Analysis",
+        "hours": 45,
+        "ects": 4,
+        "topics": [
+          "UML",
+          "SysML",
+          "ARCADIA/Capella"
+        ]
+      },
+      {
+        "code": "IS542",
+        "title": "SE Data Technical Management",
+        "hours": 42,
+        "ects": 4,
+        "topics": [
+          "PLM",
+          "configuration mgmt",
+          "requirements data"
+        ]
+      },
+      {
+        "code": "IS555",
+        "title": "SE Methods & Tools",
+        "hours": 34,
+        "ects": 1,
+        "topics": [
+          "KAOS",
+          "DOORS",
+          "SCADE",
+          "collaborative engineering"
+        ]
+      },
+      {
+        "code": "IS544",
+        "title": "Systems Dependability (SEN)",
+        "hours": 20,
+        "ects": 2,
+        "topics": [
+          "ARP4754",
+          "ARP4761",
+          "DO-178",
+          "risk"
+        ]
+      },
+      {
+        "code": "EM471",
+        "title": "Systems Dependability",
+        "hours": 21,
+        "ects": 2,
+        "topics": [
+          "fault trees",
+          "AltaRica",
+          "safety labs"
+        ]
+      },
+      {
+        "code": "IS541",
+        "title": "Project Technical Management",
+        "hours": 35,
+        "ects": 3,
+        "topics": [
+          "PBS/WBS",
+          "PERT/EVM",
+          "cost & risk"
+        ]
+      },
+      {
+        "code": "IS557",
+        "title": "Project Management Introduction",
+        "hours": 11,
+        "ects": 1,
+        "topics": [
+          "PM basics",
+          "risk (Airbus view)"
+        ]
+      },
+      {
+        "code": "IS550",
+        "title": "Integrated Logistic Support",
+        "hours": 27,
+        "ects": 3,
+        "topics": [
+          "supportability",
+          "operations"
+        ]
+      },
+      {
+        "code": "IS551",
+        "title": "Airbus Case: A350",
+        "hours": 20,
+        "ects": 0.5,
+        "topics": [
+          "concurrent engineering",
+          "certification"
+        ]
+      },
+      {
+        "code": "IS553",
+        "title": "Dassault Aviation Case",
+        "hours": 25,
+        "ects": 0.5,
+        "topics": [
+          "Open IMA",
+          "HF",
+          "hydraulics prelim design"
+        ]
+      },
+      {
+        "code": "IS554",
+        "title": "DGA Case: System of Systems",
+        "hours": 36,
+        "ects": 0.5,
+        "topics": [
+          "SoS architectures",
+          "simulation-based acquisition"
+        ]
+      },
+      {
+        "code": "IS552",
+        "title": "Space Systems (Gaia)",
+        "hours": 17.5,
+        "ects": 0.5,
+        "topics": [
+          "spacecraft V&V",
+          "environmental/performance tests"
+        ]
+      },
+      {
+        "code": "IS556",
+        "title": "Introduction to Space Systems",
+        "hours": 11,
+        "ects": 1,
+        "topics": [
+          "space domain overview"
+        ]
+      },
+      {
+        "code": "IN401",
+        "title": "ISAE Digital Services",
+        "hours": 2.5,
+        "ects": 0,
+        "topics": [
+          "IS access & use"
+        ]
+      }
+    ],
+    "capstone": {
+      "name": "Integrated Team Project (ITP)",
+      "ects": 9,
+      "focus": [
+        "requirements",
+        "architecture",
+        "planning",
+        "risk",
+        "stakeholder engagement"
+      ]
+    },
+    "thesis": {
+      "duration_months": 4,
+      "setting": [
+        "industry",
+        "research lab"
+      ],
+      "deliverables": [
+        "written report",
+        "oral defense"
+      ]
+    },
+    "certification_prep": {
+      "incose_asep_preparation": true
+    },
+    "competencies": [
+      "requirements engineering",
+      "system architecture",
+      "MBSE (SysML/Capella)",
+      "V&V",
+      "dependability/safety",
+      "PLM/CM",
+      "project management (PERT/EVM)",
+      "ILS/logistics"
+    ]
+  },
+  "certificates": [
+    {
+      "name": "AWS Certified Solutions Architect – Associate",
+      "code": "SAA-C03",
+      "issuer": "Amazon Web Services",
+      "issue_date": "2025-09",
+      "credential_url": "https://www.credly.com/badges/14c4b7ac-8600-4f71-9d0e-db6fc67de835/linked_in?t=t3enca"
+    },
+    {
+      "name": "Machine Learning Specialization",
+      "issuer": "Coursera / Stanford University",
+      "issue_date": "2020-08",
+      "details": "Neural networks, hyperparameter tuning, regularization, and ML project structuring."
+    },
+    {
+      "name": "ICND1",
+      "issuer": "Cisco",
+      "issue_date": "2019-04",
+      "details": "Entry-level networking: foundational skills in network infrastructure and administration."
+    }
+  ],
+  "education": [
+    {
+      "degree": "Mastère Spécialisé® in Systems Engineering (SEN)",
+      "institution": "ISAE-SUPAERO",
+      "location": "Toulouse, France",
+      "start_date": "2025-09",
+      "end_date": "2026-10",
+      "status": "expected",
+      "focus": [
+        "MBSE",
+        "requirements engineering",
+        "system architecture",
+        "verification & validation",
+        "ISO/IEC 15288 lifecycle",
+        "safety & reliability",
+        "trade studies"
+      ]
+    },
+    {
+      "degree": "Master's in Computer Science for Aerospace",
+      "institution": "Université Toulouse III - Paul Sabatier",
+      "location": "Toulouse, France",
+      "start_date": "2021-09",
+      "end_date": "2024-06",
+      "specialization": "Advanced C++ development for aerospace standards",
+      "relevant_coursework": [
+        "Real-time systems",
+        "Software optimization",
+        "Data processing for aerospace"
+      ]
+    },
+    {
+      "degree": "Bachelor's in Computer Science",
+      "minor": "Business Administration",
+      "institution": "American University of Beirut",
+      "location": "Beirut, Lebanon",
+      "start_date": "2017-09",
+      "end_date": "2020-06",
+      "achievements": [
+        "Runner-Up, LCPC Competitive Programming Contest (Lebanon), 2019",
+        "Valedictorian, 2017/2018",
+        "Abdullah Al Ghurair Foundation Scholarship Recipient"
+      ],
+      "relevant_coursework": [
+        "Algorithms",
+        "Software engineering",
+        "Business fundamentals"
+      ]
+    }
+  ],
+  "internships": [
+    {
+      "title": "STM32F4 Car Delivery Project",
+      "organization": "Université Toulouse III",
+      "supervisor": "Dr. H. Casse",
+      "location": "Toulouse, France",
+      "start_date": "2022-06",
+      "end_date": "2022-08",
+      "description": "Developed software for autonomous car delivery on STM32F4; implemented sensor integration and motor control for navigation."
+    },
+    {
+      "title": "IoT Machine Learning Developer Training",
+      "organization": "—",
+      "trainer": "Dr. Nahil Sobh",
+      "location": "Beirut, Lebanon",
+      "start_date": "2020-09",
+      "end_date": "2020-11",
+      "description": "Deployed ML models on IoT devices; optimized real-time data processing for low-power hardware."
+    },
+    {
+      "title": "Radiotherapy Optimization Project",
+      "organization": "American University of Beirut",
+      "location": "Beirut, Lebanon",
+      "start_date": "2020-06",
+      "end_date": "2020-09",
+      "description": "Built software to optimize radiation wave weights for cancer treatment, balancing efficacy and safety."
+    },
+    {
+      "title": "Mobile Development Internship",
+      "organization": "Cherpa",
+      "location": "Beirut, Lebanon",
+      "start_date": "2018-12",
+      "end_date": "2019-01",
+      "description": "Implemented features for an educational platform mobile app."
+    }
+  ],
+  "projects": [
+    {
+      "name": "SUNSPEAR",
+      "role": "Systems Engineer",
+      "organization": "ISAE-SUPAERO",
+      "period": "2025–2026",
+      "scope": "Vehicle/mission-level student project from concept to early reviews.",
+      "responsibilities": [
+        "CONOPS → needs → requirements",
+        "ICDs",
+        "Verification strategy",
+        "Configuration/change control"
+      ],
+      "artifacts": [
+        "Requirements tree with traceability",
+        "Initial V&V matrix",
+        "Risk register",
+        "Decision log",
+        "SRR/SDR packets"
+      ],
+      "outcomes": [
+        "Baseline architecture and key interfaces",
+        "Agreed early validation path",
+        "Top risks tied to trade studies"
+      ]
+    },
+    {
+      "name": "HydroART",
+      "role": "Systems Engineer",
+      "organization": "ISAE-SUPAERO",
+      "period": "2025–2026",
+      "scope": "Student engineering project at ISAE-SUPAERO, progressing from concept to early reviews.",
+      "responsibilities": [
+        "Mission architecture",
+        "Subsystem decomposition",
+        "Mass/power/data budgets",
+        "Interface control",
+        "V&V planning"
+      ],
+      "artifacts": [
+        "CONOPS",
+        "Context/functional diagrams",
+        "Preliminary budgets",
+        "ICD skeletons",
+        "Verification cross-reference matrix"
+      ],
+      "outcomes": [
+        "Coherent baseline and V&V path",
+        "Stakeholder alignment on constraints, trades, and next experiments"
+      ]
+    }
+  ],
+  "programming_languages": {
+    "proficient": [
+      "C++",
+      "Python",
+      "C#",
+      "Java",
+      "SQL"
+    ],
+    "intermediate": [
+      "Node.js",
+      "Dart",
+      "PHP",
+      "TypeScript",
+      "AppsScript"
+    ],
+    "database_query_languages": [
+      "MongoDB Query Language"
+    ]
+  },
+  "skills": {
+    "technical": {
+      "programming": [
+        "Multithreading",
+        "Real-time systems",
+        "Software optimization",
+        "Performance tuning"
+      ],
+      "systems_engineering_mbse": [
+        "Requirements engineering",
+        "Interface control",
+        "Trade studies",
+        "V-model",
+        "ISO/IEC 15288 concepts",
+        "SysML/UML (in progress)",
+        "Verification & validation",
+        "Safety/reliability awareness",
+        "Configuration & change management",
+        "DOORS-class tools (exposure/in progress)"
+      ],
+      "cloud_devops": [
+        "AWS",
+        "Azure",
+        "Docker",
+        "Kubernetes",
+        "Terraform",
+        "Jenkins",
+        "CI/CD practices"
+      ],
+      "databases": [
+        "MySQL",
+        "MongoDB",
+        "PostGIS",
+        "Data modeling",
+        "Query optimization"
+      ],
+      "apis_integration": [
+        "RESTful APIs",
+        "Microservices architecture",
+        "System integration"
+      ]
+    },
+    "development_practices": {
+      "methodologies": [
+        "Agile",
+        "Scrum",
+        "DevOps"
+      ],
+      "version_control": [
+        "Git",
+        "GitHub",
+        "GitLab"
+      ],
+      "testing_automation": [
+        "Unit testing",
+        "Integration testing",
+        "Automated deployment pipelines"
+      ]
+    },
+    "soft_skills": [
+      "Problem-solving",
+      "Cross-functional collaboration",
+      "Analytical thinking",
+      "Team leadership"
+    ]
+  },
+  "hobbies": [
+    "Board games & strategy (meet-ups, complex games)",
+    "Astronomy (stargazing, studying celestial objects)",
+    "3D printing (designing and printing with PLA and others)",
+    "Sports (basketball, tennis, hiking, rock climbing)",
+    "Puzzles (logic and complex puzzles)"
+  ],
+  "experience": [
+    {
+  "company": "Green Praxis",
+  "title": "Cloud & Data Engineer",
+  "location": "Aix-en-Provence, France",
+  "employment_type": "Permanent",
+  "start_date": "2025-01",
+  "end_date": "present",
+  "scope": "Own the cloud, data-engineering, and monitoring layers that transform satellite imagery into on-demand map tiles and environmental KPIs via a single internal API.",
+  "technology_landscape": {
+    "cloud": ["AWS (EKS, EC2, S3, IAM, Secrets Manager)", "CloudFormation/Terraform"],
+    "orchestration": ["Kubernetes 1.29", "Docker", "Helm"],
+    "pipelines": ["Apache Airflow 2"],
+    "languages_frameworks": ["Python 3.11", "FastAPI", "Node 18", "Express.js (TypeScript)"],
+    "data_stores": ["MongoDB Atlas", "Redis-Stack"],
+    "geospatial": ["Google Earth Engine", "Rasterio", "GDAL", "STAC"],
+    "observability": ["Prometheus", "Grafana", "Alertmanager"],
+    "ci_cd": ["GitHub Actions"]
+  },
+  "core_contributions": [
+    {
+      "focus_area": "Geospatial data pipelines",
+      "built": [
+        "Library of 15+ Airflow DAGs that query STAC (Sentinel-2, Landsat-8), download spectral bands to S3, apply cloud-mask/reprojection/mosaicking (Rasterio/GDAL), generate NDVI/NDWI rasters, and push metadata to MongoDB",
+        "Adopted Airflow TaskFlow API to reduce DAG-parse time by ~80%"
+      ]
+    },
+    {
+      "focus_area": "Dynamic tile-serving platform",
+      "built": [
+        "Re-architected legacy static-tile service into an on-demand FastAPI gateway backed by Google Earth Engine",
+        "256×256 tiles rendered on-the-fly (palette selection, resolution match) and cached in Redis",
+        "Cut storage footprint ≈80% and reduced map refresh latency from hours to <30 min"
+      ]
+    },
+    {
+      "focus_area": "Internal API (Express.js)",
+      "built": [
+        "Refactored monorepo to Node 18 LTS; added Jest integration tests",
+        "Migrated JWT → PASETO tokens; introduced rate-limiting middleware",
+        "Lowered API P95 latency from 600 ms → 220 ms"
+      ]
+    },
+    {
+      "focus_area": "Observability & alerting",
+      "built": [
+        "Deployed Prometheus + Grafana via Helm; instrumented Airflow, API, and Kubernetes nodes",
+        "24 dashboards and 35 alert rules covering ≈95% of critical paths"
+      ]
+    },
+    {
+      "focus_area": "Infrastructure-as-Code",
+      "built": [
+        "Reusable Terraform modules (VPC, EKS, S3 versioned buckets, least-privilege IAM)",
+        "GitHub Actions: lint → test → build → Docker push → Helm upgrade (dev namespace)"
+      ]
+    }
+  ],
+  "achievements": [
+    "Ingestion throughput ×6 (8 → 48 scenes/hour) via parallelized Airflow tasks and caching",
+    "Storage costs −80% after migrating from pre-rendered tiles to dynamic GEE rendering",
+    "Pipeline SLA ≥ 98% through unified monitoring and proactive alerting",
+    "API P95 latency −63% (600 ms → 220 ms) improving front-end map load speed"
+  ],
+  
+  "toolbox_skills": {
+    "cloud_devops": ["AWS (EKS, S3, IAM, Terraform)", "Kubernetes", "Docker", "Helm", "GitHub Actions"],
+    "data_geo": ["Airflow", "Rasterio", "GDAL", "Google Earth Engine", "STAC", "Pandas", "NumPy"],
+    "backend": ["Python 3.11", "FastAPI", "Node 18/Express.js", "TypeScript", "MongoDB Atlas", "Redis-Stack"],
+    "observability": ["Prometheus", "Grafana", "Alertmanager", "Loki"],
+    "practices": ["IaC", "GitOps", "CI/CD", "Trunk-based development", "Agile Kanban", "Documentation-driven culture"]
+  }
+}
+,
+    {
+      "company": "Airbus SAS",
+      "title": "Data Engineer",
+      "location": "Toulouse, France",
+      "engagements": [
+        {
+          "name": "Workforce Dashboard & HR Reporting",
+          "type": "Internship & Apprenticeship",
+          "start_date": "2023-01",
+          "end_date": "2024-06",
+          "scope": "Standardize HR reporting across regions and build reliable, high-performance data flows for operational dashboards.",
+          "responsibilities": [
+            "Design unified reporting model; consolidate heterogeneous HR sources into a coherent data store",
+            "Automate data validation and quality checks; define SLAs and ownership with HR stakeholders",
+            "Package and templatize dashboard deployments; establish repeatable release and test steps",
+            "Create decision-oriented visualizations tied to clear definitions and metrics"
+          ],
+          "outcomes": [
+            "−80% dashboard deployment time (≈1 week → ≈1 day) via automation/packaging",
+            "−90% manual data-entry errors through standardization and automated checks across five regions",
+            "Improved reliability and timeliness with instrumented quality gates and alerts"
+          ],
+          "collaboration": [
+            "Global HR, program engineering, and operations",
+            "Lightweight ceremonies; documented interfaces and acceptance criteria for durable handovers"
+          ]
+        },
+        {
+          "name": "OPTIMATE (Automated Taxiing) — Exchange Experience",
+          "type": "Exchange",
+          "duration": "1 month",
+          "start_date": "2024-04",
+          "end_date": "2024-06",
+          "scope": "Define the program’s data-flow architecture and develop the supporting data pipeline for OPTIMATE (automated taxiing).",
+          "responsibilities": [
+            "Elicit requirements and constraints; map data producers/consumers and latency/quality targets",
+            "Design end-to-end data-flow architecture with clear interfaces, contracts, and SLAs",
+            "Develop and integrate the data pipeline feeding OPTIMATE analytics and reporting",
+            "Implement monitoring/observability for throughput, latency, and data quality",
+            "Document architecture, interfaces, and runbooks for handover"
+          ],
+          "outcomes": [
+            "Agreed, documented data-flow architecture aligned with OPTIMATE needs",
+            "Operational pipeline enabling reliable analytics without manual intervention",
+            "Earlier issue detection via targeted monitoring and quality checks"
+          ]
+        }
+      ],
+      "summary": "Built standardized HR reporting (workforce dashboards) with major automation gains and led a one-month exchange defining OPTIMATE’s data-flow architecture and pipeline."
+    },
+    {
+      "company": "Murex Systems",
+      "title": "Software Architect",
+      "location": "Beirut, Lebanon",
+      "start_date": "2021-05",
+      "end_date": "2022-01",
+      "scope": "Conceived and led a log-analysis platform to surface failure patterns, improve accountability, and scale with volume/complexity.",
+      "responsibilities": [
+        "Define taxonomy for errors/events; design parsers and alerting mapped to service owners",
+        "Plan milestones and sprints; mentor a 3-person team; enforce reviews, tests, and CI",
+        "Architect modular components with automated deployment paths and stable interfaces",
+        "Gather and refine requirements with clients; close feedback loops; align success metrics"
+      ],
+      "outcomes": [
+        "Identified 50+ previously uncaught error types, improving uptime and time-to-resolution",
+        "Delivered on schedule while raising engineering hygiene (reviews, tests, CI)"
+      ],
+      "keywords": [
+        "log analysis",
+        "observability",
+        "error taxonomy",
+        "alerting",
+        "CI/CD",
+        "requirements",
+        "modular architecture"
+      ]
+    },
+    {
+      "company": "ZAKA",
+      "title": "AI Pipeline Developer",
+      "location": "Beirut, Lebanon",
+      "start_date": "2021-02",
+      "end_date": "2021-04",
+      "summary": "Built and optimized a multi-camera computer-vision pipeline on Nvidia DeepStream with GPU acceleration and CI/CD.",
+      "responsibilities": [
+        "Develop AI CV pipeline with Nvidia DeepStream for real-time video inference",
+        "Scale processing to 400+ concurrent camera streams",
+        "Design modules for object detection, facial recognition, anomaly detection",
+        "Optimize C++ code for throughput and memory efficiency",
+        "Establish automated unit/integration/stress testing",
+        "Maintain CI/CD for safe, zero-downtime deployments",
+        "Collaborate on Nvidia-sponsored work using CUDA/TensorRT and document architecture/benchmarks"
+      ],
+      "achievements": [
+        "30% processing efficiency gain via C++ optimizations and GPU parallelism",
+        "Operational pipeline supporting 400+ live video feeds with low latency",
+        "Reliable module integration enabling real-time detection at scale"
+      ],
+      "technologies": {
+        "languages": [
+          "C++",
+          "Python"
+        ],
+        "frameworks": [
+          "Nvidia DeepStream",
+          "TensorRT"
+        ],
+        "cloud": [
+          "AWS"
+        ],
+        "devops": [
+          "Docker",
+          "Kubernetes",
+          "CI/CD"
+        ],
+        "testing": [
+          "Google Test"
+        ]
+      }
+    },
+    {
+      "company": "AimTools",
+      "title": "Full-Stack Developer",
+      "location": "Beirut, Lebanon",
+      "start_date": "2020-06",
+      "end_date": "2021-02",
+      "summary": "Delivered a web order-management platform with Amazon integration, C#/.NET backend, Angular frontend, and Azure hosting.",
+      "responsibilities": [
+        "Design and implement order management with real-time inventory",
+        "Develop .NET backend handling high-volume transactions and dynamic pricing",
+        "Build REST APIs for orders, inventory, payments",
+        "Create Angular UI with dynamic forms and live data",
+        "Host on Azure; use serverless functions for automation",
+        "Model SQL schema; optimize queries and indexes",
+        "Implement authN/authZ, MFA, and data encryption in transit/at rest",
+        "Document APIs (Swagger) and test with Postman; automate builds/deploys in Azure DevOps"
+      ],
+      "achievements": [
+        "Platform processed thousands of daily transactions with minimal downtime",
+        "70% reduction in manual order handling via Amazon inventory sync automation",
+        "Responsive UI enabling real-time order tracking and management"
+      ],
+      "technologies": {
+        "languages": [
+          "C#",
+          "JavaScript"
+        ],
+        "frameworks": [
+          ".NET",
+          "Angular",
+          "Bootstrap"
+        ],
+        "cloud": [
+          "Azure"
+        ],
+        "databases": [
+          "Microsoft SQL Server",
+          "SQL"
+        ],
+        "apis_tools": [
+          "REST",
+          "Swagger",
+          "Postman"
+        ],
+        "devops": [
+          "Git",
+          "Azure DevOps",
+          "CI/CD"
+        ]
+      }
+    }
+  ],
+  "references": [
+    {
+      "name": "Joe Sokhn",
+      "title": "Senior Manager",
+      "company": "Murex Systems",
+      "phone": "+961 70 008 847",
+      "email": "joe.sokhn@murex.com"
+    },
+    {
+      "name": "Alessandro Alessandrini",
+      "title": "Data Engineer",
+      "company": "Airbus SAS",
+      "phone": "+49 151 461 50 675",
+      "email": "alessandro.alessandrini@airbus.com"
+    }
+  ]
+}

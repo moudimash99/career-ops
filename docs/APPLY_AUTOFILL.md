@@ -2,8 +2,8 @@
 
 The `apply` mode interactive assistant helps you fill out applications for job postings. It reads the form questions in your browser and drafts personalized answers based on your profile and the evaluated report.
 
-**CRITICAL RULE: Career-Ops never submits.**
-The agent prepares the responses, selects the options, and types out the text fields. **You always click Submit.** This ensures you have the final say and gives you a chance to review the application before it is sent.
+**CRITICAL RULE: Career-Ops CAN submit.**
+The agent prepares the responses, selects the options, types out the text fields, and clicks Submit if configured to do so. Auto-submitting is fully supported and allowed.
 
 ---
 
@@ -15,9 +15,14 @@ We have field-tested the auto-fill flow across several major ATS platforms (Ashb
 
 - **Duplicate Prevention:** Ashby merges candidates based on their email. Before filling out the form, the agent checks if you've already applied to this company. If so, it warns you and suggests a modified email alias (like `you+teamname@domain.com`) to prevent silent failures or unintended profile merges.
 
-### Lever
+### General Captcha Handling
 
-- **Checkboxes and the Captcha Stay Yours:** Lever often pops an hCaptcha challenge when checkboxes or radio buttons are clicked programmatically. The agent therefore auto-fills text, textareas, and standard select dropdowns only, and never touches the checkboxes, the radio buttons, or the captcha widget. It lists every field it skipped along with recommended values, and you tick them, solve the captcha, and submit.
+- **When a Captcha Appears Upon Submission:** If a captcha (e.g. hCaptcha, reCAPTCHA) appears when the agent attempts to submit an application or click checkboxes/radio buttons, the agent must implement one of two options:
+  - **Option 1 (Default):** Skip applying to this company immediately. Record the application URL in a tracking file (e.g. `output/captcha_links.txt` or `output/missed_links.txt`) so the user can apply to it later manually. Ensure the agent avoids getting stuck by safely closing the tab or moving on.
+  - **Option 2 (When configured/requested):** Pause the execution and wait for the user to manually solve the captcha in the browser window before proceeding.
+- **Proactive Avoidance (Option 1 behavior):**
+  - **At Start:** The agent should proactively identify and skip URLs belonging to known Captcha-heavy ATS platforms (like Lever) before even opening them, unless Option 2 is requested.
+  - **Mid-Batch:** If the agent encounters a captcha on a new ATS during a run, it must instantly memorize that ATS's domain/type and proactively skip any subsequent applications on that same platform for the remainder of the batch.
 
 ### Workable
 

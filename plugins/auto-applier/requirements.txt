@@ -1,0 +1,8 @@
+# Stage 1 - job board scanning + Workday application automation
+selenium==4.36.0
+beautifulsoup4==4.14.2
+
+# Stage 3 - LaTeX CV / cover-letter generation (not used by main.py yet)
+openai==2.6.0
+python-dotenv==1.1.1
+PyPDF2==3.0.1

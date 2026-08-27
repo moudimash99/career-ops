@@ -86,6 +86,35 @@ export function pageIsPastWindow(pageJobs, sinceMs) {
   return Math.min(...dated) < sinceMs - EARLY_STOP_MARGIN_MS;
 }
 
+/**
+ * Optional server-side narrowing for very large tenants.
+ *
+ * Workday's CXS endpoint reports at most 2,000 results, so a global directory
+ * bigger than that hides everything past the cap — including every posting in
+ * the one country the user actually scans for. `applied_facets` (and the
+ * companion `search_text`) are passed straight through to the request body so
+ * the tenant can be scoped before that cap applies, e.g.
+ *
+ *   applied_facets:
+ *     locationCountry: ["54c5b6971ffb4bf0b116fe7651ec789a"]   # France
+ *
+ * Facet IDs come from the `facets` array of any unfiltered response. Both keys
+ * are optional; omitting them reproduces the previous unfiltered behaviour
+ * exactly. Values are normalized to arrays of strings, which is the only shape
+ * the API accepts.
+ */
+function resolveAppliedFacets(entry) {
+  const raw = entry?.applied_facets;
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return {};
+  const out = {};
+  for (const [key, value] of Object.entries(raw)) {
+    const values = (Array.isArray(value) ? value : [value])
+      .filter((v) => typeof v === 'string' && v.length > 0);
+    if (values.length) out[key] = values;
+  }
+  return out;
+}
+
 function resolveEndpoint(entry) {
   // Try api: first, then careers_url (mirrors greenhouse/ashby), returning the
   // first that matches the Workday tenant pattern. This lets a branded page
@@ -167,7 +196,7 @@ export default {
    * origin/referer clears it without needing per-tenant config (same fix
    * as providers/glints.mjs's firewall).
    *
-   * @param {{ name?: string, api?: string, careers_url?: string, max_pages?: number }} entry
+   * @param {{ name?: string, api?: string, careers_url?: string, max_pages?: number, applied_facets?: Record<string, string|string[]>, search_text?: string }} entry
    * @param {{ fetchJson: (url: string, opts?: object) => Promise<any>, sinceMs?: number, maxPages?: number, syntheticEntries?: boolean }} ctx
    * @returns {Promise<Array<{title: string, url: string, company: string, location: string, postedAt?: number}>>}
    */
@@ -187,7 +216,9 @@ export default {
         referer: `${ep.jobBase}/`,
       },
     };
-    const makeBody = (offset) => JSON.stringify({ limit: PAGE_SIZE, offset, searchText: '', appliedFacets: {} });
+    const appliedFacets = resolveAppliedFacets(entry);
+    const searchText = typeof entry.search_text === 'string' ? entry.search_text : '';
+    const makeBody = (offset) => JSON.stringify({ limit: PAGE_SIZE, offset, searchText, appliedFacets });
     const sinceMs = typeof ctx?.sinceMs === 'number' ? ctx.sinceMs : null;
 
     const first = await fetchJsonWithRetry(ctx, ep.api, { ...postOpts, body: makeBody(0) }, RETRY_POLICY);

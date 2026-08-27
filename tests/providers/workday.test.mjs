@@ -188,6 +188,56 @@ try {
     fail(`workday.fetch() redirect opts across pages = ${JSON.stringify(capturedRedirects)}`);
   }
 
+  // applied_facets / search_text — optional server-side narrowing for tenants
+  // whose global directory exceeds Workday's 2,000-result display cap
+  // (Accenture, Airbus). The request body must carry them on EVERY page, and
+  // omitting them must reproduce the unfiltered body exactly.
+  const capturedBodies = [];
+  const captureBodies = async (_url, opts) => {
+    capturedBodies.push(JSON.parse(opts.body));
+    return { total: 30, jobPostings: Array.from({ length: 20 }, (_, i) => ({ title: `J${i}`, externalPath: `/job/board/j${i}` })) };
+  };
+
+  await workday.fetch(
+    { ...entry, applied_facets: { locationCountry: '54c5b6971ffb4bf0b116fe7651ec789a' }, search_text: 'engineer' },
+    mkWorkdayCtx(captureBodies),
+  );
+  const facetOk = capturedBodies.length === 2 && capturedBodies.every(b =>
+    b.searchText === 'engineer'
+    && Array.isArray(b.appliedFacets?.locationCountry)
+    && b.appliedFacets.locationCountry.length === 1
+    && b.appliedFacets.locationCountry[0] === '54c5b6971ffb4bf0b116fe7651ec789a');
+  if (facetOk) {
+    pass('workday.fetch() sends applied_facets + search_text on every page (scalar normalized to array)');
+  } else {
+    fail(`workday.fetch() facet bodies = ${JSON.stringify(capturedBodies)}`);
+  }
+
+  capturedBodies.length = 0;
+  await workday.fetch(
+    { ...entry, applied_facets: { locationCountry: ['a', 'b'], junk: 42, empty: [] } },
+    mkWorkdayCtx(captureBodies),
+  );
+  const sanitizedOk = capturedBodies.length > 0
+    && JSON.stringify(capturedBodies[0].appliedFacets) === JSON.stringify({ locationCountry: ['a', 'b'] })
+    && capturedBodies[0].searchText === '';
+  if (sanitizedOk) {
+    pass('workday.fetch() drops non-string and empty facet values, keeps string arrays');
+  } else {
+    fail(`workday.fetch() sanitized facets = ${JSON.stringify(capturedBodies[0]?.appliedFacets)}`);
+  }
+
+  capturedBodies.length = 0;
+  await workday.fetch(entry, mkWorkdayCtx(captureBodies));
+  const unfilteredOk = capturedBodies.length > 0
+    && JSON.stringify(capturedBodies[0].appliedFacets) === '{}'
+    && capturedBodies[0].searchText === '';
+  if (unfilteredOk) {
+    pass('workday.fetch() without applied_facets sends the unfiltered body (backward compatible)');
+  } else {
+    fail(`workday.fetch() unfiltered body = ${JSON.stringify(capturedBodies[0])}`);
+  }
+
   // parseWorkdayResponse — null/undefined entries in jobPostings must be
   // skipped, not crash
   const sparseWorkday = { jobPostings: [null, undefined, { title: 'Real Job', externalPath: '/job/board/real-job' }] };

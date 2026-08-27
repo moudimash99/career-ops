@@ -56,6 +56,7 @@ writing-samples/*
 
 # User config and customization (never auto-updated)
 config/profile.yml
+config/apply-answers.yml
 config/cv-facts.json
 config/benchmarks.yml
 # Fork-local path declarations — this checkout's own files, read by
@@ -156,3 +157,12 @@ documents/*
 # Intake fingerprints — the recorded source filenames may themselves carry
 # PII (e.g. cv/jane-doe-master-cv.pdf). #1723
 data/intake-state.json
+
+# Capgemini SuccessFactors browser session (contains login cookies)
+.capgemini-session/
+
+# user-layer answer content + local scratch (see DATA_CONTRACT.md)
+config/apply-essays.yml
+apply-real.py
+apply-browser-poc.py
+scratch/

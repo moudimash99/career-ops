@@ -1,0 +1,774 @@
+{
+  "_comment": "Per-role cover letter content for Capgemini, keyed by requisition id. Rendered by app/letters.py through career-ops' generate-cover-letter.mjs, which fact-checks the result against cv.md - so every claim here is one the CV already evidences. Written against each posting's own text, fetched with capgemini_board.fetch_description. A letter belongs to ONE requisition: its reference number is printed in the body, so these are never reused across postings.",
+  "_voice": "Sell the fit. Name strengths and evidence only. Never state that a required skill is missing, never measure the years asked against the years held, and never concede the profile may not suit - a gap is handled by not raising it, not by confessing it. The fact check already prevents claiming what the CV cannot support, so honesty is enforced by what is asserted, not by volunteering what is absent.",
+  "1193959801": {
+    "slug": "tech-lead-cloud-aws",
+    "role_title": "Tech Lead Cloud AWS (réf. 1193959801)",
+    "city": "Toulouse",
+    "opening": "Votre annonce demande un leader technique sur l'industrialisation des enablers Cloud, des solutions serverless et conteneurisées sur services managés AWS, et une certification Cloud appréciée. Je suis titulaire de l'AWS Certified Solutions Architect – Associate (SAA-C03), et c'est en construisant et en exploitant ce type de plateforme au quotidien que je l'ai obtenue.",
+    "profile_intro": "Chez Green Praxis, j'ai été responsable de bout en bout de la plateforme AWS qui transforme de l'imagerie satellite en tuiles cartographiques à la demande : VPC, EKS, buckets S3 versionnés et IAM au moindre privilège, décrits dans des modules Terraform réutilisables et déployés par Helm et GitHub Actions.",
+    "achievements": [
+      {
+        "lead": "Architectures modernes mises en production",
+        "impact": "nœuds EKS provisionnés par Terraform et Karpenter pour un autoscaling dynamique, avec une passerelle FastAPI et un cache Redis à la place d'un service statique."
+      },
+      {
+        "lead": "Résultats mesurés de cette architecture",
+        "impact": "empreinte de stockage réduite de 80%, latence P95 ramenée de 600 ms à 220 ms, et SLA de pipeline maintenu au-dessus de 98% grâce à 35 règles d'alerte."
+      },
+      {
+        "lead": "Posture de leadership technique chez Murex Systems",
+        "impact": "pilotage d'une plateforme d'analyse de logs, encadrement d'une équipe de trois personnes et instauration des revues de code, des tests et de l'intégration continue."
+      }
+    ],
+    "problems_section": "Le volet avant-vente et représentation de l'annonce rejoint ce que m'a apporté le Mastère Spécialisé en Ingénierie des Systèmes de l'ISAE-SUPAERO (certifié ASEP INCOSE) : formaliser un besoin, spécifier des interfaces et argumenter des compromis techniques avant de construire. C'est ce qui rend une cible défendable devant un client comme devant une équipe."
+  },
+  "1196953201": {
+    "slug": "ingenieur-qualite-logiciel",
+    "role_title": "Ingénieur Qualité logiciel (réf. 1196953201)",
+    "city": "Blagnac",
+    "opening": "Gestion des exigences, gestion de configuration et des modifications, cycle en V comme Scrum : votre annonce décrit exactement la discipline que le Mastère Spécialisé en Ingénierie des Systèmes de l'ISAE-SUPAERO m'a enseignée et que je suis certifié ASEP (INCOSE) pour pratiquer.",
+    "profile_intro": "Chez Airbus, je travaille sur la définition des interfaces et des contrats du projet OPTIMATE : ce que chaque composant doit garantir, ce qu'il attend des autres, et comment on le vérifie. C'est la matière première d'une démarche qualité, dans un environnement aéronautique où la traçabilité des exigences est une contrainte quotidienne.",
+    "achievements": [
+      {
+        "lead": "Qualité installée dans une équipe qui n'en avait pas",
+        "impact": "chez Murex Systems, instauration des revues de code, des tests et de l'intégration continue, ce qui a permis d'identifier plus de cinquante types d'erreurs jusque-là non détectés."
+      },
+      {
+        "lead": "Vérification outillée et mesurée",
+        "impact": "supervision Prometheus et Grafana déployée via Helm, avec 24 tableaux de bord et 35 règles d'alerte couvrant 95% des chemins critiques, pour un SLA de pipeline supérieur à 98%."
+      },
+      {
+        "lead": "Tests intégrés à la chaîne de livraison",
+        "impact": "tests d'intégration Jest sur un monorepo TypeScript et chaîne GitHub Actions lint, test, build et déploiement, de sorte qu'aucune régression ne passe en production sans être vue."
+      }
+    ],
+    "problems_section": "Le cycle en V, les exigences vérifiables et les stratégies de vérification sont le cœur de ma formation d'ingénieur systèmes, appliqués selon l'ISO/IEC 15288. Les mettre au service d'un référentiel normé aéronautique, dans une équipe qui en fait son métier, est précisément la suite que je cherche à donner à mon parcours."
+  },
+  "1276352901": {
+    "slug": "developpeur-fullstack-react-nodejs",
+    "role_title": "Développeur FullStack React / Node.js (réf. 1276352901)",
+    "city": "Blagnac",
+    "opening": "Node.js et TypeScript en production, des API REST tenues à la milliseconde, et la qualité assurée par les tests et les revues plutôt que par la bonne volonté : c'est le travail que je fais aujourd'hui, et c'est ce que décrit votre annonce.",
+    "profile_intro": "Chez Green Praxis, j'ai repris le monorepo Express.js / TypeScript de l'entreprise, l'ai porté sur Node 18 LTS avec une couverture de tests d'intégration Jest, migré l'authentification de JWT vers PASETO et ajouté une limitation de débit. Les applications que je livre sont pensées pour la charge, pas seulement pour la démonstration.",
+    "achievements": [
+      {
+        "lead": "Performance mesurée sur l'API",
+        "impact": "latence P95 ramenée de 600 ms à 220 ms, soit 63% de moins, sur le service que j'ai ré-architecturé."
+      },
+      {
+        "lead": "Sécurité et robustesse applicatives",
+        "impact": "migration des jetons JWT vers PASETO, limitation de débit en middleware, et bases MongoDB Atlas et Redis exploitées en production."
+      },
+      {
+        "lead": "Pratiques d'équipe et outillage DevOps",
+        "impact": "revues de code, tests et intégration continue instaurés chez Murex Systems avec mentorat de trois personnes, et chaîne GitHub Actions lint, test, build, Docker et Helm."
+      }
+    ],
+    "problems_section": "Ce qui me plaît dans ce poste est la collaboration avec le produit, le design et la QA : j'ai pris l'habitude, en ingénierie des systèmes à l'ISAE-SUPAERO, de traduire un besoin métier en exigences testables avant d'écrire la première ligne. C'est ce qui évite les allers-retours tardifs et rend une application cohérente de bout en bout."
+  },
+  "1195629201": {
+    "slug": "architecte-logiciels-scientifique",
+    "role_title": "Consultant / Architecte logiciels scientifique (réf. 1195629201)",
+    "city": "Blagnac",
+    "opening": "Un contexte scientifique et industriel, Python et C++ et leurs écosystèmes, des architectures en microservices et conteneurs, et la capacité à structurer avant de coder : votre annonce décrit le métier que je pratique et celui vers lequel ma formation me porte.",
+    "profile_intro": "Chez Green Praxis, j'ai conçu l'architecture d'une plateforme géospatiale de production qui transforme de l'imagerie satellite en tuiles cartographiques et en indicateurs environnementaux : traitement de données scientifiques orchestré par Airflow, passerelle FastAPI, conteneurs orchestrés par Kubernetes et infrastructure décrite en Terraform.",
+    "achievements": [
+      {
+        "lead": "Architecture repensée plutôt que rafistolée",
+        "impact": "ré-architecture d'un service de tuiles statiques en passerelle à la demande, avec une empreinte de stockage réduite de 80% et une latence P95 ramenée de 600 ms à 220 ms."
+      },
+      {
+        "lead": "Calcul intensif et parallélisme",
+        "impact": "chaîne de vision par ordinateur multi-caméras optimisée sur Nvidia DeepStream avec offload GPU (CUDA, TensorRT), multithreading et optimisation fine des performances en C++."
+      },
+      {
+        "lead": "Architecture de flux de données chez Airbus",
+        "impact": "définition des interfaces et des contrats du projet OPTIMATE, et flux ETL unifiés consolidant des sources hétérogènes sur cinq régions."
+      }
+    ],
+    "problems_section": "Le Mastère Spécialisé en Ingénierie des Systèmes de l'ISAE-SUPAERO (certifié ASEP INCOSE) structure ma façon d'aborder une architecture : exigences explicites, interfaces spécifiées, compromis argumentés et stratégie de vérification définie avant d'écrire du code. Appliquée à des systèmes scientifiques réellement en production, c'est ce qui rend une cible robuste et évolutive plutôt que seulement élégante."
+  },
+  "1245188701": {
+    "slug": "consultant-data-analytics-sap",
+    "role_title": "Consultant SAP Analytics (réf. 1245188701)",
+    "city": "Toulouse",
+    "opening": "Modéliser un domaine, réconcilier des sources qui ne se parlent pas et rendre le résultat exploitable par des métiers : c'est le fond du travail d'analytics, et c'est ce que je fais depuis le début de mon parcours. Rejoindre une communauté SAP de cette taille, sur des projets de transformation à grande échelle, est exactement le cadre dans lequel je veux exercer ce métier.",
+    "profile_intro": "Chez Airbus, j'ai unifié des flux ETL consolidant des sources hétérogènes sur cinq régions et défini les interfaces et les contrats du projet OPTIMATE. Chez Green Praxis, j'ai orchestré sous Airflow une chaîne qui transforme de l'imagerie satellite en indicateurs environnementaux exploitables.",
+    "achievements": [
+      {
+        "lead": "Chaînes de données en production",
+        "impact": "ingestion et traitement orchestrés par Airflow, avec une adoption de la TaskFlow API qui a réduit de 80% le temps d'analyse des DAG."
+      },
+      {
+        "lead": "Restitution et pilotage",
+        "impact": "24 tableaux de bord et 35 règles d'alerte sous Prometheus et Grafana couvrant 95% des chemins critiques, pour un SLA de pipeline supérieur à 98%."
+      },
+      {
+        "lead": "Encadrement d'équipe",
+        "impact": "chez Murex Systems, pilotage d'une plateforme d'analyse de logs et mentorat d'une équipe de trois personnes, avec instauration des revues de code et de l'intégration continue."
+      }
+    ],
+    "problems_section": "Le Mastère Spécialisé en Ingénierie des Systèmes de l'ISAE-SUPAERO (certifié ASEP INCOSE) m'a appris à traduire le besoin d'un métier en exigences vérifiables et en interfaces spécifiées. C'est ce qui fait la différence sur un projet de transformation, où la valeur tient moins à l'outil qu'à la justesse du modèle de données qu'il porte."
+  },
+  "1285201401": {
+    "slug": "lead-engineer-cloud-aws-2",
+    "role_title": "Lead Engineer Cloud AWS (réf. 1285201401)",
+    "city": "Toulouse",
+    "opening": "Votre annonce demande une certification AWS DevOps Engineer, Developer ou Solutions Architect, et la conception d'applications cloud natives sur services managés. Je suis titulaire de l'AWS Certified Solutions Architect – Associate (SAA-C03), obtenue en construisant et en exploitant exactement ce type de plateforme.",
+    "profile_intro": "Chez Green Praxis, j'ai été responsable de bout en bout de la plateforme AWS qui transforme de l'imagerie satellite en tuiles cartographiques à la demande : nœuds EKS provisionnés par Terraform et Karpenter, modules réutilisables pour le VPC, les buckets S3 versionnés et un IAM au moindre privilège, et déploiements industrialisés par Helm et GitHub Actions.",
+    "achievements": [
+      {
+        "lead": "Applications cloud natives sur services managés",
+        "impact": "cluster EKS en production, passerelle FastAPI et cache Redis en remplacement d'un service statique, avec un autoscaling dynamique piloté par Karpenter."
+      },
+      {
+        "lead": "Résultats mesurés de cette architecture",
+        "impact": "empreinte de stockage réduite de 80%, latence P95 ramenée de 600 ms à 220 ms, et SLA de pipeline maintenu au-dessus de 98% grâce à 35 règles d'alerte."
+      },
+      {
+        "lead": "Accompagnement et montée en compétences",
+        "impact": "chez Murex Systems, mentorat d'une équipe de trois personnes et instauration des revues de code, des tests et de l'intégration continue."
+      }
+    ],
+    "problems_section": "Le volet innovation et communauté AWS de l'annonce est ce qui m'attire le plus. Le Mastère Spécialisé en Ingénierie des Systèmes de l'ISAE-SUPAERO (certifié ASEP INCOSE) structure ma façon de travailler : exigences explicites, interfaces spécifiées, compromis argumentés et stratégie de vérification définie avant de construire. C'est ce qui rend une solution défendable devant un client comme devant une équipe."
+  },
+  "1366344433": {
+    "slug": "consultant-devops-2",
+    "role_title": "Consultant DevOps (réf. 1366344433)",
+    "city": "Toulouse",
+    "opening": "Concevoir et maintenir des pipelines CI/CD, administrer des clusters Kubernetes et porter une expertise technique au sein d'une squad : c'est le contenu de mon poste actuel, et c'est ce que décrit votre annonce.",
+    "profile_intro": "Chez Green Praxis, j'ai été responsable de bout en bout de la plateforme AWS qui transforme de l'imagerie satellite en tuiles cartographiques à la demande : nœuds EKS provisionnés par Terraform et Karpenter, modules réutilisables pour le VPC, les buckets S3 versionnés et un IAM au moindre privilège, et déploiements industrialisés par Helm et GitHub Actions.",
+    "achievements": [
+      {
+        "lead": "Chaînes d'intégration et de déploiement continues",
+        "impact": "GitHub Actions de bout en bout (lint, test, build, image Docker, mise à jour Helm), et Jenkins, Docker et Terraform sur la plateforme que j'ai architecturée chez Murex Systems."
+      },
+      {
+        "lead": "Administration de cluster Kubernetes",
+        "impact": "cluster EKS 1.29 provisionné par Terraform et Karpenter, déploiements par Helm et autoscaling dynamique en production."
+      },
+      {
+        "lead": "Résultats mesurés de cette architecture",
+        "impact": "empreinte de stockage réduite de 80%, latence P95 ramenée de 600 ms à 220 ms, et SLA de pipeline maintenu au-dessus de 98% grâce à 35 règles d'alerte."
+      }
+    ],
+    "problems_section": "Le volet avant-vente de l'annonce rejoint ce que m'a apporté ma formation d'ingénieur systèmes. Le Mastère Spécialisé en Ingénierie des Systèmes de l'ISAE-SUPAERO (certifié ASEP INCOSE) structure ma façon de travailler : exigences explicites, interfaces spécifiées, compromis argumentés et stratégie de vérification définie avant de construire. C'est ce qui rend une solution défendable devant un client comme devant une équipe."
+  },
+  "1285206801": {
+    "slug": "lead-engineer-cloud-azure",
+    "role_title": "Lead Engineer Cloud Azure (réf. 1285206801)",
+    "city": "Toulouse",
+    "opening": "Piloter les choix techniques d'une plateforme data dans le cloud, en garantir la cohérence et faire monter l'équipe en compétences : c'est le rôle que je tiens aujourd'hui, et celui que décrit votre annonce.",
+    "profile_intro": "Chez Green Praxis, j'ai été responsable de bout en bout de la plateforme AWS qui transforme de l'imagerie satellite en tuiles cartographiques à la demande : nœuds EKS provisionnés par Terraform et Karpenter, modules réutilisables pour le VPC, les buckets S3 versionnés et un IAM au moindre privilège, et déploiements industrialisés par Helm et GitHub Actions. J'ai également livré et hébergé sur Azure une plateforme de gestion de commandes en C#/.NET avec un frontend Angular, dont les builds et déploiements étaient automatisés sous Azure DevOps.",
+    "achievements": [
+      {
+        "lead": "Plateformes data en production",
+        "impact": "ingestion et traitement orchestrés par Airflow, avec une adoption de la TaskFlow API qui a réduit de 80% le temps d'analyse des DAG."
+      },
+      {
+        "lead": "Résultats mesurés de cette architecture",
+        "impact": "empreinte de stockage réduite de 80%, latence P95 ramenée de 600 ms à 220 ms, et SLA de pipeline maintenu au-dessus de 98% grâce à 35 règles d'alerte."
+      },
+      {
+        "lead": "Encadrement technique chez Murex Systems",
+        "impact": "pilotage d'une plateforme d'analyse de logs, mentorat d'une équipe de trois personnes et instauration des revues de code, des tests et de l'intégration continue."
+      }
+    ],
+    "problems_section": "Le rôle de garant de la cohérence technique est celui qui me correspond le mieux. Le Mastère Spécialisé en Ingénierie des Systèmes de l'ISAE-SUPAERO (certifié ASEP INCOSE) structure ma façon de travailler : exigences explicites, interfaces spécifiées, compromis argumentés et stratégie de vérification définie avant de construire. C'est ce qui rend une solution défendable devant un client comme devant une équipe."
+  },
+  "1292892201": {
+    "slug": "architecte-infrastructure",
+    "role_title": "Architecte Infrastructure (réf. 1292892201)",
+    "city": "Toulouse",
+    "opening": "Cadrer un besoin, concevoir une architecture robuste et sécurisée, rédiger le dossier qui la défend en comité et accompagner sa mise en œuvre : votre annonce décrit précisément la démarche que ma formation d'ingénieur systèmes m'a apprise et que je pratique sur des plateformes en production.",
+    "profile_intro": "Chez Green Praxis, j'ai été responsable de bout en bout de la plateforme AWS qui transforme de l'imagerie satellite en tuiles cartographiques à la demande : nœuds EKS provisionnés par Terraform et Karpenter, modules réutilisables pour le VPC, les buckets S3 versionnés et un IAM au moindre privilège, et déploiements industrialisés par Helm et GitHub Actions.",
+    "achievements": [
+      {
+        "lead": "Architectures cloud et hybrides décrites en code",
+        "impact": "modules Terraform réutilisables pour le VPC, EKS, les buckets S3 versionnés et un IAM au moindre privilège, conteneurs orchestrés par Kubernetes et Helm."
+      },
+      {
+        "lead": "Résultats mesurés de cette architecture",
+        "impact": "empreinte de stockage réduite de 80%, latence P95 ramenée de 600 ms à 220 ms, et SLA de pipeline maintenu au-dessus de 98% grâce à 35 règles d'alerte."
+      },
+      {
+        "lead": "Supervision et qualité de service",
+        "impact": "Prometheus et Grafana déployés via Helm, 24 tableaux de bord et 35 règles d'alerte couvrant 95% des chemins critiques, pour un SLA de pipeline supérieur à 98%."
+      }
+    ],
+    "problems_section": "Vulgariser et dialoguer avec les décideurs est la partie que ma formation prépare le mieux. Le Mastère Spécialisé en Ingénierie des Systèmes de l'ISAE-SUPAERO (certifié ASEP INCOSE) structure ma façon de travailler : exigences explicites, interfaces spécifiées, compromis argumentés et stratégie de vérification définie avant de construire. C'est ce qui rend une solution défendable devant un client comme devant une équipe."
+  },
+  "1195625001": {
+    "slug": "developpeur-cpp-python",
+    "role_title": "Développeur C++ / Python (réf. 1195625001)",
+    "city": "Blagnac",
+    "opening": "Du C++ multithread sous Windows et Linux, des traitements de données à optimiser, et du Python pour l'automatisation et les tests : c'est le cœur de mon parcours d'ingénieur logiciel, et c'est ce que demande votre annonce.",
+    "profile_intro": "Chez ZAKA, j'ai construit et optimisé une chaîne de vision par ordinateur multi-caméras sur Nvidia DeepStream : optimisation fine des performances en C++, parallélisme GPU (CUDA, TensorRT) et multithreading, sur des flux temps réel où la moindre latence se voit.",
+    "achievements": [
+      {
+        "lead": "Optimisation de traitements de données",
+        "impact": "ré-architecture d'un service de tuiles en passerelle à la demande chez Green Praxis : empreinte de stockage réduite de 80% et latence P95 ramenée de 600 ms à 220 ms."
+      },
+      {
+        "lead": "Qualité de code et intégration continue",
+        "impact": "tests d'intégration sur un monorepo TypeScript, revues de code et CI instaurées chez Murex Systems, et chaîne GitHub Actions lint, test, build et déploiement."
+      },
+      {
+        "lead": "Traduction du besoin en solution technique",
+        "impact": "recueil et affinage des exigences avec les clients chez Murex Systems, et définition des interfaces et contrats du projet OPTIMATE chez Airbus."
+      }
+    ],
+    "problems_section": "Le Mastère Spécialisé en Ingénierie des Systèmes de l'ISAE-SUPAERO (certifié ASEP INCOSE) structure ma façon de travailler : exigences explicites, interfaces spécifiées, compromis argumentés et stratégie de vérification définie avant de construire. C'est ce qui rend une solution défendable devant un client comme devant une équipe."
+  },
+  "1290377301": {
+    "slug": "software-engineer-fullstack-2",
+    "role_title": "Software Engineer Fullstack (réf. 1290377301)",
+    "city": "Toulouse",
+    "opening": "Prendre en charge les développements complexes, transformer des projets en microservices et garantir la qualité par la revue de code : c'est la façon dont je travaille, et c'est ce que décrit votre annonce.",
+    "profile_intro": "Chez Green Praxis, j'ai repris le monorepo Express.js / TypeScript de l'entreprise, l'ai porté sur Node 18 LTS avec une couverture de tests d'intégration, migré l'authentification de JWT vers PASETO et ajouté une limitation de débit. Chez UrbanSeller, j'avais livré une plateforme de gestion de commandes avec un backend C#/.NET et un frontend Angular.",
+    "achievements": [
+      {
+        "lead": "Performance mesurée sur l'API",
+        "impact": "latence P95 ramenée de 600 ms à 220 ms, soit 63% de moins, sur le service que j'ai ré-architecturé."
+      },
+      {
+        "lead": "Architecture en microservices",
+        "impact": "composants modulaires à interfaces stables et chemins de déploiement automatisés, conteneurisés et orchestrés par Kubernetes et Helm."
+      },
+      {
+        "lead": "Encadrement technique chez Murex Systems",
+        "impact": "pilotage d'une plateforme d'analyse de logs, mentorat d'une équipe de trois personnes et instauration des revues de code, des tests et de l'intégration continue."
+      }
+    ],
+    "problems_section": "L'encadrement d'une équipe de développeurs est la dimension du poste qui m'intéresse le plus. Le Mastère Spécialisé en Ingénierie des Systèmes de l'ISAE-SUPAERO (certifié ASEP INCOSE) structure ma façon de travailler : exigences explicites, interfaces spécifiées, compromis argumentés et stratégie de vérification définie avant de construire. C'est ce qui rend une solution défendable devant un client comme devant une équipe."
+  },
+  "1197058401": {
+    "slug": "tech-lead-api-integration",
+    "role_title": "Tech Lead API Integration (réf. 1197058401)",
+    "city": "Toulouse",
+    "opening": "Concevoir des flux et des API, déployer et optimiser des pipelines de données dans le cloud, et garantir la scalabilité et la modularité des plateformes d'interfaces : c'est exactement le travail que je mène depuis le début de mon parcours.",
+    "profile_intro": "Chez Airbus, j'ai unifié des flux ETL consolidant des sources hétérogènes sur cinq régions et défini les interfaces et les contrats du projet OPTIMATE. Chez Green Praxis, j'ai conçu la passerelle FastAPI qui expose à la demande les données d'une plateforme géospatiale, adossée à un cache Redis.",
+    "achievements": [
+      {
+        "lead": "API tenues à la milliseconde",
+        "impact": "latence P95 ramenée de 600 ms à 220 ms, soit 63% de moins, avec une limitation de débit et une migration des jetons JWT vers PASETO."
+      },
+      {
+        "lead": "Pipelines de données industrialisés",
+        "impact": "ingestion et traitement orchestrés par Airflow, avec une adoption de la TaskFlow API qui a réduit de 80% le temps d'analyse des DAG."
+      },
+      {
+        "lead": "Documentation et contrats d'interface",
+        "impact": "API documentées sous Swagger et testées chez UrbanSeller, et interfaces spécifiées avec les parties prenantes chez Airbus."
+      }
+    ],
+    "problems_section": "Le Mastère Spécialisé en Ingénierie des Systèmes de l'ISAE-SUPAERO (certifié ASEP INCOSE) structure ma façon de travailler : exigences explicites, interfaces spécifiées, compromis argumentés et stratégie de vérification définie avant de construire. C'est ce qui rend une solution défendable devant un client comme devant une équipe."
+  },
+  "1408439433": {
+    "slug": "tech-lead-databricks",
+    "role_title": "Tech Lead Databricks (réf. 1408439433)",
+    "city": "Toulouse",
+    "opening": "Concevoir des flux d'ingestion et de traitement, les industrialiser et les monitorer au quotidien, puis faire progresser techniquement l'équipe autour d'eux : c'est le métier que j'exerce, et le partenariat Databricks est exactement le cadre dans lequel je veux le faire grandir.",
+    "profile_intro": "Chez Green Praxis, j'ai orchestré sous Airflow une chaîne qui transforme de l'imagerie satellite en tuiles cartographiques et en indicateurs environnementaux : collecte, nettoyage, organisation et modélisation des données, puis exposition à la demande par une passerelle FastAPI.",
+    "achievements": [
+      {
+        "lead": "Pipelines industrialisés et monitorés",
+        "impact": "ingestion orchestrée par Airflow avec la TaskFlow API, qui a réduit de 80% le temps d'analyse des DAG, et déploiement continu par GitHub Actions et Helm."
+      },
+      {
+        "lead": "Supervision et qualité de service",
+        "impact": "Prometheus et Grafana déployés via Helm, 24 tableaux de bord et 35 règles d'alerte couvrant 95% des chemins critiques, pour un SLA de pipeline supérieur à 98%."
+      },
+      {
+        "lead": "Modélisation et flux de données chez Airbus",
+        "impact": "flux ETL unifiés consolidant des sources hétérogènes sur cinq régions, et définition des interfaces et des contrats du projet OPTIMATE."
+      }
+    ],
+    "problems_section": "Organiser les revues de code et être garant de la qualité logicielle est un rôle que j'ai déjà tenu, chez Murex Systems, où j'ai encadré trois personnes et instauré revues, tests et intégration continue. Le Mastère Spécialisé en Ingénierie des Systèmes de l'ISAE-SUPAERO (certifié ASEP INCOSE) structure ma façon de travailler : exigences explicites, interfaces spécifiées, compromis argumentés et stratégie de vérification définie avant de construire. C'est ce qui rend une solution défendable devant un client comme devant une équipe."
+  },
+  "1242556901": {
+    "slug": "expert-big-data",
+    "role_title": "Expert Big Data (réf. 1242556901)",
+    "city": "Toulouse",
+    "opening": "Exploiter des plateformes de données en production, en optimiser les performances et en garantir la supervision : c'est ce que je fais au quotidien sur une plateforme géospatiale qui traite de l'imagerie satellite à l'échelle.",
+    "profile_intro": "Chez Green Praxis, je suis responsable de bout en bout d'une plateforme de données AWS : ingestion et traitement orchestrés par Airflow, stockage S3 versionné, exposition par une passerelle FastAPI et un cache Redis, le tout décrit en Terraform et déployé par Helm sur Kubernetes.",
+    "achievements": [
+      {
+        "lead": "Optimisation des traitements et du stockage",
+        "impact": "empreinte de stockage réduite de 80% et latence P95 ramenée de 600 ms à 220 ms après ré-architecture du service."
+      },
+      {
+        "lead": "Supervision et qualité de service",
+        "impact": "Prometheus et Grafana déployés via Helm, 24 tableaux de bord et 35 règles d'alerte couvrant 95% des chemins critiques, pour un SLA de pipeline supérieur à 98%."
+      },
+      {
+        "lead": "Sécurité et gouvernance des accès",
+        "impact": "IAM au moindre privilège, buckets S3 versionnés, gestion des secrets par AWS Secrets Manager, et chiffrement en transit et au repos mis en œuvre chez UrbanSeller."
+      }
+    ],
+    "problems_section": "Le Mastère Spécialisé en Ingénierie des Systèmes de l'ISAE-SUPAERO (certifié ASEP INCOSE) structure ma façon de travailler : exigences explicites, interfaces spécifiées, compromis argumentés et stratégie de vérification définie avant de construire. C'est ce qui rend une solution défendable devant un client comme devant une équipe."
+  },
+  "1290478601": {
+    "slug": "data-analytics-experimente",
+    "role_title": "Ingénieur Data Analytics Expérimenté (réf. 1290478601)",
+    "city": "Blagnac",
+    "opening": "Traiter la donnée de bout en bout, de la collecte des sources jusqu'à sa mise à disposition aux utilisateurs finaux : c'est la façon dont j'ai construit chacune des plateformes sur lesquelles j'ai travaillé.",
+    "profile_intro": "Chez Airbus, j'ai unifié des flux ETL consolidant des sources hétérogènes sur cinq régions et défini les interfaces et les contrats du projet OPTIMATE. Chez Green Praxis, j'orchestre sous Airflow la collecte, le nettoyage et l'enrichissement d'imagerie satellite jusqu'aux indicateurs livrés aux utilisateurs.",
+    "achievements": [
+      {
+        "lead": "Collecte et traitement outillés",
+        "impact": "ingestion par scripts et API orchestrée sous Airflow, avec une adoption de la TaskFlow API qui a réduit de 80% le temps d'analyse des DAG."
+      },
+      {
+        "lead": "Modélisation et optimisation",
+        "impact": "schéma SQL modélisé et requêtes et index optimisés chez UrbanSeller, sur une plateforme traitant des milliers de transactions quotidiennes."
+      },
+      {
+        "lead": "Mise à disposition et restitution",
+        "impact": "exposition des données à la demande par une passerelle FastAPI, et 24 tableaux de bord de suivi construits sous Grafana."
+      }
+    ],
+    "problems_section": "Le Mastère Spécialisé en Ingénierie des Systèmes de l'ISAE-SUPAERO (certifié ASEP INCOSE) structure ma façon de travailler : exigences explicites, interfaces spécifiées, compromis argumentés et stratégie de vérification définie avant de construire. C'est ce qui rend une solution défendable devant un client comme devant une équipe."
+  },
+  "1368253333": {
+    "slug": "architecte-data",
+    "role_title": "Architecte DATA (réf. 1368253333)",
+    "city": "Blagnac",
+    "opening": "Concevoir techniquement les applications, garantir la qualité du code de l'équipe et faire monter ses membres en compétences : ce sont les trois volets du poste, et les trois que j'ai déjà tenus ensemble.",
+    "profile_intro": "Chez Murex Systems, j'ai conçu et piloté une plateforme d'analyse de logs : architecture modulaire à interfaces stables, encadrement de trois personnes, et instauration des revues de code, des tests et de l'intégration continue. Chez Green Praxis, je conçois et exploite une plateforme de données AWS de bout en bout.",
+    "achievements": [
+      {
+        "lead": "Conception technique et qualité",
+        "impact": "taxonomie d'erreurs et alerting cartographiés par service, qui ont permis d'identifier plus de cinquante types d'erreurs jusque-là non détectés."
+      },
+      {
+        "lead": "Architecture data en environnement cloud",
+        "impact": "ingestion Airflow, stockage S3 versionné et exposition FastAPI, décrits en Terraform et déployés par Helm sur Kubernetes."
+      },
+      {
+        "lead": "Résultats mesurés de cette architecture",
+        "impact": "empreinte de stockage réduite de 80%, latence P95 ramenée de 600 ms à 220 ms, et SLA de pipeline maintenu au-dessus de 98% grâce à 35 règles d'alerte."
+      }
+    ],
+    "problems_section": "L'animation d'une communauté Data et l'avant-vente en équipe sont les dimensions vers lesquelles je veux faire évoluer mon rôle. Le Mastère Spécialisé en Ingénierie des Systèmes de l'ISAE-SUPAERO (certifié ASEP INCOSE) structure ma façon de travailler : exigences explicites, interfaces spécifiées, compromis argumentés et stratégie de vérification définie avant de construire. C'est ce qui rend une solution défendable devant un client comme devant une équipe."
+  },
+  "1377550533": {
+    "slug": "architecte-systeme-mbse",
+    "role_title": "Architecte Système MBSE (réf. 1377550533)",
+    "city": "Blagnac",
+    "opening": "Un rôle d'architecte système orienté SE et MBSE, couvrant tout le cycle d'ingénierie et appliqué à l'aéronautique et au spatial : c'est précisément ce pour quoi j'ai suivi le Mastère Spécialisé en Ingénierie des Systèmes de l'ISAE-SUPAERO, et ce pour quoi je suis certifié ASEP (INCOSE).",
+    "profile_intro": "Chez Airbus, je travaille sur la définition des interfaces et des contrats du projet OPTIMATE : formaliser ce que chaque composant garantit, ce qu'il attend des autres, et comment on le vérifie. C'est l'application directe de la démarche modèle à un système réel, dans un contexte aéronautique.",
+    "achievements": [
+      {
+        "lead": "Spécification et interface client",
+        "impact": "recueil et affinage des exigences avec les clients chez Murex Systems, avec des boucles de retour fermées et des critères de succès alignés."
+      },
+      {
+        "lead": "Vérification et validation",
+        "impact": "stratégie de vérification outillée, 24 tableaux de bord et 35 règles d'alerte couvrant 95% des chemins critiques, pour un SLA supérieur à 98%."
+      },
+      {
+        "lead": "Systèmes complexes et pluridisciplinaires",
+        "impact": "architecture d'une plateforme géospatiale de production et d'une chaîne de vision par ordinateur temps réel optimisée sur GPU."
+      }
+    ],
+    "problems_section": "Le cycle complet que décrit l'annonce, de l'audit au déploiement et à la formation, est la façon dont j'ai appris à conduire l'ingénierie d'un système selon l'ISO/IEC 15288, et le secteur aéronautique est celui dans lequel je la pratique aujourd'hui."
+  },
+  "1194863101": {
+    "slug": "ingenieur-systemes-infrastructure",
+    "role_title": "Ingénieur Systèmes (réf. 1194863101)",
+    "city": "Toulouse",
+    "opening": "Standardiser les procédures d'exploitation, garantir l'intégrité des données et la sécurité des accès, et développer l'automatisation : rejoindre une équipe Cloud Infrastructure Services pour faire cela est la suite naturelle de ce que je construis aujourd'hui.",
+    "profile_intro": "Chez Green Praxis, j'ai été responsable de bout en bout de la plateforme AWS qui transforme de l'imagerie satellite en tuiles cartographiques à la demande : nœuds EKS provisionnés par Terraform et Karpenter, modules réutilisables pour le VPC, les buckets S3 versionnés et un IAM au moindre privilège, et déploiements industrialisés par Helm et GitHub Actions.",
+    "achievements": [
+      {
+        "lead": "Automatisation des procédures",
+        "impact": "infrastructure entièrement décrite en modules Terraform réutilisables, déploiements par Helm et chaîne GitHub Actions de bout en bout, de sorte qu'aucune opération courante ne reste manuelle."
+      },
+      {
+        "lead": "Intégrité des données et sécurité des accès",
+        "impact": "buckets S3 versionnés, IAM au moindre privilège, secrets gérés par AWS Secrets Manager, et authentification par jetons PASETO avec limitation de débit."
+      },
+      {
+        "lead": "Supervision et qualité de service",
+        "impact": "Prometheus et Grafana déployés via Helm, 24 tableaux de bord et 35 règles d'alerte couvrant 95% des chemins critiques, pour un SLA de pipeline supérieur à 98%."
+      }
+    ],
+    "problems_section": "Maximiser l'autonomie des développeurs par une approche agile et automatisée est exactement l'objectif que je poursuis sur ma plateforme actuelle. Le Mastère Spécialisé en Ingénierie des Systèmes de l'ISAE-SUPAERO (certifié ASEP INCOSE) structure ma façon de travailler : exigences explicites, interfaces spécifiées, compromis argumentés et stratégie de vérification définie avant de construire. C'est ce qui rend une solution défendable devant un client comme devant une équipe."
+  },
+  "1288378601": {
+    "slug": "responsable-technique-java",
+    "role_title": "Responsable technique Java (réf. 1288378601)",
+    "city": "Toulouse",
+    "opening": "Un rôle à la fois back-end et front-end, avec l'encadrement d'une équipe de développeurs et la prise en charge des développements les plus complexes : c'est la combinaison que je recherche, et celle que j'ai déjà pratiquée.",
+    "profile_intro": "Chez UrbanSeller, j'ai livré une plateforme de gestion de commandes de bout en bout : backend C#/.NET traitant des volumes de transactions élevés et tarification dynamique, API REST documentées sous Swagger, et frontend Angular à formulaires dynamiques et données temps réel pour le suivi des commandes.",
+    "achievements": [
+      {
+        "lead": "Chaîne technique complète",
+        "impact": "schéma SQL modélisé, requêtes et index optimisés, authentification et autorisation avec MFA et chiffrement en transit et au repos, builds et déploiements automatisés sous Azure DevOps."
+      },
+      {
+        "lead": "Résultats livrés",
+        "impact": "des milliers de transactions quotidiennes traitées avec une indisponibilité minimale, et une synchronisation d'inventaire automatisée qui a réduit de 70% le traitement manuel des commandes."
+      },
+      {
+        "lead": "Encadrement technique chez Murex Systems",
+        "impact": "pilotage d'une plateforme d'analyse de logs, mentorat d'une équipe de trois personnes et instauration des revues de code, des tests et de l'intégration continue."
+      }
+    ],
+    "problems_section": "L'encadrement et la transmission sont ce qui m'attire dans ce poste : je les ai pratiqués chez Murex Systems et je veux en faire le cœur de mon rôle. Le Mastère Spécialisé en Ingénierie des Systèmes de l'ISAE-SUPAERO (certifié ASEP INCOSE) structure ma façon de travailler : exigences explicites, interfaces spécifiées, compromis argumentés et stratégie de vérification définie avant de construire. C'est ce qui rend une solution défendable devant un client comme devant une équipe."
+  },
+  "1194103701": {
+    "slug": "architecte-cloud-devops-idf",
+    "role_title": "Architecte Cloud DevOps (réf. 1194103701)",
+    "city": "Issy-les-Moulineaux",
+    "opening": "Concevoir des architectures cloud natives robustes et optimisées, moderniser et conteneuriser l'existant, et industrialiser les chaînes de déploiement : c'est le travail que je mène au quotidien, et je suis titulaire de l'AWS Certified Solutions Architect – Associate (SAA-C03).",
+    "profile_intro": "Chez Green Praxis, j'ai été responsable de bout en bout de la plateforme AWS qui transforme de l'imagerie satellite en tuiles cartographiques à la demande : nœuds EKS provisionnés par Terraform et Karpenter, modules réutilisables pour le VPC, les buckets S3 versionnés et un IAM au moindre privilège, et déploiements industrialisés par Helm et GitHub Actions.",
+    "achievements": [
+      {
+        "lead": "Modernisation et conteneurisation d'un existant",
+        "impact": "ré-architecture d'un service de tuiles statiques en passerelle FastAPI à la demande, adossée à un cache Redis et déployée sur EKS."
+      },
+      {
+        "lead": "Résultats mesurés de cette architecture",
+        "impact": "empreinte de stockage réduite de 80%, latence P95 ramenée de 600 ms à 220 ms, et SLA de pipeline maintenu au-dessus de 98% grâce à 35 règles d'alerte."
+      },
+      {
+        "lead": "Optimisation des coûts et de la disponibilité",
+        "impact": "autoscaling dynamique par Karpenter, infrastructure entièrement décrite en modules Terraform réutilisables et IAM au moindre privilège."
+      }
+    ],
+    "problems_section": "Le Mastère Spécialisé en Ingénierie des Systèmes de l'ISAE-SUPAERO (certifié ASEP INCOSE) structure ma façon de travailler : exigences explicites, interfaces spécifiées, compromis argumentés et stratégie de vérification définie avant de construire. C'est ce qui rend une solution défendable devant un client comme devant une équipe."
+  },
+  "1214389901": {
+    "slug": "architecte-logiciel-cloud-produit",
+    "role_title": "Architecte logiciel / Cloud Produit (réf. 1214389901)",
+    "city": "Issy-les-Moulineaux",
+    "opening": "Concevoir des solutions cloud pour des clients industriels, au sein d'une équipe d'architectes et de développeurs expérimentés : c'est exactement le cadre dans lequel je veux exercer, et celui pour lequel ma formation d'ingénieur systèmes me prépare.",
+    "profile_intro": "Chez Green Praxis, j'ai été responsable de bout en bout de la plateforme AWS qui transforme de l'imagerie satellite en tuiles cartographiques à la demande : nœuds EKS provisionnés par Terraform et Karpenter, modules réutilisables pour le VPC, les buckets S3 versionnés et un IAM au moindre privilège, et déploiements industrialisés par Helm et GitHub Actions.",
+    "achievements": [
+      {
+        "lead": "Architecture logicielle et cloud d'un produit en production",
+        "impact": "passerelle FastAPI, cache Redis, conteneurs orchestrés par Kubernetes et Helm, sur une plateforme géospatiale servant des tuiles à la demande."
+      },
+      {
+        "lead": "Résultats mesurés de cette architecture",
+        "impact": "empreinte de stockage réduite de 80%, latence P95 ramenée de 600 ms à 220 ms, et SLA de pipeline maintenu au-dessus de 98% grâce à 35 règles d'alerte."
+      },
+      {
+        "lead": "Contexte industriel et aéronautique",
+        "impact": "définition des interfaces et des contrats du projet OPTIMATE chez Airbus, et flux ETL unifiés consolidant des sources hétérogènes sur cinq régions."
+      }
+    ],
+    "problems_section": "Le Mastère Spécialisé en Ingénierie des Systèmes de l'ISAE-SUPAERO (certifié ASEP INCOSE) structure ma façon de travailler : exigences explicites, interfaces spécifiées, compromis argumentés et stratégie de vérification définie avant de construire. C'est ce qui rend une solution défendable devant un client comme devant une équipe."
+  },
+  "1418387433": {
+    "slug": "expert-data-science-engineering",
+    "role_title": "Expert Data Science / Data Engineering (réf. 1418387433)",
+    "city": "Issy-les-Moulineaux",
+    "opening": "Des projets data à fortes exigences de robustesse, de sécurité et de mise en production : c'est la partie du métier qui m'intéresse le plus, et celle sur laquelle j'ai construit mon expérience.",
+    "profile_intro": "Chez Green Praxis, j'orchestre sous Airflow une chaîne qui transforme de l'imagerie satellite en indicateurs environnementaux : collecte, nettoyage, enrichissement et modélisation, puis exposition par une passerelle FastAPI. Chez Airbus, j'ai unifié des flux ETL consolidant des sources hétérogènes sur cinq régions.",
+    "achievements": [
+      {
+        "lead": "Industrialisation et mise en production",
+        "impact": "ingestion orchestrée par Airflow avec la TaskFlow API, qui a réduit de 80% le temps d'analyse des DAG, et déploiement continu par GitHub Actions et Helm."
+      },
+      {
+        "lead": "Supervision, alerting et gestion des logs",
+        "impact": "Prometheus et Grafana déployés via Helm, 24 tableaux de bord et 35 règles d'alerte couvrant 95% des chemins critiques, pour un SLA de pipeline supérieur à 98%."
+      },
+      {
+        "lead": "Sécurité et maîtrise des accès",
+        "impact": "IAM au moindre privilège, buckets S3 versionnés, secrets gérés par AWS Secrets Manager, jetons PASETO et chiffrement en transit et au repos."
+      }
+    ],
+    "problems_section": "Le Mastère Spécialisé en Ingénierie des Systèmes de l'ISAE-SUPAERO (certifié ASEP INCOSE) structure ma façon de travailler : exigences explicites, interfaces spécifiées, compromis argumentés et stratégie de vérification définie avant de construire. C'est ce qui rend une solution défendable devant un client comme devant une équipe."
+  },
+  "1263211501": {
+    "slug": "developpeur-python-cicd",
+    "role_title": "Développeur Python CI/CD (réf. 1263211501)",
+    "city": "Issy-les-Moulineaux",
+    "opening": "Des API microservices en Python, une chaîne CI/CD sous GitHub Actions et un déploiement Kubernetes par Helm Charts : votre environnement technique décrit précisément celui dans lequel je travaille aujourd'hui.",
+    "profile_intro": "Chez Green Praxis, j'ai conçu et exploité une passerelle FastAPI adossée à un cache Redis qui sert des tuiles cartographiques à la demande, déployée sur EKS par Helm et livrée par une chaîne GitHub Actions complète : lint, test, build, image Docker puis mise à jour Helm.",
+    "achievements": [
+      {
+        "lead": "API REST tenues à la milliseconde",
+        "impact": "latence P95 ramenée de 600 ms à 220 ms, soit 63% de moins, sur le service que j'ai ré-architecturé."
+      },
+      {
+        "lead": "Sécurité applicative",
+        "impact": "migration des jetons JWT vers PASETO, limitation de débit en middleware, et gestion des secrets par AWS Secrets Manager."
+      },
+      {
+        "lead": "Qualité et tests",
+        "impact": "tests d'intégration sur un monorepo TypeScript, et revues de code, tests et intégration continue instaurés chez Murex Systems."
+      }
+    ],
+    "problems_section": "Le Mastère Spécialisé en Ingénierie des Systèmes de l'ISAE-SUPAERO (certifié ASEP INCOSE) structure ma façon de travailler : exigences explicites, interfaces spécifiées, compromis argumentés et stratégie de vérification définie avant de construire. C'est ce qui rend une solution défendable devant un client comme devant une équipe."
+  },
+  "1385368233": {
+    "slug": "developpeur-java-devops-nantes",
+    "role_title": "Développeur Java-DevOps (réf. 1385368233)",
+    "city": "Nantes",
+    "opening": "Rédiger les spécifications techniques, contribuer aux choix d'architecture, puis construire et tenir les chaînes CI/CD qui portent l'application en production : c'est la combinaison développement et exploitation qui me correspond, et la posture de consultant qui va avec.",
+    "profile_intro": "Chez Green Praxis, j'ai été responsable de bout en bout de la plateforme AWS qui transforme de l'imagerie satellite en tuiles cartographiques à la demande : nœuds EKS provisionnés par Terraform et Karpenter, modules réutilisables pour le VPC, les buckets S3 versionnés et un IAM au moindre privilège, et déploiements industrialisés par Helm et GitHub Actions.",
+    "achievements": [
+      {
+        "lead": "Chaînes CI/CD industrialisées",
+        "impact": "GitHub Actions de bout en bout (lint, test, build, image Docker, mise à jour Helm), et Jenkins, Docker et Terraform sur la plateforme architecturée chez Murex Systems."
+      },
+      {
+        "lead": "Automatisation des déploiements et des environnements",
+        "impact": "cluster EKS provisionné par Terraform et Karpenter, déploiements par Helm et autoscaling dynamique, sans opération manuelle courante."
+      },
+      {
+        "lead": "Qualité et exploitabilité en production",
+        "impact": "24 tableaux de bord et 35 règles d'alerte couvrant 95% des chemins critiques, pour un SLA de pipeline supérieur à 98%."
+      }
+    ],
+    "problems_section": "Le Mastère Spécialisé en Ingénierie des Systèmes de l'ISAE-SUPAERO (certifié ASEP INCOSE) structure ma façon de travailler : exigences explicites, interfaces spécifiées, compromis argumentés et stratégie de vérification définie avant de construire. C'est ce qui rend une solution défendable devant un client comme devant une équipe."
+  },
+  "1377093233": {
+    "slug": "developpeur-devops-lyon",
+    "role_title": "Développeur DevOps (réf. 1377093233)",
+    "city": "Lyon",
+    "opening": "Concevoir et optimiser des pipelines CI/CD, automatiser le déploiement et la gestion des infrastructures, superviser les plateformes et garantir leur disponibilité : c'est le contenu exact de mon poste actuel.",
+    "profile_intro": "Chez Green Praxis, j'ai été responsable de bout en bout de la plateforme AWS qui transforme de l'imagerie satellite en tuiles cartographiques à la demande : nœuds EKS provisionnés par Terraform et Karpenter, modules réutilisables pour le VPC, les buckets S3 versionnés et un IAM au moindre privilège, et déploiements industrialisés par Helm et GitHub Actions.",
+    "achievements": [
+      {
+        "lead": "Chaînes CI/CD industrialisées",
+        "impact": "GitHub Actions de bout en bout (lint, test, build, image Docker, mise à jour Helm), et Jenkins, Docker et Terraform sur la plateforme architecturée chez Murex Systems."
+      },
+      {
+        "lead": "Supervision, alerting et gestion des logs",
+        "impact": "Prometheus et Grafana déployés via Helm, 24 tableaux de bord et 35 règles d'alerte couvrant 95% des chemins critiques, pour un SLA de pipeline supérieur à 98%."
+      },
+      {
+        "lead": "Résultats mesurés de cette architecture",
+        "impact": "empreinte de stockage réduite de 80%, latence P95 ramenée de 600 ms à 220 ms, et SLA de pipeline maintenu au-dessus de 98% grâce à 35 règles d'alerte."
+      }
+    ],
+    "problems_section": "Être force de proposition sur les choix d'architecture et d'outillage est la partie du rôle qui m'intéresse le plus. Le Mastère Spécialisé en Ingénierie des Systèmes de l'ISAE-SUPAERO (certifié ASEP INCOSE) structure ma façon de travailler : exigences explicites, interfaces spécifiées, compromis argumentés et stratégie de vérification définie avant de construire. C'est ce qui rend une solution défendable devant un client comme devant une équipe."
+  },
+  "1200104401": {
+    "slug": "ingenieur-cloud-devops-merignac",
+    "role_title": "Ingénieur Cloud DevOps (réf. 1200104401)",
+    "city": "Merignac",
+    "opening": "Superviser et optimiser des infrastructures cloud, administrer les clusters Kubernetes et tenir les pipelines CI/CD au quotidien : c'est ce que je fais, et l'AWS Certified Solutions Architect – Associate (SAA-C03) est venue le formaliser.",
+    "profile_intro": "Chez Green Praxis, j'ai été responsable de bout en bout de la plateforme AWS qui transforme de l'imagerie satellite en tuiles cartographiques à la demande : nœuds EKS provisionnés par Terraform et Karpenter, modules réutilisables pour le VPC, les buckets S3 versionnés et un IAM au moindre privilège, et déploiements industrialisés par Helm et GitHub Actions.",
+    "achievements": [
+      {
+        "lead": "Administration de cluster Kubernetes",
+        "impact": "EKS 1.29 provisionné par Terraform et Karpenter, conteneurs Docker orchestrés par Helm, mises à jour et stabilité assurées en production."
+      },
+      {
+        "lead": "Supervision, alerting et gestion des logs",
+        "impact": "Prometheus et Grafana déployés via Helm, 24 tableaux de bord et 35 règles d'alerte couvrant 95% des chemins critiques, pour un SLA de pipeline supérieur à 98%."
+      },
+      {
+        "lead": "Chaînes CI/CD industrialisées",
+        "impact": "GitHub Actions de bout en bout (lint, test, build, image Docker, mise à jour Helm), et Jenkins, Docker et Terraform sur la plateforme architecturée chez Murex Systems."
+      }
+    ],
+    "problems_section": "Collaborer avec les équipes de développement pour résoudre les incidents et améliorer la fiabilité est la façon dont j'ai toujours travaillé. Le Mastère Spécialisé en Ingénierie des Systèmes de l'ISAE-SUPAERO (certifié ASEP INCOSE) structure ma façon de travailler : exigences explicites, interfaces spécifiées, compromis argumentés et stratégie de vérification définie avant de construire. C'est ce qui rend une solution défendable devant un client comme devant une équipe."
+  },
+  "1411727433": {
+    "slug": "architecte-cloud-devops-pau",
+    "role_title": "Architecte Cloud DevOps (réf. 1411727433)",
+    "city": "Pau",
+    "opening": "Auditer, concevoir une architecture cloud, puis accompagner les équipes qui la mettent en œuvre en leur apportant l'industrialisation et le déploiement continu : c'est le parcours complet que j'ai mené sur la plateforme dont j'ai la charge.",
+    "profile_intro": "Chez Green Praxis, j'ai été responsable de bout en bout de la plateforme AWS qui transforme de l'imagerie satellite en tuiles cartographiques à la demande : nœuds EKS provisionnés par Terraform et Karpenter, modules réutilisables pour le VPC, les buckets S3 versionnés et un IAM au moindre privilège, et déploiements industrialisés par Helm et GitHub Actions.",
+    "achievements": [
+      {
+        "lead": "Architecture conçue puis livrée",
+        "impact": "ré-architecture d'un service statique en passerelle FastAPI à la demande, avec un cache Redis et un cluster EKS provisionné en Terraform."
+      },
+      {
+        "lead": "Chaînes CI/CD industrialisées",
+        "impact": "GitHub Actions de bout en bout (lint, test, build, image Docker, mise à jour Helm), et Jenkins, Docker et Terraform sur la plateforme architecturée chez Murex Systems."
+      },
+      {
+        "lead": "Résultats mesurés de cette architecture",
+        "impact": "empreinte de stockage réduite de 80%, latence P95 ramenée de 600 ms à 220 ms, et SLA de pipeline maintenu au-dessus de 98% grâce à 35 règles d'alerte."
+      }
+    ],
+    "problems_section": "Le rôle de technical leader décrit par l'annonce est celui que j'ai tenu chez Murex Systems, où j'ai encadré trois personnes et instauré les revues de code, les tests et l'intégration continue. Le Mastère Spécialisé en Ingénierie des Systèmes de l'ISAE-SUPAERO (certifié ASEP INCOSE) structure ma façon de travailler : exigences explicites, interfaces spécifiées, compromis argumentés et stratégie de vérification définie avant de construire. C'est ce qui rend une solution défendable devant un client comme devant une équipe."
+  },
+  "1284918801": {
+    "slug": "leader-technique-backend-java-python",
+    "role_title": "Leader Technique Back-End Java / Python (réf. 1284918801)",
+    "city": "Aix-en-Provence",
+    "opening": "Être le référent technique d'une équipe back-end sur des stacks Python et Java, en portant la qualité et les bonnes pratiques Craft et DevOps : c'est le rôle vers lequel tout mon parcours converge.",
+    "profile_intro": "Chez Green Praxis, j'ai conçu une passerelle FastAPI adossée à Redis et repris le monorepo Express.js / TypeScript de l'entreprise, porté sur Node 18 LTS avec des tests d'intégration. Chez Murex Systems, j'ai conçu et piloté une plateforme d'analyse de logs en Python et encadré l'équipe qui la construisait.",
+    "achievements": [
+      {
+        "lead": "Référent technique et mentorat",
+        "impact": "mentorat d'une équipe de trois personnes chez Murex Systems, avec instauration des revues de code, des tests et de l'intégration continue."
+      },
+      {
+        "lead": "Traitements et performance back-end",
+        "impact": "latence P95 ramenée de 600 ms à 220 ms, soit 63% de moins, et empreinte de stockage réduite de 80%."
+      },
+      {
+        "lead": "Chaînes CI/CD industrialisées",
+        "impact": "GitHub Actions de bout en bout (lint, test, build, image Docker, mise à jour Helm), et Jenkins, Docker et Terraform sur la plateforme architecturée chez Murex Systems."
+      }
+    ],
+    "problems_section": "Le Mastère Spécialisé en Ingénierie des Systèmes de l'ISAE-SUPAERO (certifié ASEP INCOSE) structure ma façon de travailler : exigences explicites, interfaces spécifiées, compromis argumentés et stratégie de vérification définie avant de construire. C'est ce qui rend une solution défendable devant un client comme devant une équipe."
+  },
+  "1282265101": {
+    "slug": "software-engineer-java-schiltigheim",
+    "role_title": "Software Engineer Java (réf. 1282265101)",
+    "city": "Schiltigheim",
+    "opening": "Concevoir et développer des applications robustes, garantir la qualité du code par les tests et les revues, et faire avancer les pratiques de l'équipe : c'est la façon dont je travaille depuis le début.",
+    "profile_intro": "Chez UrbanSeller, j'ai livré une plateforme de gestion de commandes de bout en bout : backend C#/.NET traitant des volumes de transactions élevés, API REST documentées sous Swagger, frontend Angular à formulaires dynamiques, schéma SQL modélisé et requêtes optimisées, builds et déploiements automatisés sous Azure DevOps.",
+    "achievements": [
+      {
+        "lead": "Résultats livrés sur cette plateforme",
+        "impact": "des milliers de transactions quotidiennes traitées avec une indisponibilité minimale, et une synchronisation d'inventaire automatisée qui a réduit de 70% le traitement manuel des commandes."
+      },
+      {
+        "lead": "Qualité et intégration continue",
+        "impact": "revues de code, tests et CI instaurés chez Murex Systems, où la taxonomie d'erreurs mise en place a permis d'identifier plus de cinquante types d'erreurs jusque-là non détectés."
+      },
+      {
+        "lead": "Chaînes CI/CD industrialisées",
+        "impact": "GitHub Actions de bout en bout (lint, test, build, image Docker, mise à jour Helm), et Jenkins, Docker et Terraform sur la plateforme architecturée chez Murex Systems."
+      }
+    ],
+    "problems_section": "Le Mastère Spécialisé en Ingénierie des Systèmes de l'ISAE-SUPAERO (certifié ASEP INCOSE) structure ma façon de travailler : exigences explicites, interfaces spécifiées, compromis argumentés et stratégie de vérification définie avant de construire. C'est ce qui rend une solution défendable devant un client comme devant une équipe."
+  },
+  "1198740401": {
+    "slug": "lead-technique-java-fullstack-grenoble",
+    "role_title": "Lead technique Java Full Stack (réf. 1198740401)",
+    "city": "Montbonnot-Saint-Martin",
+    "opening": "Encadrer techniquement une équipe, concevoir l'architecture avec les architectes et écrire un code que les autres peuvent reprendre : ce sont les trois choses que j'ai faites ensemble chez Murex Systems, et celles que décrit votre annonce.",
+    "profile_intro": "Chez UrbanSeller, j'ai livré une plateforme de gestion de commandes de bout en bout : backend C#/.NET traitant des volumes de transactions élevés, API REST documentées sous Swagger, frontend Angular à formulaires dynamiques, schéma SQL modélisé et requêtes optimisées, builds et déploiements automatisés sous Azure DevOps.",
+    "achievements": [
+      {
+        "lead": "Encadrement technique chez Murex Systems",
+        "impact": "pilotage d'une plateforme d'analyse de logs, mentorat d'une équipe de trois personnes et instauration des revues de code, des tests et de l'intégration continue."
+      },
+      {
+        "lead": "Résultats livrés sur cette plateforme",
+        "impact": "des milliers de transactions quotidiennes traitées avec une indisponibilité minimale, et une synchronisation d'inventaire automatisée qui a réduit de 70% le traitement manuel des commandes."
+      },
+      {
+        "lead": "Scalabilité et maintenabilité",
+        "impact": "composants modulaires à interfaces stables et chemins de déploiement automatisés, conteneurisés et orchestrés par Kubernetes et Helm."
+      }
+    ],
+    "problems_section": "Le Mastère Spécialisé en Ingénierie des Systèmes de l'ISAE-SUPAERO (certifié ASEP INCOSE) structure ma façon de travailler : exigences explicites, interfaces spécifiées, compromis argumentés et stratégie de vérification définie avant de construire. C'est ce qui rend une solution défendable devant un client comme devant une équipe."
+  },
+  "1372955933": {
+    "slug": "lead-developpeur-java-fullstack-valbonne",
+    "role_title": "Lead développeur Java full stack (réf. 1372955933)",
+    "city": "Valbonne",
+    "opening": "Un rôle de leader technique dans une équipe pluridisciplinaire, à la fois sur l'architecture, la qualité du code et l'accompagnement des développeurs : c'est la combinaison que je recherche, et celle que j'ai déjà pratiquée.",
+    "profile_intro": "Chez UrbanSeller, j'ai livré une plateforme de gestion de commandes de bout en bout : backend C#/.NET traitant des volumes de transactions élevés, API REST documentées sous Swagger, frontend Angular à formulaires dynamiques, schéma SQL modélisé et requêtes optimisées, builds et déploiements automatisés sous Azure DevOps.",
+    "achievements": [
+      {
+        "lead": "Encadrement technique chez Murex Systems",
+        "impact": "pilotage d'une plateforme d'analyse de logs, mentorat d'une équipe de trois personnes et instauration des revues de code, des tests et de l'intégration continue."
+      },
+      {
+        "lead": "Résultats livrés sur cette plateforme",
+        "impact": "des milliers de transactions quotidiennes traitées avec une indisponibilité minimale, et une synchronisation d'inventaire automatisée qui a réduit de 70% le traitement manuel des commandes."
+      },
+      {
+        "lead": "Chaîne technique complète",
+        "impact": "API REST documentées sous Swagger, authentification et autorisation avec MFA, chiffrement en transit et au repos, et déploiements automatisés."
+      }
+    ],
+    "problems_section": "Le Mastère Spécialisé en Ingénierie des Systèmes de l'ISAE-SUPAERO (certifié ASEP INCOSE) structure ma façon de travailler : exigences explicites, interfaces spécifiées, compromis argumentés et stratégie de vérification définie avant de construire. C'est ce qui rend une solution défendable devant un client comme devant une équipe."
+  },
+  "family:cloud": {
+    "slug": "famille-cloud-devops",
+    "role_title": "Ingénierie Cloud et DevOps",
+    "city": "Toulouse",
+    "opening": "Je vous écris au sujet de vos postes en ingénierie Cloud et DevOps. Concevoir une plateforme cloud, l'industrialiser et ensuite l'exploiter est le métier que j'exerce au quotidien, et l'AWS Certified Solutions Architect – Associate (SAA-C03) est venue le formaliser.",
+    "profile_intro": "Chez Green Praxis, j'ai été responsable de bout en bout de la plateforme AWS qui transforme de l'imagerie satellite en tuiles cartographiques à la demande : nœuds EKS provisionnés par Terraform et Karpenter, modules réutilisables pour le VPC, les buckets S3 versionnés et un IAM au moindre privilège, et déploiements industrialisés par Helm et GitHub Actions.",
+    "achievements": [
+      {
+        "lead": "Chaînes CI/CD de bout en bout",
+        "impact": "GitHub Actions couvrant lint, test, build, image Docker et mise à jour Helm, et Jenkins, Docker et Terraform sur la plateforme architecturée chez Murex Systems."
+      },
+      {
+        "lead": "Résultats mesurés en production",
+        "impact": "empreinte de stockage réduite de 80%, latence P95 ramenée de 600 ms à 220 ms, et SLA de pipeline maintenu au-dessus de 98% grâce à 35 règles d'alerte."
+      },
+      {
+        "lead": "Supervision et fiabilité",
+        "impact": "Prometheus et Grafana déployés via Helm, 24 tableaux de bord et 35 règles d'alerte couvrant 95% des chemins critiques."
+      }
+    ],
+    "problems_section": "Le Mastère Spécialisé en Ingénierie des Systèmes de l'ISAE-SUPAERO (certifié ASEP INCOSE) structure ma façon de travailler : exigences explicites, interfaces spécifiées, compromis argumentés et stratégie de vérification définie avant de construire. C'est ce qui rend une solution défendable devant un client comme devant une équipe."
+  },
+  "family:data": {
+    "slug": "famille-data-engineering",
+    "role_title": "Ingénierie de la donnée",
+    "city": "Toulouse",
+    "opening": "Je vous écris au sujet de vos postes en ingénierie de la donnée. Traiter la donnée de bout en bout, de la collecte des sources jusqu'à sa mise à disposition aux utilisateurs, est la façon dont j'ai construit chacune des plateformes sur lesquelles j'ai travaillé.",
+    "profile_intro": "Chez Airbus, j'ai unifié des flux ETL consolidant des sources hétérogènes sur cinq régions et défini les interfaces et les contrats du projet OPTIMATE. Chez Green Praxis, j'orchestre sous Airflow la collecte, le nettoyage et l'enrichissement d'imagerie satellite jusqu'aux indicateurs livrés aux utilisateurs.",
+    "achievements": [
+      {
+        "lead": "Pipelines industrialisés",
+        "impact": "ingestion orchestrée par Airflow avec la TaskFlow API, qui a réduit de 80% le temps d'analyse des DAG, et déploiement continu par GitHub Actions et Helm."
+      },
+      {
+        "lead": "Modélisation et optimisation",
+        "impact": "schéma SQL modélisé et requêtes et index optimisés chez UrbanSeller, sur une plateforme traitant des milliers de transactions quotidiennes."
+      },
+      {
+        "lead": "Restitution et pilotage",
+        "impact": "exposition des données à la demande par une passerelle FastAPI, et 24 tableaux de bord de suivi construits sous Grafana."
+      }
+    ],
+    "problems_section": "Le Mastère Spécialisé en Ingénierie des Systèmes de l'ISAE-SUPAERO (certifié ASEP INCOSE) structure ma façon de travailler : exigences explicites, interfaces spécifiées, compromis argumentés et stratégie de vérification définie avant de construire. C'est ce qui rend une solution défendable devant un client comme devant une équipe."
+  },
+  "family:fullstack": {
+    "slug": "famille-developpement-logiciel",
+    "role_title": "Développement logiciel back-end et full stack",
+    "city": "Toulouse",
+    "opening": "Je vous écris au sujet de vos postes en développement logiciel. Concevoir des API robustes, garantir la qualité par les tests et les revues, et livrer des applications qui tiennent la charge en production : c'est le travail que je fais depuis le début de mon parcours.",
+    "profile_intro": "Chez Green Praxis, j'ai conçu une passerelle FastAPI adossée à un cache Redis et repris le monorepo Express.js / TypeScript de l'entreprise, porté sur Node 18 LTS avec une couverture de tests d'intégration, avec une migration des jetons JWT vers PASETO. Chez UrbanSeller, j'avais livré une plateforme de gestion de commandes avec un backend C#/.NET, des API REST documentées sous Swagger et un frontend Angular.",
+    "achievements": [
+      {
+        "lead": "Performance mesurée sur l'API",
+        "impact": "latence P95 ramenée de 600 ms à 220 ms, soit 63% de moins, sur le service que j'ai ré-architecturé."
+      },
+      {
+        "lead": "Volume et robustesse",
+        "impact": "des milliers de transactions quotidiennes traitées avec une indisponibilité minimale, et une synchronisation d'inventaire automatisée qui a réduit de 70% le traitement manuel des commandes."
+      },
+      {
+        "lead": "Encadrement technique chez Murex Systems",
+        "impact": "pilotage d'une plateforme d'analyse de logs, mentorat d'une équipe de trois personnes et instauration des revues de code, des tests et de l'intégration continue."
+      }
+    ],
+    "problems_section": "Le Mastère Spécialisé en Ingénierie des Systèmes de l'ISAE-SUPAERO (certifié ASEP INCOSE) structure ma façon de travailler : exigences explicites, interfaces spécifiées, compromis argumentés et stratégie de vérification définie avant de construire. C'est ce qui rend une solution défendable devant un client comme devant une équipe."
+  },
+  "family:systemes": {
+    "slug": "famille-ingenierie-systemes",
+    "role_title": "Ingénierie des systèmes",
+    "city": "Toulouse",
+    "opening": "Je vous écris au sujet de vos postes en ingénierie des systèmes. C'est la discipline pour laquelle je me suis formé au Mastère Spécialisé de l'ISAE-SUPAERO, pour laquelle je suis certifié ASEP (INCOSE), et que je pratique aujourd'hui dans un contexte aéronautique.",
+    "profile_intro": "Chez Airbus, je travaille sur la définition des interfaces et des contrats du projet OPTIMATE : formaliser ce que chaque composant garantit, ce qu'il attend des autres, et comment on le vérifie. C'est l'application directe de la démarche systèmes à un système réel.",
+    "achievements": [
+      {
+        "lead": "Spécification et recueil du besoin",
+        "impact": "recueil et affinage des exigences avec les clients chez Murex Systems, avec des boucles de retour fermées et des critères de succès alignés."
+      },
+      {
+        "lead": "Vérification et validation outillées",
+        "impact": "24 tableaux de bord et 35 règles d'alerte couvrant 95% des chemins critiques, pour un SLA de pipeline supérieur à 98%."
+      },
+      {
+        "lead": "Systèmes complexes et pluridisciplinaires",
+        "impact": "architecture d'une plateforme géospatiale de production et d'une chaîne de vision par ordinateur temps réel optimisée sur GPU."
+      }
+    ],
+    "problems_section": "Conduire l'ingénierie d'un système selon l'ISO/IEC 15288, de l'expression du besoin à la stratégie de vérification, est exactement ce que ma formation m'a appris et ce que je cherche à exercer à plein temps."
+  }
+}
