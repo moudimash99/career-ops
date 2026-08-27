@@ -1,0 +1,27 @@
+DASSAULT SYSTEMES, the 3DEXPERIENCE Company, provides businesses and people with virtual universes to imagine sustainable innovations. Serving over 250,000 clients in 11 industries, from high-tech to life sciences, fashion to transportation, we help businesses and people around the world to create sustainable innovations for today and tomorrow.
+Our High-Tech Industry Team is looking for a Systems Engineer. The location for this position is Vélizy, France.
+The High-Tech Industry MBSE Systems Engineer will drive adoption of Model-Based Systems Engineering (MBSE), providing technical leadership on tools and the digital engineering ecosystem. This role will also collaborate with internal teams and clients.
+Missions
+Create and enrich the assigned set of demonstrations of Industry Solutions for Model-based Systems Engineering
+Ensure these demonstrations are simple and compelling to effectively showcase their value to clients of the High-Tech Industry and support the go to market strategy
+Use Model-based and data-driven processes to develop and refine strategies for Requirements Engineering, System Architecture, System Behavior Analysis, Requirements Verification, Test planning, and Interface integration and management for a complex system
+Engage regularly with customers and provide technical assistance on CATIA Magic, SysML, and broader systems engineering (SE) principles
+Develop and maintain scripts, plugins and integrations using JavaScript and/or Python and/or Java
+Be aware of industry specific use cases and document software gaps and best practices
+Work closely with Industry Solution Experience Managers and Industry Business Consultants to align our MBSE solutions with customer needs
+Support technical Sales Enablement through deliverables and enablement sessions
+Develop specific demonstrations for key client’s cases
+ 
+Qualifications
+Bachelor's Degree in Computer Science, Systems Engineering, Software Engineering or related field required
+Masters or additional certifications is a plus
+Hands-on experience with CATIA Magic (formerly Cameo) or a similar SysML modeling tool
+Proficiency in Java, Python and/or Javascript
+Experience in designing and implementing integrations between MBSE tools and other enterprise applications
+Experience in Electrical Engineering and Electrical Schematics is a plus
+Experience with Dymola is a plus
+Strong presentation, didactic and communication skills
+Experience in consulting or customer-facing roles
+High-Tech Industry experience would be an advantage
+Inclusion statement
+As a game-changer in sustainable technology and innovation, Dassault Systèmes is striving to build more inclusive and diverse teams across the globe. We believe that our people are our number one asset and we want all employees to feel empowered to bring their whole selves to work every day. It is our goal that our people feel a sense of pride and a passion for belonging. As a company leading change, it’s our responsibility to foster opportunities for all people to participate in a harmonized Workforce of the Future.

@@ -315,6 +315,12 @@ risk_summary:
   culture: "{pass | caution | fail | not_evaluated}"
   interview_redflags: "{none | caution | warning | not_evaluated}"
   ai_infra: "{consistent | mismatch | not_evaluated}"
+why_great_for_you: "{1–2 sentence personalized explanation of why this role is a strong match for the candidate, referencing specific CV strengths and JD requirements}"
+experience_delta:
+  required: {number of years the JD asks for, or null if unstated}
+  yours: {candidate's actual years of professional experience, computed from cv.md work history}
+  delta: {yours minus required, e.g. +3 or -2, or null if required is null}
+  note: "{brief contextual note, e.g. 'JD says 5+ years; you have ~5.5 years (Oct 2020–present)' or 'JD does not state a year requirement'}"
 ```
 
 Rules:
@@ -325,6 +331,8 @@ Rules:
 - Do not invent missing data. If confidence is limited, set `confidence: "Low"` and explain the limitation in the human-readable sections.
 - `work_auth` reflects the Block A work-authorization tier: `no_sponsorship` only when the JD **explicitly** refuses sponsorship for a role outside the candidate's `authorized_in`; `unstated` when the JD is silent (neutral, not a blocker); `not_needed` when the role is within `authorized_in` or sponsorship isn't required; `sponsors` when the JD explicitly offers it.
 - `risk_summary` mirrors the `## Risk Summary` block row by row — same source verdicts, snake_cased: `legitimacy` from the Block G tier (`high_confidence` / `proceed_with_caution` / `suspicious`), `culture` from the Block A Culture screen (`pass` / `caution` / `fail`), `interview_redflags` from the red-flag file's warning level (`none` / `caution` / `warning`). Any row rendered `— not evaluated` (or `— no interview sessions yet`) is `not_evaluated` here. Never invent a value the block does not show.
+- `why_great_for_you` is a concise, personalized sentence synthesized from the completed Block B (CV match) and Block C (Level and Strategy) analysis. It should highlight the 1–2 strongest match points between the candidate's actual experience and the JD's top requirements. Source-of-truth rules apply: never reference skills or experience not evidenced in `cv.md`. When the match is weak, say so honestly (e.g. "Partial match — your AWS container experience is relevant but the role's serverless focus is a gap").
+- `experience_delta.required` is the number of years the JD explicitly asks for (e.g. "5+ years" → `5`); `null` when the JD is silent on experience years. `experience_delta.yours` is computed from `cv.md` work history (first role start date to present, minus career gaps longer than 3 months). `experience_delta.delta` is `yours - required` (positive = you exceed, negative = you're short). `experience_delta.note` is a brief human-readable contextual sentence.
 
 ### Step 3 — Save the Report
 

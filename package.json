@@ -91,8 +91,9 @@
   "license": "MIT",
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
-    "dotenv": "^17.0.0",
+    "dotenv": "^17.4.2",
     "js-yaml": "^4.3.1",
+    "nodemailer": "^9.0.5",
     "playwright": "1.62.1"
   }
 }

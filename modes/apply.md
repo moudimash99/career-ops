@@ -251,11 +251,15 @@ Field-tested across ~12 Playwright-driven applications (Ashby, Greenhouse, Lever
 - **Agent:** Before filling the email field, check whether an earlier report for the same company already exists in `reports/`. If it does, warn the candidate and pre-fill a `+tag` alias (e.g., `user+teamname@domain.com`) as the suggested value.
 - **Candidate:** Confirms or changes the email before the form is submitted.
 
-### Lever — hCaptcha intercepts checkbox/radio clicks
+### Captcha Handling (e.g. Lever hCaptcha)
 
-- **Symptom:** Programmatic `click()` on checkboxes or radio buttons triggers an hCaptcha challenge mid-form, blocking the rest of the fill.
-- **Agent:** Fill `<input type="text">`, `<textarea>`, and `<select>` fields only. Skip all checkboxes, radio buttons, and the captcha widget. List the skipped fields with their recommended values so the candidate can tick them.
-- **Candidate:** Completes the checkboxes, solves the captcha, and clicks Submit.
+- **Symptom:** Programmatic `click()` on checkboxes, radio buttons, or the Submit button triggers a captcha challenge (like hCaptcha or reCAPTCHA), blocking the rest of the fill.
+- **Agent:** You must proactively avoid captchas and handle them gracefully using one of two behaviors:
+  1. **Default (Option 1):** Abort the form filling/submission. Do NOT get stuck. Safely close or skip the page, note down the application URL in a tracking file (e.g., `output/captcha_links.txt`), and move on.
+     * **Proactive Skip:** Before starting a batch, skip URLs of known Captcha-heavy sites (like Lever).
+     * **Reactive Skip:** If a Captcha appears on a new ATS mid-batch, learn its domain/pattern and instantly skip all other matching URLs in the batch.
+  2. **Wait Mode (Option 2):** If explicitly requested, pause and prompt the candidate to manually solve the captcha on screen, and wait until the captcha is gone before resuming.
+- **Candidate:** When using Option 2, the candidate solves the captcha and clicks Submit, or the agent resumes once it detects the captcha is gone.
 
 ### Workable — SPA re-renders break form refs
 

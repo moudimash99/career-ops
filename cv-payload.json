@@ -1,0 +1,124 @@
+{
+  "lang": "fr-FR",
+  "page_format": "a4",
+  "candidate": {
+    "name": "Mohammad Machaka",
+    "phone": "+33 7 53 37 78 23",
+    "email": "machaka.mohammad@gmail.com",
+    "linkedin": { "url": "https://linkedin.com/in/mohammad-machaka-a63685172", "display": "linkedin.com/in/mohammad-machaka-a63685172" },
+    "portfolio": { "url": "https://machaka.net", "display": "machaka.net" },
+    "location": "Toulouse, France",
+    "photo": "",
+    "photo_style": "rounded"
+  },
+  "sections": {
+    "summary": "Résumé Professionnel",
+    "competencies": "Compétences Clés",
+    "experience": "Expérience Professionnelle",
+    "projects": "Projets en Ingénierie Système",
+    "education": "Formation",
+    "certifications": "Certifications",
+    "skills": "Compétences Techniques"
+  },
+  "summary": "Ingénieur Cloud et Données avec une solide expertise en administration de systèmes Linux et en automatisation, complétée par une formation en ingénierie système (ISAE-SUPAERO MS SEN). Expérimenté dans la gestion de plateformes Kubernetes/AWS, l'automatisation de l'infrastructure (Terraform, CI/CD) et l'exploitation des systèmes aux niveaux 2 et 3 avec une observabilité avancée. Je construis et opère des plateformes temps réel avec des SLA stricts, tout en appliquant les principes de l'ingénierie système pour garantir l'intégrité des données.",
+  "competencies": ["Administration Systèmes Linux", "Automatisation & IaC", "Exploitation Niveaux 2/3", "AWS & Kubernetes", "Observabilité", "Ingénierie Système (MBSE)"],
+  "experience": [
+    {
+      "company": "Airbus Electric Center",
+      "role": "Ingénieur Système et Qualité (Stagiaire)",
+      "location": "Toulouse, France",
+      "dates": "Mai 2026 - Nov 2026",
+      "bullets": [
+        "Architecture d'un pipeline de données centralisé sur Skywise (Palantir Foundry) pour remplacer le suivi fragmenté des non-conformités, visant à réduire le Coût de Non-Qualité (CoNQ).",
+        "Application des principes de l'ingénierie système pour modéliser l'architecture des données qualité 'as-is' et 'to-be', garantissant l'intégrité des données avec des procédures d'exploitation standardisées."
+      ]
+    },
+    {
+      "company": "Green Praxis",
+      "role": "Ingénieur Cloud & Données",
+      "location": "Aix-en-Provence, France",
+      "dates": "Jan 2025 - Août 2025",
+      "bullets": [
+        "Administration et exploitation des plateformes Linux (niveaux 2 et 3) sur AWS EKS, provisionnées via Terraform et Karpenter pour un autoscaling dynamique.",
+        "Développement de processus d'automatisation avec plus de 15 DAGs Airflow pour l'ingestion géospatiale, multipliant le débit par 6 (de 8 à 48 scènes/heure).",
+        "Refonte d'un service statique vers une API FastAPI à la demande avec cache Redis, réduisant l'empreinte de stockage de 80% et la latence P95 de 63% (600 ms à 220 ms).",
+        "Déploiement de Prometheus et Grafana via Helm (24 tableaux de bord, 35 règles d'alerte), assurant un SLA supérieur à 98% sur les chemins critiques."
+      ]
+    },
+    {
+      "company": "Airbus SAS",
+      "role": "Ingénieur Données (Alternance)",
+      "location": "Toulouse, France",
+      "dates": "Jan 2023 - Juin 2024",
+      "bullets": [
+        "Conception de flux ETL Python unifiés consolidant des sources RH hétérogènes sur 5 régions, réduisant le temps de déploiement des tableaux de bord de 80%.",
+        "Automatisation de la validation des données et définition de SLA, diminuant de 90% les erreurs manuelles.",
+        "Projet OPTIMATE : Définition de l'architecture des flux de données pour le roulage automatisé, incluant les interfaces et contrats."
+      ]
+    },
+    {
+      "company": "Murex Systems",
+      "role": "Architecte Logiciel / Chef de Projet",
+      "location": "Beyrouth, Liban",
+      "dates": "Mai 2021 - Jan 2022",
+      "bullets": [
+        "Conception et direction d'une plateforme d'analyse de logs pour détecter les schémas d'échec, identifiant plus de 50 types d'erreurs non détectées auparavant.",
+        "Architecture de composants modulaires avec des pipelines de déploiement automatisés sur Kubernetes et Docker."
+      ]
+    }
+  ],
+  "projects": [
+    {
+      "name": "SUNSPEAR",
+      "description": "Projet véhicule/mission à l'ISAE-SUPAERO. Responsable du CONOPS, des exigences, des ICDs et de la stratégie de vérification (V&V). Livraison d'une architecture de référence et des interfaces clés."
+    },
+    {
+      "name": "HydroART",
+      "description": "Architecture de mission incluant les budgets de masse/puissance/données, le contrôle des interfaces et la planification V&V à l'ISAE-SUPAERO."
+    }
+  ],
+  "education": [
+    {
+      "title": "Mastère Spécialisé, Systems Engineering (SEN)",
+      "org": "ISAE-SUPAERO",
+      "year": "Mai 2026",
+      "description": "Focus : MBSE (SysML/Capella), Ingénierie des exigences, V&V, ISO/IEC 15288."
+    },
+    {
+      "title": "Master Informatique pour l'Aéronautique",
+      "org": "Université Toulouse III – Paul Sabatier",
+      "year": "Juin 2024"
+    },
+    {
+      "title": "Licence Informatique",
+      "org": "American University of Beirut",
+      "year": "Juin 2020"
+    }
+  ],
+  "certifications": [
+    {
+      "title": "Associate Systems Engineering Professional (ASEP)",
+      "org": "INCOSE",
+      "year": "Mai 2026"
+    },
+    {
+      "title": "AWS Certified Solutions Architect – Associate",
+      "org": "Amazon Web Services",
+      "year": "Sep 2023"
+    }
+  ],
+  "skills": [
+    {
+      "category": "Systèmes & Cloud",
+      "items": "Linux, AWS (EKS, EC2, S3), Kubernetes, Docker, Helm, Terraform, CI/CD"
+    },
+    {
+      "category": "Ingénierie Système",
+      "items": "MBSE, SysML, Capella, Exigences, ICDs, V-model, ISO/IEC 15288"
+    },
+    {
+      "category": "Développement & Données",
+      "items": "Python, C++, FastAPI, Airflow, Prometheus, Grafana, PostgreSQL"
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+═══════════════════════════════════════════════════
+ career-ops apply — 5 Tech Company Applications
+ (Veepee, Pennylane, Scaleway, Owkin)
+═══════════════════════════════════════════════════
+
+▶ Opening [1/5] Veepee - SRE - DataPlatform...
+  📎 CV PDF uploaded automatically.
+  ✅ Fields populated. Left for you: Check boxes, Captcha, Submit.
+▶ Opening [2/5] Pennylane - Senior Data Engineer...
+  📎 CV PDF uploaded automatically.
+  ✅ Fields populated. Left for you: Check boxes, Captcha, Submit.
+▶ Opening [3/5] Scaleway - System Engineer (Object Storage)...
+  📎 CV PDF uploaded automatically.
+  ✅ Fields populated. Left for you: Check boxes, Captcha, Submit.
+▶ Opening [4/5] Owkin - Senior Software Engineer (Platform)...
+  📎 CV PDF uploaded automatically.
+  ✅ Fields populated. Left for you: Check boxes, Captcha, Submit.
+▶ Opening [5/5] Scaleway - SRE - Network Products...
+  📎 CV PDF uploaded automatically.
+  ✅ Fields populated. Left for you: Check boxes, Captcha, Submit.
+
+All 5 tech tabs open! Browser will stay open until you close it.
+^C
