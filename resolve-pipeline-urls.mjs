@@ -54,16 +54,26 @@ async function resolve(url) {
   return { error: 'no known ATS fingerprint on the page' };
 }
 
-/** Confirm the rewritten URL actually resolves before trusting it. */
+/**
+ * Confirm the rewritten URL actually serves an application form.
+ *
+ * Checking the API alone is not enough: Datadog's board answers
+ * boards-api.greenhouse.io fine, but boards.greenhouse.io/datadog/jobs/{id}
+ * 302s straight back to careers.datadoghq.com, which has no Greenhouse form on
+ * it. That produced 19 rewrites that all failed later with NO_FORM.
+ */
 async function verify(hit) {
   if (hit.vendor !== 'greenhouse') return true;
   const m = hit.url.match(/greenhouse\.io\/([^/]+)\/jobs\/(\d+)/);
   if (!m) return false;
   try {
-    const res = await fetch(`https://boards-api.greenhouse.io/v1/boards/${m[1]}/jobs/${m[2]}`, {
+    const api = await fetch(`https://boards-api.greenhouse.io/v1/boards/${m[1]}/jobs/${m[2]}`, {
       signal: AbortSignal.timeout(15000),
     });
-    return res.ok;
+    if (!api.ok) return false;
+    // The board must actually host the form, not bounce back to the brand site.
+    const page = await fetch(hit.url, { redirect: 'follow', signal: AbortSignal.timeout(20000) });
+    return page.ok && /greenhouse\.io/.test(new URL(page.url).hostname);
   } catch {
     return false;
   }
