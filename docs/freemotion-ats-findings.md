@@ -534,6 +534,30 @@ Nested-frame architecture and a gate before the form.
   is a fourth reason a page looks empty, on top of G16's three, and the only
   one that is invisible from inside the browser.
 
+### Workday tenants that gate the form behind an account
+
+Some Workday tenants let a guest reach the form; others do not, and the
+difference is invisible from the posting. Checked 2026-09-09 on
+`accenture.wd103.myworkdayjobs.com`: the posting offers three routes —
+**Autofill with Resume**, **Apply Manually**, **Use My Last Application** —
+and *both* of the first two land on the same `Sign In` page (`Sign in with
+Google` / `Sign in with email`), with zero form controls. The URL keeps the
+`/apply/autofillWithResume` or `/apply/applyManually` path while the title
+becomes `Sign In`, so a "did I reach the form?" check keyed on the URL reports
+success on a page that has no form at all. Check for controls, not for a path.
+
+**This gates most of the high-score backlog.** The 4.0+ evaluated roles that
+have never been applied to sit almost entirely on Workday tenants — Accenture,
+Sanofi, NTT, Thales — and a Workday account is **per tenant**, so each one
+needs its own registration plus its own email verification. That makes
+`lib/freemotion-inbox.mjs` (Phase 9) the thing standing between this backlog
+and an automated run, and it is currently unconfigured: `readInboxConfig()`
+returns defaults and `getAccessToken()` throws for want of OAuth client
+credentials. Until that exists, each tenant costs the user one manual
+verification click, and the applier cannot resume unattended.
+
+---
+
 ## Open gaps
 
 1. **`data/freemotion-submissions.tsv` has no outcome for "the ATS refused
@@ -551,10 +575,15 @@ Nested-frame architecture and a gate before the form.
    `lib/voice-check.mjs`'s `styleCalibration()` now says so on every run
    rather than letting "clean" imply "sounds like you". One past cover letter
    or LinkedIn About in `writing-samples/` closes it.
-4. **Phase 10 has never been exercised against a real verification wall.**
-   `lib/freemotion-inbox.mjs` makes `account-verification-pending` resumable
-   and is tested offline, but no live run has yet hit a confirm-your-email
-   gate and come back through it.
+4. **Phase 10 has never been exercised against a real verification wall, and
+   it is now the top blocker.** Gmail OAuth is unconfigured, so
+   `getAccessToken()` throws for want of client credentials. The Workday note
+   above explains why that gates most of the 4.0+ backlog.
+5. **Two 4.5+ scored roles are outside France** (#930 UK home office, #931
+   Nairobi), which the Passeport Talent route rules out. Location is not
+   weighted hard enough in scoring to disqualify them, so the top of the
+   backlog reads better than it is.
+
 
 ### Closed since the first version of this document
 
