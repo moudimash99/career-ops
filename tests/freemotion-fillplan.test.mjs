@@ -291,3 +291,38 @@ const src = readFileSync(join(ROOT, 'lib/freemotion-fillplan.mjs'), 'utf-8');
 const vendors = ['greenhouse', 'workday', 'lever', 'ashby', 'workable', 'icims', 'smartrecruiters', 'successfactors', 'radancy', 'taleo'];
 check('no ATS vendor is named in the plan builder',
   vendors.filter((v) => new RegExp(v, 'i').test(src)), []);
+
+// ------------------------------- a hidden control is clicked by its label
+
+// Four force-clicks on four custom-styled radios all reported success and
+// left every group unanswered: the real inputs were 0x0 behind painted
+// labels, so the click landed on whatever was on top. Same shape as G6 for
+// uploads, same remedy — click the visible thing.
+const hiddenRadio = buildFillPlan({
+  fields: [], uploads: [],
+  groups: [{
+    group: 'lvl', question: 'Level', role: 'radio', required: true, visible: true, answered: false,
+    options: [
+      { label: 'Fluent', selector: '#r-2', hidden: true, clickSelector: 'label[for="r-2"]' },
+      { label: 'Basic', selector: '#r-1', hidden: true, clickSelector: 'label[for="r-1"]' },
+    ],
+  }],
+}, [{ question: 'Level', choices: ['Fluent'] }]);
+check('a hidden radio is clicked through its label', hiddenRadio.actions[0].target, 'label[for="r-2"]');
+check('and it is still a click, not something cleverer', hiddenRadio.actions[0].op, 'click');
+
+const visibleRadio = buildFillPlan({
+  fields: [], uploads: [],
+  groups: [{
+    group: 'lvl', question: 'Level', role: 'radio', required: true, visible: true, answered: false,
+    options: [{ label: 'Fluent', selector: '#v-2', hidden: false, clickSelector: '' }],
+  }],
+}, [{ question: 'Level', choices: ['Fluent'] }]);
+check('an ordinary radio is still clicked directly', visibleRadio.actions[0].target, '#v-2');
+
+const hiddenConsent = buildFillPlan({
+  fields: [{ selector: '#gdpr', label: 'I agree to the privacy policy', role: 'checkbox', tag: 'input',
+    required: true, visible: true, checked: false, hidden: true, clickSelector: 'label.consent' }],
+  groups: [], uploads: [],
+}, [{ question: 'I agree to the privacy policy', value: 'Yes' }]);
+check('a hidden consent checkbox uses its label too', hiddenConsent.actions[0].target, 'label.consent');

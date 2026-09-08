@@ -652,3 +652,36 @@ check('and the blocker names the field', withError.blockers[0], 'error on fitSco
 
 check('an empty inventory is ready, not a crash', readiness({}).ready, true);
 check('pendingWork tolerates an empty inventory', pendingWork({}), { required: [], optional: [], uploads: [] });
+
+// ------------------------------------- a dial prefix is not a phone number
+
+// A phone widget with a country picker pre-fills the input with the dial code
+// on render. A plain non-empty test called the field answered, no fill was
+// planned, and the form then rejected "+33" as invalid — naming a field that
+// looked populated both on screen and in the inventory.
+const dialOnly = pendingWork({
+  fields: [
+    { selector: '#p1', label: 'Phone', role: 'textbox', tag: 'input', required: true, visible: true, value: '+33' },
+    { selector: '#p2', label: 'Phone', role: 'textbox', tag: 'input', required: true, visible: true, value: ' +33 ' },
+    { selector: '#p3', label: 'Phone', role: 'textbox', tag: 'input', required: true, visible: true, value: '0033' },
+  ],
+  groups: [], uploads: [],
+});
+check('a lone dial prefix is not an answer', dialOnly.required.length, 3);
+
+const realValues = pendingWork({
+  fields: [
+    { selector: '#a', label: 'Phone', role: 'textbox', tag: 'input', required: true, visible: true, value: '+33 7 53 37 78 23' },
+    { selector: '#b', label: 'Postcode', role: 'textbox', tag: 'input', required: true, visible: true, value: '31300' },
+    { selector: '#c', label: 'Years', role: 'textbox', tag: 'input', required: true, visible: true, value: '6' },
+    { selector: '#d', label: 'Salary', role: 'textbox', tag: 'input', required: true, visible: true, value: '42000' },
+  ],
+  groups: [], uploads: [],
+});
+// The rule has to stay narrow: a bare number with no plus sign is a real
+// answer, and so is a full number that merely starts with a prefix.
+check('a real value is still an answer, prefix-shaped or not', realValues.required.length, 0);
+
+check('the tag comes through, so a native select is distinguishable from a combobox',
+  pendingWork({ fields: [{ selector: '#s', label: 'Country', role: 'combobox', tag: 'select', required: true, visible: true, value: '', options: ['A'] }], groups: [], uploads: [] })
+    .required[0].tag, 'select');
