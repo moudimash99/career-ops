@@ -93,6 +93,14 @@ policy, or what gets submitted.
    human would call it complete, not when its asterisks are satisfied — see the
    "Never" list for the one exception.
 
+   **One field is never filled, optional or required: a honeypot.** A field
+   whose label asks to be left blank, or that is parked off-screen, or that is
+   out of the tab order with no label, exists only to catch something that
+   fills every field it can see (G26). `pendingWork` drops them, so they never
+   reach the plan — but if you are working from a raw inventory rather than the
+   plan, check `honeypot` before typing. Filling one is the single thing that
+   marks an application as automated.
+
 3. **Build the fill plan from the inventory, not from the snapshot.**
 
    ```
@@ -121,9 +129,35 @@ policy, or what gets submitted.
    with `slowly: true` (the retry when a field reads back empty, G14); `click`
    → `browser_click` (**never** `el.click()` from `browser_evaluate`, G1);
    `select_option` → `browser_select_option`; `expand_then_pick` → click the
-   control, re-read `[role=option]`, click the option (typing into an ARIA
-   combobox filters but never commits); `upload` → click the trigger, then
-   `browser_file_upload` (G6).
+   control, re-read the options, click the option; `set_range` → click the
+   slider, then `browser_press_key ArrowRight`/`ArrowLeft` to step it (a
+   programmatic write to a range input is refused); `upload` → click the
+   trigger, then `browser_file_upload` (G6).
+
+   **Before the first action, clear anything overlaying the page.** Dismiss the
+   cookie banner even when the form reads perfectly (G31), and check for
+   `dialog[open]` — an open modal makes the whole page inert and turns every
+   later click into a 30-second timeout on a control that looks fine (G30).
+
+   **An action's `target` is already the right thing to click.** Where a control
+   is 0×0 behind a painted label, or a perfectly visible box with a paragraph
+   or a sticky bar drawn over it, the plan gives you the label instead
+   (G22). One caveat the plan cannot see: if that label contains a link
+   (a Privacy Policy anchor inside a consent line is the common case), clicking
+   its centre opens the link, so click the input directly once overlays are
+   clear.
+
+   **After EACH `cascade` action, re-read the inventory before the next one.**
+   Not once after the phase — after each step. A cascade parent does more than
+   re-render: choosing a country on one live form deleted the State field
+   outright, renamed "ZIP" to "Postal Code", and re-created three text fields
+   under fresh ids, so four fills failed on stale selectors (G28). A field that
+   has vanished is not an error.
+
+   **An `expand_then_pick` opener is a toggle.** The plan reports
+   `alreadyExpanded`; when it is true, do not click the opener, or you close
+   the menu you need. The options may live in the action's `menu` target rather
+   than in the control, and may be `<button>`s rather than labels.
 
    Three lists come back, and none of them may be ignored:
    - `needsJudgment` — no rule matched. Answer it yourself and fill it in the
