@@ -340,6 +340,201 @@ Two things followed from it, both worth keeping:
 
 ---
 
+### G21. Three different ways a control lies about being empty
+
+The "is this field already answered?" test looked obvious — a non-empty value
+means answered — and it was wrong three times in one night, each time silently.
+A field wrongly judged answered is never planned, so the form refuses to
+advance and names a control that looks perfectly filled on screen.
+
+- **A dial prefix.** A phone input fronted by a country picker renders holding
+  `+33`. Real value, not an answer. Now: a lone `+` or `00` plus at most four
+  digits and nothing else counts as empty.
+- **A slider's starting position.** `<input type=range>` always has a value —
+  it has to render somewhere. Now: a range is answered only when its value
+  differs from the `defaultValue` the markup shipped.
+- **A pre-selected placeholder option.** A `<select>` whose first option is
+  "Please select" has a value of `''` in well-built forms, but not always.
+  Watch for it; not yet a rule here because every case seen so far did use `''`.
+
+The general lesson is that "empty" is a property of the ANSWER, not of the
+string in the DOM. Ask what the control looks like before anyone touched it.
+
+---
+
+### G22. A hidden control is clicked by its label (G6, for choices)
+
+Four force-clicks on four custom-styled radios all reported success and left
+every group unanswered. The real inputs were 0×0 behind painted labels, so each
+click landed on whatever was on top — and a Playwright `force: true` click
+suppresses exactly the actionability complaint that would have caught it.
+
+Same shape as the 1×1 file input, same remedy: click the visible thing. A
+`<label>` bound to a control toggles it by definition, so there is no guess
+about which wrapper is clickable — resolve via `el.labels[0]`, then
+`label[for=id]`, then the nearest ancestor `<label>`. The reader now reports
+`hidden` and a `clickSelector` per option and per checkbox; the plan prefers it.
+
+On the form that exposed this, clicking labels instead took the same page from
+three unanswered required groups to `requiredEmpty: 0`.
+
+---
+
+### G23. A submit control is an `<input>` too
+
+`type=submit`, `button`, `reset` and `image` are all `<input>` elements, so a
+naive `input:not([type=hidden])` sweep collects them as fields. One form
+reported its submit as an unlabelled textbox whose "value" was the words
+*Submit application*, which a planner would then try to type an answer into.
+Exclude all four types at the source; the buttons are already reported
+separately, classified, in `submits`.
+
+---
+
+### G24. "Required" is often only in the label
+
+Some forms never set the `required` attribute and write the word instead —
+"First name * Required". A form like that reports zero required fields, a
+readiness check passes, and the submit is refused for a field nobody planned.
+
+Treat a control as required when its own accessible name contains the word, in
+the languages a label says it in (`required`, `mandatory`, `obligatoire`,
+`requis`, `erforderlich`, `obligatorio`, `obbligatorio`). Only as a fallback,
+and only from the control's OWN label, never from surrounding page text.
+
+---
+
+### G25. Not every form on a careers page is the application
+
+A careers page carries other forms: a newsletter signup in the footer, a site
+search, a cookie preferences panel. One live page offered a field labelled
+"Email address without domain" — a mailing list — and a planner that fills
+every field on the page puts the candidate's address into it and calls the
+application complete.
+
+Controls now report their owning `<form>` as an index, and the plan keeps to
+the one holding the work. Which form that is gets decided by EVIDENCE, not by a
+name or a position: its uploads weigh most (a newsletter box never asks for a
+CV), then its required fields, then everything else. Two rules keep it safe:
+
+- A control belonging to **no** form is always kept. Plenty of ATS render their
+  fields outside a `<form>` element entirely, and dropping those would empty
+  the plan on exactly the pages that need it most.
+- A page with one form is never filtered.
+
+---
+
+### G26. A honeypot is a field that asks to be left alone
+
+Found live: an `<input>` labelled **"Please leave this field blank"**, optional,
+rendered, in an otherwise ordinary application form. The standing instruction
+for this project is to fill optional fields too — so it would have been filled,
+and filling it is the single thing that marks an application as automated.
+
+Three signals, checked independently. On the live field all three fired:
+
+1. The label asks to be left alone, in whatever language it asks (`leave this
+   field blank`, `ne pas remplir`, `nicht ausfüllen`, `dejar en blanco`, …).
+2. The control is parked off-screen (`position:absolute; left:-9999px` — the
+   live one measured at (-9902, -9759)) or painted to invisibility while still
+   reporting as laid out.
+3. It is out of the tab order (`tabindex="-1"`) with no label at all. A real
+   question is always reachable by keyboard.
+
+**Not** keyed on the field's name or id. That is fingerprinting one
+implementation: the moment a form calls its honeypot something other than
+`nickname_hpcsaf`, a name-based check is worthless while still looking like it
+works. `pendingWork` drops honeypots entirely, required ones included — a
+honeypot is not work to schedule, and the only correct action is none.
+
+---
+
+### G27. "Are there any fields?" is the wrong way to ask "am I on the form?"
+
+A job POSTING page routinely carries one or two fields: an "email me this job"
+box, a site search, a newsletter signup. Two opposite failures follow from
+guessing on the count:
+
+- Keyed on **zero** fields, the caller never clicks Apply on those pages,
+  because it thinks it is already on a form.
+- Keyed on **any** field, it stops at the posting and fills a mailing list.
+
+`looksLikeApplicationForm()`: an upload settles it (a newsletter box never asks
+for a CV), otherwise four or more questions. Both live probes that needed it —
+one at one field, one at two — were posting pages with an Apply button.
+
+---
+
+### G28. A cascade does more than re-render: it deletes, renames and re-ids
+
+The original G4 said a cascading select invalidates the refs below it. The live
+run went further. Choosing **France** for Country on one form:
+
+- **deleted** the State field outright (France has no state in that form's
+  model), so a plan built beforehand listed a field that no longer exists;
+- **renamed** "State *" to "Province *" and "ZIP *" to "Postal Code *";
+- **re-created** Address, City and Date Available under fresh ids, so four
+  fills failed on stale selectors and succeeded immediately on a re-read.
+
+Three consequences worth keeping:
+
+1. Re-read after **each** cascade step, not once after all of them.
+2. A field that has vanished is not an error. A caller that treats "the field
+   I planned is missing" as a failure fails a form that is perfectly fine.
+3. An answer rule must cover both countries' vocabulary for the same concept,
+   because the label changes under you. The postcode rule matching `zip`,
+   `postal code` and `postcode` is not redundancy, it is this.
+
+---
+
+### G29. A picklist can arrive with no options, or with a default nobody chose
+
+Two more ways a `<select>` misrepresents itself, both live on one form:
+
+- **No options yet.** Both picklists reported exactly one blank option, so a
+  ranked answer matched nothing and the plan reported the form as offering no
+  valid value. The options are injected when a person opens the control — the
+  popup then held 256 countries. Treat a select whose meaningful option count
+  is zero as `optionsUnknown` and open it, exactly like a collapsed combobox.
+- **A default nobody chose.** Country arrived set to *United States*, which
+  reads as perfectly answered and is wrong for most candidates. A REQUIRED
+  picklist still sitting on the option the markup shipped (`defaultSelected`)
+  has not been answered by anyone. Only required ones: an optional select left
+  at a sensible default is a legitimate end state.
+
+---
+
+### G30. Clicking a consent label can open a modal instead of ticking the box
+
+The consent line was *"I have read the Privacy Policy and accepted them"*, with
+**Privacy Policy** as a link inside the label. Clicking the label at its centre
+hit the link, which opened the policy in a `<dialog>`. That dialog is `:modal`,
+so everything behind it became inert, and the next three clicks timed out for
+reasons that had nothing to do with the controls they named.
+
+So the click-target preference has an exception: prefer the input once overlays
+are clear, and use the label only when the input is genuinely unclickable AND
+the label contains no anchor. And check `dialog[open]` / `:modal` before
+concluding a control is broken — an open modal explains every timeout on the
+page at once.
+
+---
+
+### G31. Dismiss a consent banner even when the form is perfectly readable
+
+G11 covered the case where a cookie wall replaces the form. This is the case
+where it merely **covers part of it**: the form read fine, 17 fields and 2
+groups, and three controls in the lower half could not be clicked because a
+banner sat on top of them. Same 30-second timeouts, no error message, nothing
+in the inventory to suggest a cookie problem.
+
+Dismiss the banner first, always, whether or not the form looks readable. One
+live page also had a cookie **preferences** form of its own, whose "Strictly
+necessary" checkbox showed up in the page's checked-boxes list — another reason
+the owning-form filter (G25) exists.
+
+---
+
 ## Per-ATS notes
 
 ### Radancy career site proxying Workday (`careers.thalesgroup.com`)
@@ -470,6 +665,88 @@ profile instead. A generic driver surfaces that immediately; a per-site script
 never does, because whoever writes it already knows the answer.
 
 
+### Recruitee (`careers.{company}.com/o/{slug}/c/new`) — fully French
+
+The first form driven end to end entirely in French, which is what the
+language-agnostic claim needed. 4 fields, 3 groups, 2 uploads, all in French.
+The apply URL is reachable directly from `https://{co}.recruitee.com/api/offers/`
+(`careers_apply_url`), so no entry click is needed.
+
+- One **"Nom complet"** field rather than first/last. The answer rule for it
+  has to sit BEFORE the first/last rules, which both contain the word "name"
+  and would otherwise swallow it and answer with half the name.
+- Every one of its 11 radios and checkboxes is 0×0 behind a visible label —
+  see G22. Four `force: true` clicks on the inputs reported success and left
+  every group unanswered; clicking the labels took the same page from three
+  unanswered required groups to `requiredEmpty: 0`.
+- The phone field ships holding `+33` (G21).
+- Its CEFR groups are phrased "Comment évalues-tu ton niveau en anglais ?",
+  which no English-keyed rule reaches. Both language rules now carry the French
+  phrasing.
+
+Result: **all 8 planned actions landed, `requiredEmpty: 0`, not submitted.**
+
+---
+
+### Teamtailor (`careers.{company}.co/jobs/{id}-{slug}`)
+
+Richest single form of the night: 17 fields, 2 groups, 2 uploads, and four
+distinct problems in one page — a range slider (G21/G29), a submit control
+reported as a field (G23), "Required" only in the label (G24), and a newsletter
+signup in a second form (G25). It also supplied G30 and G31.
+
+- The apply control is on the posting; clicking it reveals the form in place.
+- **English fluency is a 1–5 slider.** No `choose` list can answer that; the
+  `set_range` op steps it with arrow keys, and a top-of-scale answer maps to
+  the control's own max.
+- The "Where did you first hear about this job offer?" question is ten radios,
+  all 0×0 in a container marked hidden, behind one "Select an option" button
+  whose `aria-controls` points at a separate `[role=menu]` of ten `<button>`s.
+  Markup says radio group; behaviour says combobox (G28's sibling case).
+- The opener is a toggle: clicking it without checking `aria-expanded` closes a
+  menu that was already open, then reports no options visible.
+
+Result: **name, email, phone, essay, slider, CV, source, office answer and both
+consents all filled; newsletter untouched; not submitted.**
+
+---
+
+### BambooHR (`{company}.bamboohr.com/careers/{id}`)
+
+Listing available with no key at `/careers/list` (JSON). The apply form is
+revealed by a button on the posting; `looksLikeApplicationForm` is what tells
+the two states apart (G27).
+
+- **The honeypot lives here** (G26).
+- Its picklists are 0×0 native `<select>`s at opacity 0 behind
+  `button.fab-SelectToggle`, with options injected on open (G29).
+- Country → France triggered the strongest cascade seen (G28): State deleted,
+  ZIP renamed to Postal Code, three text fields re-created under new ids.
+
+Result: **13 of 14 fields filled, honeypot left empty, CV attached, one
+province picklist outstanding on a posting that is not a real target.** Used as
+a form-shape test only; no tracker row.
+
+---
+
+### join.com (`join.com/companies/{co}/{id}-{slug}`)
+
+Apply leads to `/apply/authentication` — an email-first gate offering "Weiter"
+or "Weiter mit Google" before any form. Not full registration, but still a
+verification step, so it belongs to the same Phase 9 path as the Workday
+tenants. Recorded, not pursued: the posting was a Berlin Werkstudent role.
+
+---
+
+### Personio (`{company}.jobs.personio.de`)
+
+The XML feed at `/xml` is public and lists positions with ids, but the job URL
+built from an id (`/job/{id}`) redirected to the marketing site on the posting
+tried, and the feed carries no `<url>` element to use instead. Feed is useful
+for discovery; the apply URL needs resolving another way. Unfinished.
+
+---
+
 ### SmartRecruiters (`jobs.smartrecruiters.com` → `oneclick-ui`)
 
 The hardest of the six structurally, and the one that produced G11-G15.
@@ -585,10 +862,13 @@ verification click, and the applier cannot resume unattended.
    `lib/voice-check.mjs`'s `styleCalibration()` now says so on every run
    rather than letting "clean" imply "sounds like you". One past cover letter
    or LinkedIn About in `writing-samples/` closes it.
-4. **Phase 10 has never been exercised against a real verification wall, and
-   it is now the top blocker.** Gmail OAuth is unconfigured, so
-   `getAccessToken()` throws for want of client credentials. The Workday note
-   above explains why that gates most of the 4.0+ backlog.
+4. **Phase 10 has never been exercised against a real verification wall,
+   but it is no longer blocked.** Gmail OAuth was wired up 2026-09-09 from
+   credentials the user already had, and verified end to end: a token refresh
+   plus a real message fetch for machaka.mohammad@gmail.com. What remains is
+   an actual run that hits a confirm-your-email gate and comes back through
+   it. The Workday tenants and join.com's /apply/authentication are both
+   waiting on exactly that.
 5. **Two 4.5+ scored roles are outside France** (#930 UK home office, #931
    Nairobi), which the Passeport Talent route rules out. Location is not
    weighted hard enough in scoring to disqualify them, so the top of the
