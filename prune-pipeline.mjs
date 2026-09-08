@@ -23,7 +23,7 @@
  */
 
 import fs from 'fs';
-import yaml from 'js-yaml';
+import * as yaml from 'js-yaml';
 import { buildLocationFilter, loadBlacklist, locationHintFromUrl } from './scan.mjs';
 import { normalizeCompany } from './tracker-utils.mjs';
 

@@ -304,6 +304,7 @@ risk_level: "{Low | Medium | High}"
 confidence: "{Low | Medium | High}"
 next_action: "{one concrete next step}"
 work_auth: "{sponsors | not_needed | unstated | no_sponsorship}"
+reports_to: {reporting line exactly as the JD states it, as a quoted string (e.g. "reports to the Head of Data"), or null when the JD says nothing}
 discard_reasons:
   - "{predicted reason if final_decision is Skip/Consider, e.g. salary_too_low, hybrid_required, tech_stack_mismatch, seniority_mismatch, geo_restriction, size_mismatch, company_culture, or other specific reason}"
 via: {agency/recruiter firm as a quoted string, or null for direct applications}
@@ -315,6 +316,7 @@ risk_summary:
   culture: "{pass | caution | fail | not_evaluated}"
   interview_redflags: "{none | caution | warning | not_evaluated}"
   ai_infra: "{consistent | mismatch | not_evaluated}"
+  ai_screening_disclosure: "{discloses | jurisdiction_requires_posting_silent | no_jurisdiction_match | not_evaluated}"
 why_great_for_you: "{1–2 sentence personalized explanation of why this role is a strong match for the candidate, referencing specific CV strengths and JD requirements}"
 experience_delta:
   required: {number of years the JD asks for, or null if unstated}
@@ -380,6 +382,7 @@ risk_level: "{Low | Medium | High}"
 confidence: "{Low | Medium | High}"
 next_action: "{one concrete next step}"
 work_auth: "{sponsors | not_needed | unstated | no_sponsorship}"
+reports_to: {reporting line exactly as the JD states it, as a quoted string (e.g. "reports to the Head of Data"), or null when the JD says nothing}
 discard_reasons:
   - "{predicted reason if final_decision is Skip/Consider, e.g. salary_too_low, hybrid_required, tech_stack_mismatch, seniority_mismatch, geo_restriction, size_mismatch, company_culture, or other specific reason}"
 via: {agency/recruiter firm as a quoted string, or null for direct applications}
@@ -391,6 +394,7 @@ risk_summary:
   culture: "{pass | caution | fail | not_evaluated}"
   interview_redflags: "{none | caution | warning | not_evaluated}"
   ai_infra: "{consistent | mismatch | not_evaluated}"
+  ai_screening_disclosure: "{discloses | jurisdiction_requires_posting_silent | no_jurisdiction_match | not_evaluated}"
 ```
 ```
 
