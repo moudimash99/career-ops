@@ -11,14 +11,14 @@
 // Run: node test-all.mjs --only voice-check
 
 import { pass, fail, ROOT, rmSync } from './helpers.mjs';
-import { mkdtempSync, writeFileSync } from 'fs';
+import { mkdirSync, mkdtempSync, writeFileSync } from 'fs';
 import { tmpdir } from 'os';
 import { join } from 'path';
 import { pathToFileURL } from 'url';
 
 console.log('\nvoice-check — the anti-AI-slop gate');
 
-const { parseVoiceDna, checkText, REGISTERS } =
+const { parseVoiceDna, checkText, styleCalibration, REGISTERS } =
   await import(pathToFileURL(join(ROOT, 'lib/voice-check.mjs')).href);
 
 const check = (label, actual, expected) => {
@@ -188,6 +188,36 @@ zorptastic, flimflam, wibble
   check('ok is false when anything fatal fires', checkText('It — is fine.', { rules }).ok, false);
   check('warnings alone leave ok true',
     checkText('I work in French, English and Arabic. I did the work myself.', { rules }).ok, true);
+
+  // Style calibration is the honest limit of this whole file: it can remove
+  // the tells of machine writing, and it cannot make prose sound like a
+  // particular person. That needs a sample, and the checker has to say so
+  // rather than let a green result be read as "sounds like me".
+  const calRoot = join(tmp, 'cal');
+  mkdirSync(join(calRoot, 'writing-samples'), { recursive: true });
+  mkdirSync(join(calRoot, 'modes'), { recursive: true });
+  // README.md in writing-samples/ is the shipped explainer, not a sample.
+  writeFileSync(join(calRoot, 'writing-samples', 'README.md'), 'how to add samples', 'utf-8');
+  writeFileSync(join(calRoot, 'modes', '_profile.md'),
+    ['# Profile', '', '## Your Target Roles', ''].join('\n'), 'utf-8');
+  const bare = styleCalibration(calRoot);
+  check('a writing-samples dir holding only README is NOT calibrated', bare.calibrated, false);
+  check('and the README is not counted as a sample', bare.samples, 0);
+
+  writeFileSync(join(calRoot, 'writing-samples', 'old-cover-letter.md'), 'Dear team, ...', 'utf-8');
+  check('one real sample counts as calibrated', styleCalibration(calRoot).calibrated, true);
+
+  // The cached path: _profile.md carrying an extracted "## Writing Style"
+  // section counts even with the samples directory empty again.
+  rmSync(join(calRoot, 'writing-samples', 'old-cover-letter.md'), { force: true });
+  writeFileSync(join(calRoot, 'modes', '_profile.md'),
+    ['# Profile', '', '## Writing Style', '', '**Tone:** direct', ''].join('\n'), 'utf-8');
+  const cached = styleCalibration(calRoot);
+  check('a cached ## Writing Style section counts as calibrated', cached.calibrated, true);
+  check('and is reported as cached rather than sampled', [cached.samples, cached.cached], [0, true]);
+
+  check('a missing project root is uncalibrated, not a crash',
+    styleCalibration(join(tmp, 'nowhere')).calibrated, false);
 
   check('empty input is clean, not a crash', checkText('', { rules }).ok, true);
   check('null input is clean, not a crash', checkText(null, { rules }).ok, true);
