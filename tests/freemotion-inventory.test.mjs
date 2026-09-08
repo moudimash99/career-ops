@@ -753,3 +753,37 @@ for (const phrase of [
 for (const phrase of ['First Name', 'Cover letter (optional)', 'Leave of absence history', 'Blank canvas experience']) {
   check(`"${phrase}" is a real question`, LEAVE_BLANK.test(phrase), false);
 }
+
+// ------------------------------- a select can lie about being answered too
+
+// A form defaulting Country to its own company's country reads as perfectly
+// answered while being wrong for most candidates. A REQUIRED picklist still
+// sitting on the option the markup shipped has not been answered by anyone.
+const shippedDefault = pendingWork({
+  fields: [
+    { selector: '#req', label: 'Country *', role: 'combobox', tag: 'select', type: 'select-one',
+      required: true, visible: true, value: 'United States', defaultValue: 'United States', options: ['United States', 'France'] },
+    { selector: '#opt', label: 'Country', role: 'combobox', tag: 'select', type: 'select-one',
+      required: false, visible: true, value: 'United States', defaultValue: 'United States', options: ['United States', 'France'] },
+    { selector: '#chosen', label: 'Country *', role: 'combobox', tag: 'select', type: 'select-one',
+      required: true, visible: true, value: 'France', defaultValue: 'United States', options: ['United States', 'France'] },
+  ],
+  groups: [], uploads: [],
+});
+check('a required select on its shipped default is unanswered',
+  [...shippedDefault.required, ...shippedDefault.optional].map((f) => f.selector), ['#req']);
+
+// An optional select left at a sensible default is a legitimate end state,
+// and re-answering every one of those would fight the form for no reason.
+check('an optional select on its default is left alone',
+  shippedDefault.optional.some((f) => f.selector === '#opt'), false);
+check('a select deliberately changed is not re-answered',
+  shippedDefault.required.some((f) => f.selector === '#chosen'), false);
+
+// A native <select> holding only a blank placeholder has options injected on
+// interaction. Reporting [""] as the list sends a caller off to match its
+// answer against an empty string and conclude the form offers no valid value.
+check('a select with no options yet reports them as unknown, not as empty',
+  pendingWork({ fields: [{ selector: '#lazy', label: 'Country *', role: 'combobox', tag: 'select', type: 'select-one',
+    required: true, visible: true, value: '', optionsUnknown: true }], groups: [], uploads: [] })
+    .required[0].options, undefined);
