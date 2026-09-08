@@ -319,3 +319,91 @@ cover_letter:
 #     cross_role_bucket: "all_EM_roles"
 #     applied_to: ["Senior Software Engineer"]
 #     last_apply_date: "2026-01-01"
+
+# ── Application Answers (Free Motion) ──────────────────────────────────────
+#
+# The six categories the autonomous applier is FORBIDDEN from inferring. Every
+# other form question it will answer from cv.md, config/apply-answers.yml and
+# config/apply-essays.yml, or — failing all of those — by choosing the most
+# probable answer for you. These six it will not guess, because a wrong answer
+# here can cost a rescinded offer, a failed background check, or a work permit.
+#
+# Fill in what applies to you. A missing key is not fatal: work_authorization
+# falls back to location.visa_status and compensation falls back to the
+# compensation block above, both logged as `answered-from-fallback`. The other
+# four have no safe generic default, so an unlisted sub-question there is
+# answered by the model and logged as `inferred` — fill them in to avoid that.
+#
+# application_answers:
+#   work_authorization:
+#     authorized_to_work_in_france: true    # one key per country/region you
+#     authorized_to_work_in_eu: false       # hold authorisation for
+#     requires_sponsorship_now: false
+#     requires_sponsorship_future: true
+#     note: "Free-text nuance for your own reference; never submitted."
+#   background:
+#     criminal_record: false
+#     consent_to_background_check: true
+#   credentials:
+#     highest_degree: "MSc Computer Science, Example University, 2024"
+#     licences: []                          # [] answers "None", not "unknown"
+#     security_clearance: "none"
+#   compensation:
+#     expected_annual_gross_eur: 60000
+#     minimum_annual_gross_eur: 55000
+#     single_figure_answer: "60000"         # when a form demands one number
+#   availability:
+#     earliest_start_date: "2026-11-18"
+#     notice_period_days: 0
+#     willing_to_relocate: true
+#     willing_to_travel: true
+#   eeo_self_identification:
+#     # "decline" is a valid, truthful answer everywhere. Legal to decline in
+#     # the EU; US/UK forms often require an explicit selection.
+#     gender: "decline"
+#     race_ethnicity: "decline"
+#     disability_status: "decline"
+#     veteran_status: "not a veteran"
+
+# ── Browser Engine (Free Motion) ───────────────────────────────────────────
+#
+# Which browser the autonomous applier drives. This is the ENTIRE engine swap:
+# change these values, run `node lib/freemotion-engine-config.mjs --apply`, and
+# nothing else in the system needs editing — every other module is
+# browser-agnostic by construction.
+#
+# To swap in Camoufox (a hardened Firefox build, for sites behind Cloudflare
+# Enterprise / DataDome / Turnstile): set browser to firefox and put the
+# Camoufox binary path in executable_path.
+#
+# freemotion:
+#   browser_engine:
+#     name: playwright-default   # a label only, for your own reference
+#     browser: chromium          # chromium | firefox | webkit
+#     executable_path: ""        # empty = engine default; set to swap engines
+#     headless: true
+
+# ── Email verification (Free Motion) ───────────────────────────────────────
+#
+# When a site makes you register before it shows the application form, Free
+# Motion creates the account and then has to click a link in the confirmation
+# email. `node lib/freemotion-inbox.mjs check --domain <host>` reads that mail
+# and prints the one link to click.
+#
+# Reading it from Gmail needs GMAIL_CLIENT_ID / GMAIL_CLIENT_SECRET /
+# GMAIL_REFRESH_TOKEN in your environment (the same three the bundled gmail
+# plugin documents). Without them, paste the email into a file and use
+# `--from-file` — same guard rails, no credentials.
+#
+# trust_cross_site is the one setting worth thinking about. An inbox is the
+# only input channel a stranger can write to unprompted, so by default a link
+# is clicked automatically ONLY when it sits on the same registrable domain
+# the account was created on. Anything else is reported to you with its host
+# spelled out and left for you to open yourself. Turn this on only if your
+# ATS genuinely sends verification links from a different domain than the one
+# you registered on, and you have looked at one.
+#
+#   email_verification:
+#     window_minutes: 30         # only mail this recent is considered
+#     max_messages: 20           # how many recent messages to read
+#     trust_cross_site: false    # true = auto-click links on other domains

@@ -13,6 +13,32 @@ If `voice-dna.md` exists in the project root, it is a writing guardrail for gene
 
 **Precedence with personal style (`_profile.md` always wins):** The user's `## Writing Style` in `_profile.md` is the authority on voice and tone. Where `voice-dna.md` and `_profile.md` conflict, `_profile.md` wins — voice-dna never overrides a rule the user set for themselves. Example: if the user's `_profile.md` style uses em-dashes, keep them, even though voice-dna discourages them. voice-dna's anti-AI-slop rules apply only where `_profile.md` is silent. (`voice-dna.md` is itself a user file, so a user who wants the strict guardrail to win can simply leave that preference out of `_profile.md`.)
 
+### Run the check. Do not eyeball it.
+
+`node lib/voice-check.mjs --file <draft> [--register conversational|ats]`
+
+**Every piece of candidate-facing prose goes through this before it is typed
+into a form, pasted into an email, or rendered into a PDF.** Exit 1 means at
+least one HARD rule broke and the draft is not ready; rewrite and re-run.
+`--json` gives machine-readable findings with line numbers.
+
+The banned word and phrase lists are read out of `voice-dna.md` at run time,
+so editing that file changes the check and nothing has to be kept in sync.
+The checks that cannot be a word list live in the script: em dashes, the
+negative-parallelism skeletons of §3F (including the `rather than` and
+`instead of X-ing` disguises), copulative avoidance, meta commentary,
+participle padding, rule-of-three, and metronome rhythm.
+
+Pass `--register ats` for CV bullets and the Professional Summary so the
+conversational tier is not enforced on them, per the two-tier scope above.
+
+**Why this is mechanical rather than a reminder.** The rules on this page and
+in `voice-dna.md` already existed on 2026-09-07, and a run still shipped 3 em
+dashes and 7 concession-pivot constructions into live application forms; the
+candidate spotted the text as machine-written at a glance. A writer in the
+middle of a long task does not stop to re-read the guide and cannot see its
+own tells. The gate does not depend on remembering.
+
 ---
 
 ## Writing Style Calibration
