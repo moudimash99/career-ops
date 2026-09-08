@@ -430,3 +430,54 @@ check('a top-of-scale answer with no known maximum is still not guessed',
 
 check('a negative number is a valid slider value',
   resolveRange({ min: -5, max: 5 }, { value: '-2' }).value, '-2');
+
+// A visible 20x20 checkbox with a paragraph drawn over it does not silently
+// miss — it HANGS, because the automation waits for the element to become
+// clickable until it times out. Three of those cost 90 seconds on one live
+// form and left the consents unticked.
+const covered = buildFillPlan({
+  fields: [{ selector: '#consent', label: 'I agree to the privacy policy', role: 'checkbox', tag: 'input',
+    required: true, visible: true, checked: false, hidden: false, obstructed: true, clickSelector: 'label[for="consent"]' }],
+  groups: [], uploads: [],
+}, [{ question: 'I agree to the privacy policy', value: 'Yes' }]);
+check('an obstructed checkbox is clicked through its label', covered.actions[0].target, 'label[for="consent"]');
+
+// ------------------------------------- a radio group that is really a picklist
+
+// One form asked "Where did you first hear about this job offer?" as ten
+// radios, all 0x0 inside a container marked hidden, behind one visible button
+// reading "Select an option". By markup a radio group; by behaviour a
+// combobox. Clicking an option clicks something not yet rendered — and the
+// options turned out to live in a separate [role=menu] as <button>s, not in
+// the group at all.
+const collapsedGroup = (expandedNow) => buildFillPlan({
+  fields: [], uploads: [],
+  groups: [{
+    group: 'src', question: 'Where did you first hear about this job offer?', role: 'radio',
+    required: true, visible: true, answered: false, collapsed: true,
+    expandSelector: 'button[aria-controls="dd1"]', expandedNow, menuSelector: '[id="dd1"]',
+    options: [{ label: 'LinkedIn job offers', selector: '#c3' }, { label: 'Others', selector: '#c9' }],
+  }],
+}, [{ question: 'Where did you first hear about this job offer?', choices: ['Others'] }]);
+
+const closed = collapsedGroup(false).actions[0];
+check('a collapsed group is expanded, not clicked through', closed.op, 'expand_then_pick');
+check('and the target is its opener, not an option', closed.target, 'button[aria-controls="dd1"]');
+check('the wanted option still resolves from the markup', closed.value, 'Others');
+check('the aria-controls target travels with it', closed.menu, '[id="dd1"]');
+
+// The opener is a TOGGLE. A caller that clicks it without looking closes a
+// menu that was already open, which is how one run "expanded" a group twice
+// and then reported no options visible.
+const open = collapsedGroup(true).actions[0];
+check('an already-open group says so', open.alreadyExpanded, true);
+check('and its note warns against the second click', /do not click the opener/.test(open.note), true);
+check('a closed one warns that the opener toggles', /toggle/.test(closed.note), true);
+
+// An ordinary radio group with clickable options is untouched by all of this.
+const plainGroup = buildFillPlan({
+  fields: [], uploads: [],
+  groups: [{ group: 'g', question: 'Gender', role: 'radio', required: true, visible: true, answered: false,
+    options: [{ label: 'Male', selector: '#m' }] }],
+}, [{ question: 'Gender', choices: ['Male'] }]);
+check('a normal radio group is still a direct click', [plainGroup.actions[0].op, plainGroup.actions[0].target], ['click', '#m']);
