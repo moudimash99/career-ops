@@ -685,3 +685,71 @@ check('a real value is still an answer, prefix-shaped or not', realValues.requir
 check('the tag comes through, so a native select is distinguishable from a combobox',
   pendingWork({ fields: [{ selector: '#s', label: 'Country', role: 'combobox', tag: 'select', required: true, visible: true, value: '', options: ['A'] }], groups: [], uploads: [] })
     .required[0].tag, 'select');
+
+// --------------------------------------- posting page, or the form itself?
+
+const { looksLikeApplicationForm } = await import(pathToFileURL(join(ROOT, 'lib/freemotion-inventory.mjs')).href);
+
+// "Are there any fields?" is the wrong question. A posting page carries one or
+// two — an "email me this job" box, a search, a newsletter signup — so a
+// caller keyed on zero fields never clicks Apply on those pages, and one keyed
+// on any field stops at the posting and fills a mailing list.
+check('one stray email box is not an application form',
+  looksLikeApplicationForm({ counts: { fields: 1, groups: 0, uploads: 0, requiredEmpty: 1 } }), false);
+
+check('a CV upload settles it, however few the fields',
+  looksLikeApplicationForm({ counts: { fields: 1, groups: 0, uploads: 1, requiredEmpty: 2 } }), true);
+
+check('enough questions is the other way to tell',
+  looksLikeApplicationForm({ counts: { fields: 4, groups: 0, uploads: 0, requiredEmpty: 4 } }), true);
+
+check('and a group counts as a question',
+  looksLikeApplicationForm({ counts: { fields: 2, groups: 2, uploads: 0, requiredEmpty: 3 } }), true);
+
+check('an empty page is not a form', looksLikeApplicationForm({ counts: { fields: 0, groups: 0, uploads: 0, requiredEmpty: 0 } }), false);
+check('a missing inventory is not a form', looksLikeApplicationForm({}), false);
+check('a null inventory does not throw', looksLikeApplicationForm(null), false);
+
+// ------------------------------------------------------------- honeypots
+
+// Found live: an <input> labelled "Please leave this field blank" in an
+// ordinary application form, optional and rendered. This project fills
+// optional fields on purpose, so it would have been filled — and filling it
+// is the single thing that marks the application as automated.
+const honeypots = pendingWork({
+  fields: [
+    { selector: '#hp', label: 'Please leave this field blank', role: 'textbox', tag: 'input', required: false, visible: true, value: '', honeypot: true },
+    { selector: '#real', label: 'First Name', role: 'textbox', tag: 'input', required: true, visible: true, value: '', honeypot: false },
+  ],
+  groups: [], uploads: [],
+});
+check('a honeypot is not work, required or not',
+  [...honeypots.required, ...honeypots.optional].map((i) => i.selector), ['#real']);
+
+const onlyHoneypot = pendingWork({
+  fields: [{ selector: '#hp', label: 'Please leave this field blank', role: 'textbox', tag: 'input', required: true, visible: true, value: '', honeypot: true }],
+  groups: [], uploads: [],
+});
+check('even a REQUIRED honeypot is left alone', onlyHoneypot.required.length, 0);
+
+// The detection itself lives in the injected script, so exercise the phrasing
+// it keys on rather than the mechanism.
+const LEAVE_BLANK = /leave (this|it) (field )?(blank|empty)|leave blank|do ?n[o']?t (fill|complete)|ne (pas )?remplir|laissez? (ce champ )?vide|nicht ausf.llen|dejar? en blanco|non compilare/i;
+for (const phrase of [
+  'Please leave this field blank',
+  'Leave this field empty',
+  'leave blank',
+  'Do not fill this in',
+  'Don\'t fill this field',
+  'Ne pas remplir',
+  'Laissez ce champ vide',
+  'Bitte nicht ausfüllen',
+  'Dejar en blanco',
+  'Non compilare',
+]) {
+  check(`"${phrase}" reads as a honeypot`, LEAVE_BLANK.test(phrase), true);
+}
+// And the phrases a real question uses must not trip it.
+for (const phrase of ['First Name', 'Cover letter (optional)', 'Leave of absence history', 'Blank canvas experience']) {
+  check(`"${phrase}" is a real question`, LEAVE_BLANK.test(phrase), false);
+}
