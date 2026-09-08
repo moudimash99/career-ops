@@ -326,3 +326,107 @@ const hiddenConsent = buildFillPlan({
   groups: [], uploads: [],
 }, [{ question: 'I agree to the privacy policy', value: 'Yes' }]);
 check('a hidden consent checkbox uses its label too', hiddenConsent.actions[0].target, 'label.consent');
+
+// ------------------------------------------- a slider, and other people's forms
+
+// A range input reports the same role as a number box and takes no typed
+// value at all — a programmatic write is refused, and only a real interaction
+// moves it. It also always HAS a value, because it renders at a starting
+// position, so "non-empty" cannot mean "answered".
+const slider = buildFillPlan({
+  fields: [{ selector: '#s', label: 'How fluent are you in English?', role: 'spinbutton', tag: 'input',
+    type: 'range', required: true, visible: true, value: '1', defaultValue: '1', min: 1, max: 5, step: 1 }],
+  groups: [], uploads: [],
+}, [{ question: 'How fluent are you in English?', value: '5' }]);
+check('an untouched slider is planned, not read as answered', [slider.actions[0].op, slider.actions[0].value], ['set_range', '5']);
+
+const movedSlider = buildFillPlan({
+  fields: [{ selector: '#s', label: 'Fluency', role: 'spinbutton', tag: 'input',
+    type: 'range', required: true, visible: true, value: '4', defaultValue: '1', min: 1, max: 5 }],
+  groups: [], uploads: [],
+}, [{ question: 'Fluency', value: '5' }]);
+check('a slider already moved off its default is left alone', movedSlider.counts.actions, 0);
+
+check('a number box is still an ordinary fill',
+  opFor({ kind: 'field', role: 'spinbutton', tag: 'input', type: 'number' }), 'fill');
+
+// A careers page carries other forms. One live page offered a footer field
+// labelled "Email address without domain" — a mailing list — and filling every
+// field on the page puts the candidate's address into it.
+const twoForms = buildFillPlan({
+  fields: [
+    { selector: '#first', label: 'First name', role: 'textbox', tag: 'input', required: true, visible: true, value: '', formIndex: 0 },
+    { selector: '#news', label: 'Email address without domain', role: 'textbox', tag: 'input', required: true, visible: true, value: '', formIndex: 1 },
+  ],
+  groups: [],
+  uploads: [{ selector: '#cv', label: 'Upload CV', required: true, filled: false, formIndex: 0 }],
+}, [{ question: 'First name', value: 'Mohammad' }, { question: 'Email address without domain', value: 'x@y.z' }],
+  { resumePath: '/cv.pdf' });
+check('only the form holding the application is filled', twoForms.actions.map((a) => a.target), ['#cv', '#first']);
+
+// Plenty of ATS render their fields outside a <form> element entirely.
+const noForm = buildFillPlan({
+  fields: [{ selector: '#a', label: 'First name', role: 'textbox', tag: 'input', required: true, visible: true, value: '', formIndex: -1 }],
+  groups: [], uploads: [],
+}, [{ question: 'First name', value: 'Mohammad' }]);
+check('a field belonging to no form is kept', noForm.counts.actions, 1);
+
+// One form on the page means no filtering to do, whatever its index.
+const oneForm = buildFillPlan({
+  fields: [{ selector: '#a', label: 'First name', role: 'textbox', tag: 'input', required: true, visible: true, value: '', formIndex: 3 }],
+  groups: [], uploads: [],
+}, [{ question: 'First name', value: 'Mohammad' }]);
+check('a single form is never filtered out', oneForm.counts.actions, 1);
+
+// ---------------------------------------------- no invisible control characters
+
+// A backslash escape mangled into the literal control character it names is
+// invisible in an editor and changes behaviour silently: `cv\b` written as
+// "cv" plus a real backspace made AUTOFILL_UPLOAD_RE stop matching "Upload
+// CV", so a parseable resume was planned after the fields it overwrites and
+// nothing looked wrong anywhere. Cheap to check, impossible to eyeball.
+const CONTROL_CHARS = { 0: 'NUL', 8: 'backspace', 11: 'vertical tab', 12: 'form feed', 27: 'escape' };
+const sources = ['lib/freemotion-fillplan.mjs', 'lib/freemotion-inventory.mjs', 'lib/voice-check.mjs'];
+const offenders = [];
+for (const rel of sources) {
+  const text = readFileSync(join(ROOT, rel), 'utf-8');
+  for (let i = 0; i < text.length; i++) {
+    const code = text.charCodeAt(i);
+    if (CONTROL_CHARS[code]) offenders.push(`${rel}: ${CONTROL_CHARS[code]} at offset ${i}`);
+  }
+}
+check('no source file carries a literal control character', offenders, []);
+
+// --------------------------------------------------- answering a slider
+
+const { resolveRange } = mod;
+
+check('a numeric answer goes straight onto the slider',
+  resolveRange({ min: 1, max: 5 }, { value: '3' }).value, '3');
+
+// The answer engine returns a LABEL for a language question, and there is no
+// honest way to type "Fluent" into a 1-to-5 slider. But top-of-scale is what
+// Fluent means on one, so the mapping is sound.
+check('a top-of-scale label becomes the maximum',
+  resolveRange({ min: 1, max: 5 }, { value: 'Fluent', choices: ['Fluent', 'C1'] }).value, '5');
+
+check('the scale maximum is read from the control, not assumed',
+  resolveRange({ min: 0, max: 10 }, { value: 'Fluent' }).value, '10');
+
+check('a French top-of-scale label works the same way',
+  resolveRange({ min: 1, max: 4 }, { value: 'Courant' }).value, '4');
+
+// Maxing out a slider that measures years or salary would be a claim the plan
+// invented, so anything that is neither a number nor top-of-scale is a
+// judgment call.
+check('a middling label is reported, never rounded up',
+  resolveRange({ min: 1, max: 5 }, { value: 'Intermediate' }).value, null);
+
+check('and the reason says why it could not be answered',
+  /neither numeric nor top-of-scale/.test(resolveRange({ min: 1, max: 5 }, { value: 'Intermediate' }).reason), true);
+
+check('a top-of-scale answer with no known maximum is still not guessed',
+  resolveRange({}, { value: 'Fluent' }).value, null);
+
+check('a negative number is a valid slider value',
+  resolveRange({ min: -5, max: 5 }, { value: '-2' }).value, '-2');
