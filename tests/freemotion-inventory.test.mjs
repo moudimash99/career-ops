@@ -787,3 +787,20 @@ check('a select with no options yet reports them as unknown, not as empty',
   pendingWork({ fields: [{ selector: '#lazy', label: 'Country *', role: 'combobox', tag: 'select', type: 'select-one',
     required: true, visible: true, value: '', optionsUnknown: true }], groups: [], uploads: [] })
     .required[0].options, undefined);
+
+// ------------------------------------------ the required marker, in practice
+
+// The asterisk is the commonest required marker of all, and a word-only check
+// misses it entirely: one live form marked every required field with nothing
+// but "*" and so reported requiredEmpty 0 on a page where nine were mandatory.
+const REQUIRED_MARKER = /(^|[^a-z])(required|mandatory|obligatoire|requis|erforderlich|obligatorio|obbligatorio)([^a-z]|$)|[*✱]/i;
+for (const label of ['First Name *', 'Email* Required', 'Nom complet *', 'Champ obligatoire',
+  'Pflichtfeld erforderlich', 'Campo obligatorio', 'CV ✱']) {
+  check(`"${label}" reads as required`, REQUIRED_MARKER.test(label), true);
+}
+// Labels are short and do not use an asterisk for footnotes the way body text
+// does, but the word must not be matched inside an unrelated one.
+for (const label of ['Cover letter (Optional)', 'LinkedIn URL', 'Desired Pay',
+  'References (Name, Company, and Contact Information)', 'Requirements you have read']) {
+  check(`"${label}" is not marked required`, REQUIRED_MARKER.test(label), false);
+}
