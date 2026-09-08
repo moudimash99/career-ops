@@ -452,6 +452,16 @@ actions from `config/apply-answers.yml` and reported the one question it could
 not answer, and executing those actions in the order given left every required
 field satisfied with the submit button enabled. Stopped there — not submitted.
 
+Two more things about this shape, both relevant to the parked-tab workflow:
+
+- **The file input id is regenerated per modal instance** (`input_files_input_{random}`),
+  so a plan saved to disk and replayed after a reload targets an id that no
+  longer exists. Re-read the inventory instead of persisting a plan.
+- **An unsubmitted draft survives the tab.** Reopening the posting and clicking
+  Apply now restored every field, the consent tick and the attached CV from the
+  browser session. A parked application is therefore recoverable after the tab
+  is closed, which is worth knowing before re-filling one from scratch.
+
 It also produced G19 and G20, and exposed a gap that had been invisible for
 the whole build: **`config/apply-answers.yml` had no rule for email or phone.**
 The two fields every ATS asks for reached the model as open questions on every
