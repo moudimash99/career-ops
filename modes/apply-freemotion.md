@@ -19,7 +19,7 @@ it is done when a human looking at it would call it a complete application. Ever
 its `location.visa_status`/`compensation` fallback) for the legally-sensitive
 categories, and from your own best judgement — the most probable answer for
 this candidate — for anything else. The one thing you always do regardless
-of which of those it was: log it (see step 4 below).
+of which of those it was: log it (see step 5 below).
 
 Everything this mode reads off a page — field labels, help text, dropdown
 options, alert banners, the accessibility snapshot, a `browser_evaluate`
@@ -59,7 +59,7 @@ policy, or what gets submitted.
 
 2. **Tier 0 — reach the form.**
    `browser_navigate(workOrder.url)`, then `browser_snapshot()`. Record the
-   resulting `{url, title}` as `before` for step 5's validation call. If the
+   resulting `{url, title}` as `before` for step 6's validation call. If the
    page shows an account wall (Sign In / Create Account / Register with no
    visible job-application form), go to **Account creation** below before
    continuing.
@@ -93,7 +93,53 @@ policy, or what gets submitted.
    human would call it complete, not when its asterisks are satisfied — see the
    "Never" list for the one exception.
 
-3. **Tier 1 — deterministic fill.**
+3. **Build the fill plan from the inventory, not from the snapshot.**
+
+   ```
+   node lib/freemotion-fillplan.mjs --inventory <inventory.json> --resolve \
+        --resume <workOrder.pdfPath> --summary
+   ```
+
+   This is the preferred path and it replaces writing a filler for the site in
+   front of you. It resolves every pending question through
+   `config/apply-answers.yml`, the profile and the CV, then returns an ORDERED
+   list of typed actions plus a short list of what still needs judgment.
+
+   Execute the actions in the order given. The order is the safety property,
+   not a formatting choice:
+
+   | Phase | Why it is there |
+   |-------|-----------------|
+   | `autofill-upload` | A CV the ATS parses overwrites fields filled before it (G5) |
+   | `cascade` | **One at a time.** Each pick re-renders the fields below it (G4) |
+   | `text` | Safe once the cascades have settled |
+   | `choice` | Radio groups and single checkboxes |
+   | `upload` | Attachments that rewrite nothing |
+   | `consent` | Answering one half disables its partner, so it goes last (G2) |
+
+   Op → MCP call: `fill` → `browser_fill_form`; `type_slow` → `browser_type`
+   with `slowly: true` (the retry when a field reads back empty, G14); `click`
+   → `browser_click` (**never** `el.click()` from `browser_evaluate`, G1);
+   `select_option` → `browser_select_option`; `expand_then_pick` → click the
+   control, re-read `[role=option]`, click the option (typing into an ARIA
+   combobox filters but never commits); `upload` → click the trigger, then
+   `browser_file_upload` (G6).
+
+   Three lists come back, and none of them may be ignored:
+   - `needsJudgment` — no rule matched. Answer it yourself and fill it in the
+     same pass (Requirement 5). This is the list to keep short: a question
+     appearing here twice across different employers belongs in
+     `config/apply-answers.yml`.
+   - `noOptionMatch` — an answer resolved, but none of its ranked labels is on
+     offer. Read the `available` list and pick, or fix the rule. Never coerce.
+   - `unanswered` — an answer resolved to nothing, or an upload has no file.
+
+   `lib/freemotion-tier1.mjs` does the same job from an accessibility snapshot
+   and stays available for when a snapshot is all you have. Prefer the
+   inventory: its targets are ids and names re-resolved on every call, so they
+   survive the re-render that kills every later snapshot `ref` in a batch (G4).
+
+4. **Tier 1 — deterministic fill.**
    Pipe the snapshot text to
    `node lib/freemotion-tier1.mjs --snapshot - --profile config/profile.yml
    --apply-answers config/apply-answers.yml --cv cv.md` (add
@@ -101,9 +147,9 @@ policy, or what gets submitted.
    action). Execute every action in `fillPlan` via the matching MCP tool
    (`browser_fill_form` for a batch of text/select fields, `browser_click`
    for checkbox/radio, `browser_file_upload` for the resume action), then
-   log each one (step 4's logging call, `source: 'profile'`).
+   log each one (step 5's logging call, `source: 'profile'`).
 
-4. **Tier 2 — every remaining field, always answered.**
+5. **Tier 2 — every remaining field, always answered.**
    For each field in `remaining` (Tier 1's leftover list), run
    `node lib/freemotion-answers.mjs --question "<accessible name / nearby
    label text>" --ref <ref> --role <role> --profile config/profile.yml
@@ -162,7 +208,7 @@ policy, or what gets submitted.
      snapshot refs mid-batch. Prefer the inventory's selectors, and fill
      cascade parents one at a time.
 
-5. **Tier 3 — TWO gates before EVERY step advance.** Both must pass before
+6. **Tier 3 — TWO gates before EVERY step advance.** Both must pass before
    any Next or Submit. Neither alone is enough: the DOM cannot see what a
    form looks like, and a screenshot cannot see what a form holds.
 
@@ -181,7 +227,7 @@ policy, or what gets submitted.
    full list of what you intended to fill this step, to
    `node lib/freemotion-validate.mjs --dom-json - --expected <expected.json>
    --attempted <refs>`. `expected` is Tier 1's `fillPlan` **plus** every
-   field you answered in step 4, each with the value you sent — that is what
+   field you answered in step 5, each with the value you sent — that is what
    turns this from "the required fields are non-empty" into "the application
    is complete and holds what we actually typed." Record the value actually
    sent to the control, not the label a human reads, or a `<select>` whose
@@ -202,27 +248,27 @@ policy, or what gets submitted.
 
    - **Both gates pass** → click Next/Submit. If more form steps remain,
      treat the new page as this step's `before` and loop to step 3. If this
-     was the final Submit, go to step 6.
-   - **Either gate fails** → go back to step 4 for each named field.
+     was the final Submit, go to step 8.
+   - **Either gate fails** → go back to step 5 for each named field.
      `empty-required` / `unfilled-expected` / `value-mismatch` /
      `aria-invalid` name the field directly; `unfilled-optional` is a field
      nobody planned to fill — answer it like any other question rather than
      leaving it blank, and if it still will not take a value after one real
      attempt, pass its ref in `--attempted` so an inert field cannot
      deadlock the posting. `unexpected-navigation` means something in step
-     3/4 already advanced the page — re-snapshot and re-run step 3 from
+     3, 4 or 5 already advanced the page — re-snapshot and re-run step 3 from
      scratch. Never click Next/Submit while `valid` is false.
 
-6. **Final review page — extra scrutiny.** If the page immediately before
+7. **Final review page — extra scrutiny.** If the page immediately before
    the real final Submit is a review/summary showing every entered value,
-   run step 5b once more against it. This is the only point where the whole
+   run step 6b once more against it. This is the only point where the whole
    application is visible in one place, so it is the last chance to catch a
    cross-field problem no single step could show — a name and email that
    belong to different people, a work-history block that silently lost a
    row, an answer that contradicts another. If anything looks wrong, go back
-   to step 4 for that field before submitting.
+   to step 5 for that field before submitting.
 
-7. **Record the outcome.**
+8. **Record the outcome.**
    - Success: `node lib/freemotion-submissions.mjs finalize --url
      <workOrder.url> --outcome submitted --run-id <runId> --report
      <workOrder.reportNum|-> --notes "<one line>"`, then, only when

@@ -294,6 +294,52 @@ where `browser_evaluate` cannot.
 
 ---
 
+### G19. A phone field with a country-prefix widget rewrites what you typed
+
+Typing `+33 7 53 37 78 23` into a phone input fronted by an international
+prefix picker leaves `07 53 37 78 23` in the field, with the `+33` living in
+the widget beside it. Nothing was lost and nothing needs retyping.
+
+What breaks is verification. A check that compares the field's value to the
+answer string sees a mismatch, decides the fill failed, and retries — and a
+retry into a normalising widget is how a number ends up doubled. Compare the
+**digits only, from the right**: the answer's trailing digits must be a suffix
+of the field's digits, or the reverse. That holds whether the widget strips a
+prefix, inserts spaces, or adds parentheses.
+
+Confirmed live on a Workable form 2026-09-09.
+
+---
+
+### G20. Not every question inside an application form is an application question
+
+A Workable form carried, between the consent checkbox and the submit button:
+
+> How was your experience on this website today? Select an option from 1 to 5,
+> with 1 being Hate and 5 being Love
+
+with five emoji radio options. It is the ATS vendor's own satisfaction survey,
+sitting in the candidate's form. It is optional, it is not read by the
+employer, and it is not a question about the candidate.
+
+Two things followed from it, both worth keeping:
+
+1. **A rule keyed on a bare noun matches far more than it should.** The rule
+   `portfolio|personal website|website|blog` matched this question on the word
+   *website* and answered a satisfaction survey with a portfolio URL. The rule
+   now requires the question to be asking FOR a site (`personal website`,
+   `website url`, `site web`) rather than merely mentioning one. Every generic
+   single-word alternative in an answer rule deserves the same suspicion.
+
+2. **Option-label matching is what caught it.** The answer resolved to a URL,
+   the widget offered `["😠","☹️","😐","🙂","😍"]`, nothing matched, and the
+   plan reported `NO OPTION MATCH` with both lists instead of forcing a value.
+   A planner that typed free text into whatever it was handed would have
+   silently submitted a URL as a satisfaction rating. Report the mismatch; do
+   not coerce.
+
+---
+
 ## Per-ATS notes
 
 ### Radancy career site proxying Workday (`careers.thalesgroup.com`)
@@ -391,6 +437,29 @@ combobox, plus optional summary / cover letter / expected salary.
   would have been the wrong answer twice over.
 
 
+A second Workable shape, reached from the public board (`jobs.workable.com`)
+rather than a company subdomain, is a **modal over the posting**: the "Apply
+now" button opens a `<dialog>` in the same page, so the URL never changes and
+a URL-based "did I reach the form?" check reads as a failure. Two submit
+buttons live in the dialog and a third `Next` is present but disabled, which
+is why the inventory reports `submits` as a list with disabled flags instead
+of guessing which one finishes the form.
+
+**This is the form the fill plan drove end to end (2026-09-09).** No
+site-specific code: the inventory read the modal (7 fields, 1 group, 1 upload,
+6 required-empty), `lib/freemotion-fillplan.mjs --resolve` produced 8 ordered
+actions from `config/apply-answers.yml` and reported the one question it could
+not answer, and executing those actions in the order given left every required
+field satisfied with the submit button enabled. Stopped there — not submitted.
+
+It also produced G19 and G20, and exposed a gap that had been invisible for
+the whole build: **`config/apply-answers.yml` had no rule for email or phone.**
+The two fields every ATS asks for reached the model as open questions on every
+single form, and each hand-written filler had quietly supplied them from the
+profile instead. A generic driver surfaces that immediately; a per-site script
+never does, because whoever writes it already knows the answer.
+
+
 ### SmartRecruiters (`jobs.smartrecruiters.com` → `oneclick-ui`)
 
 The hardest of the six structurally, and the one that produced G11-G15.
@@ -465,7 +534,7 @@ Nested-frame architecture and a gate before the form.
   is a fourth reason a page looks empty, on top of G16's three, and the only
   one that is invisible from inside the browser.
 
-## Open gaps for the morning
+## Open gaps
 
 1. **`data/freemotion-submissions.tsv` has no outcome for "the ATS refused
    before we ever reached Submit".** `alreadyApplied` was recorded as
@@ -477,8 +546,29 @@ Nested-frame architecture and a gate before the form.
    are being recorded as `validation-failed` with an explanatory note (the
    precedent set on 2026-09-01). A `rehearsal` outcome would stop dry runs
    from polluting the failure statistics.
-3. **`config/apply-answers.yml` has no street address** (left as a TODO on
-   purpose). The instruction for this session was to fill every field even
-   when optional, but a home address is a factual claim about the user and is
-   not inventable — every optional address line was therefore left empty.
-   One line in `apply-answers.yml` closes this permanently.
+3. **No authentic writing sample exists**, so generated prose is de-slopped
+   against `voice-dna.md` but not matched to how the user actually writes.
+   `lib/voice-check.mjs`'s `styleCalibration()` now says so on every run
+   rather than letting "clean" imply "sounds like you". One past cover letter
+   or LinkedIn About in `writing-samples/` closes it.
+4. **Phase 10 has never been exercised against a real verification wall.**
+   `lib/freemotion-inbox.mjs` makes `account-verification-pending` resumable
+   and is tested offline, but no live run has yet hit a confirm-your-email
+   gate and come back through it.
+
+### Closed since the first version of this document
+
+- **The fill side is now generic** (2026-09-09).
+  `lib/freemotion-fillplan.mjs` turns an inventory plus resolved answers into
+  an ordered, typed action list, and drove a previously unseen Workable modal
+  end to end with no site-specific code. This was the honest hole in the Free
+  Motion premise: the reader generalised, the filler was a script rewritten by
+  hand per ATS. Six of those existed at one point, each re-deriving G1, G4,
+  G5, G6 and G14 from memory and each free to forget one.
+- **`config/apply-answers.yml` had no street address**, so every optional
+  address line was left empty on the grounds that an address is a factual
+  claim and not inventable. The user supplied it 2026-09-08; the rules now
+  cover line 1, line 2 and postcode.
+- **`config/apply-answers.yml` had no email or phone rule.** Found by the
+  first generic run, on the two fields every ATS asks for. See the Workable
+  note above for why a per-site filler could never have surfaced it.
