@@ -828,3 +828,37 @@ check('a field the reader called a honeypot stays dropped',
   pendingWork({ fields: [{ selector: '#hp', label: 'x', role: 'textbox', tag: 'input', required: true, visible: true, value: '', honeypot: true }], groups: [], uploads: [] }).required.length, 0);
 check('and one it cleared stays planned',
   pendingWork({ fields: [{ selector: '#ok', label: 'x', role: 'textbox', tag: 'input', required: true, visible: true, value: '', honeypot: false }], groups: [], uploads: [] }).required.length, 1);
+
+// The honeypot discriminator is the ACCESSIBLE NAME, not how the field is
+// rendered. Two live false positives found that: a consent checkbox is
+// routinely invisible (opacity 0, or parked off-screen by the sr-only pattern)
+// with its sentence painted beside it, and both times it was dropped as a
+// trap — silently, so a required consent went unanswered and the submit would
+// have failed naming nothing. A trap never has anything meaningful to say.
+const TRAP_LEAVE_BLANK = /leave (this|it) (field )?(blank|empty)|leave blank|do ?n[o']?t (fill|complete)|ne (pas )?remplir|laissez? (ce champ )?vide|nicht ausf.llen|dejar? en blanco|non compilare/i;
+const TRAP_CONSENT_NAME = /agree|consent|accept|acknowledg|privacy|policy|gdpr|terms|opt.in|j.accepte|je reconnais|je d.clare|conditions|politique|confidentialit|rgpd|donn.es/i;
+const trapVerdict = (name, { offscreen = false, invisible = false, untabbable = false } = {}) => {
+  const n = (name || '').trim();
+  if (TRAP_LEAVE_BLANK.test(n)) return true;
+  if (n.length >= 12) return false;
+  if (TRAP_CONSENT_NAME.test(n)) return false;
+  if (offscreen || invisible) return true;
+  if (!n && untabbable) return true;
+  return false;
+};
+
+check('a field whose label says to leave it blank is a trap, off-screen and all',
+  trapVerdict('Please leave this field blank', { offscreen: true }), true);
+check('a French consent at opacity 0 is a question',
+  trapVerdict('En cochant cette case, je reconnais avoir lu la politique', { invisible: true }), false);
+check('a French consent parked off-screen is a question',
+  trapVerdict('En envoyant ma candidature, je déclare accepter', { offscreen: true }), false);
+// "J'accepte" is nine characters and one of the commonest consent labels there
+// is, so length alone would have dropped it.
+check('a SHORT consent label is a question too', trapVerdict("J'accepte", { invisible: true }), false);
+check('and so is the English short form', trapVerdict('I agree', { invisible: true }), false);
+check('a nameless off-screen field is a trap', trapVerdict('', { offscreen: true }), true);
+check('a nameless invisible field is a trap', trapVerdict('', { invisible: true }), true);
+check('a nameless untabbable field is a trap', trapVerdict('', { untabbable: true }), true);
+check('an ordinary short label, plainly rendered, is a question', trapVerdict('Nom'), false);
+check('and a plainly rendered field is never a trap', trapVerdict('Prénom'), false);
