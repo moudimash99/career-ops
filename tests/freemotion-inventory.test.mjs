@@ -804,3 +804,27 @@ for (const label of ['Cover letter (Optional)', 'LinkedIn URL', 'Desired Pay',
   'References (Name, Company, and Contact Information)', 'Requirements you have read']) {
   check(`"${label}" is not marked required`, REQUIRED_MARKER.test(label), false);
 }
+
+// A honeypot is a field a person cannot see OR REACH. Being invisible is not
+// enough: "invisible control plus painted label" is the standard way to style
+// a checkbox, and the sr-only trick parks a control at left:-9999px on purpose
+// with a label the user actually clicks. Caught live on a real application — a
+// French consent checkbox at opacity 0 behind its visible label was reported
+// as a honeypot, and honeypots are dropped SILENTLY, so the applier would have
+// skipped a required consent and the submit would have failed naming nothing.
+const exonerated = pendingWork({
+  fields: [
+    { selector: '#consent', label: 'En cochant cette case, je reconnais avoir lu la politique',
+      role: 'checkbox', tag: 'input', type: 'checkbox', required: true, visible: true, checked: false, honeypot: false },
+  ],
+  groups: [], uploads: [],
+});
+check('a styled consent checkbox is still work', exonerated.required.length, 1);
+
+// The rule that does the exonerating lives in the injected script; what
+// pendingWork must guarantee is that it never second-guesses the verdict in
+// either direction.
+check('a field the reader called a honeypot stays dropped',
+  pendingWork({ fields: [{ selector: '#hp', label: 'x', role: 'textbox', tag: 'input', required: true, visible: true, value: '', honeypot: true }], groups: [], uploads: [] }).required.length, 0);
+check('and one it cleared stays planned',
+  pendingWork({ fields: [{ selector: '#ok', label: 'x', role: 'textbox', tag: 'input', required: true, visible: true, value: '', honeypot: false }], groups: [], uploads: [] }).required.length, 1);
