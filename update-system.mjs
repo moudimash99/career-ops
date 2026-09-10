@@ -180,6 +180,7 @@ const SYSTEM_PATHS = [
   'lib/freemotion-inbox.mjs',
   'lib/freemotion-inventory.mjs',
   'lib/freemotion-fillplan.mjs',
+  'lib/company-cap.mjs',
   'lib/voice-check.mjs',
   'lib/latex-escape.mjs',
   'scan-hn.mjs',

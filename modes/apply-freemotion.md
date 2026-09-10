@@ -57,6 +57,25 @@ policy, or what gets submitted.
    - Exit 1: a real usage error. Stop and report it.
    - Exit 0: you have a `workOrder` JSON. Proceed.
 
+   - **Then check the per-employer ceiling before anything else:**
+     `node lib/company-cap.mjs --check "<workOrder.company>"`. Exit 3 means the
+     cap is reached — skip this posting silently, exactly like a `blacklisted`
+     exit. Exit 0 means proceed.
+
+     This is separate from the blacklist and answers a different question. The
+     blacklist is a permanent no; the cap is "this employer has been asked
+     enough". It exists because the tracker reached 984 sent applications with
+     977 of them going to four companies — 410 to one — and one of those
+     tenants dedupes by candidate email across requisitions, so most of that
+     410 short-circuited before a human saw it. The check matches division and
+     legal-form variants (`Airbus Defence and Space`, `THALES GROUP`,
+     `Capgemini Engineering`), because an employer that has had 410
+     applications has had them however the posting spelled the name.
+
+     Evaluating and tracking a role at a capped employer is still fine. Only
+     the SEND is refused.
+
+
 2. **Tier 0 — reach the form.**
    `browser_navigate(workOrder.url)`, then `browser_snapshot()`. Record the
    resulting `{url, title}` as `before` for step 6's validation call. If the
