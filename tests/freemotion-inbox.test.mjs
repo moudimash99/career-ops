@@ -442,3 +442,42 @@ try {
   rmSync(tmp, { recursive: true, force: true });
 }
 
+
+// ------------------------------- a truncated batch must say it is truncated
+
+// Skipping one unreadable message must not sink the batch, but skipping
+// SILENTLY turns a systematic failure into a quiet lie. Gmail rate-limits per
+// minute, so a wide window hits 403 partway and the caller gets a short list
+// with no way to distinguish it from "that is all there was" — which is
+// exactly how a sweep of this mailbox returned 118 of 200 and was read as
+// evidence that 984 applications had produced almost no replies.
+{
+  const listBody = { messages: [{ id: 'a' }, { id: 'b' }, { id: 'c' }] };
+  const msgBody = (id) => ({
+    payload: { headers: [{ name: 'From', value: `${id}@x.co` }, { name: 'Subject', value: id }, { name: 'Date', value: 'Tue, 09 Sep 2026 10:00:00 +0000' }], body: {} },
+    internalDate: '1757412000000',
+  });
+  const fake = async (url) => {
+    if (url.includes('/messages?')) return { ok: true, json: async () => listBody };
+    if (url.includes('/messages/b')) return { ok: false, status: 403, text: async () => 'quota' };
+    const id = url.split('/messages/')[1].split('?')[0];
+    return { ok: true, json: async () => msgBody(id) };
+  };
+  const got = await fetchGmailMessages({ accessToken: 't', windowMinutes: 60, max: 10 }, fake);
+  check('the readable messages still come back', got.length, 2);
+  check('and the batch admits it is partial', Boolean(got.incomplete), true);
+  check('with the numbers that show it', [got.incomplete.listed, got.incomplete.returned, got.incomplete.dropped], [3, 2, 1]);
+  check('a rate-limit is named as such', got.incomplete.throttled, 1);
+  check('and the hint says what to do', /Lower --max|narrow the window/.test(got.incomplete.hint), true);
+}
+
+{
+  // The normal case must stay clean: no marker at all when nothing was lost.
+  const listBody = { messages: [{ id: 'a' }] };
+  const fake = async (url) => {
+    if (url.includes('/messages?')) return { ok: true, json: async () => listBody };
+    return { ok: true, json: async () => ({ payload: { headers: [{ name: 'Date', value: 'Tue, 09 Sep 2026 10:00:00 +0000' }], body: {} }, internalDate: '1757412000000' }) };
+  };
+  const got = await fetchGmailMessages({ accessToken: 't', windowMinutes: 60, max: 10 }, fake);
+  check('a complete batch carries no marker', got.incomplete, undefined);
+}
