@@ -321,7 +321,15 @@ policy, or what gets submitted.
    row, an answer that contradicts another. If anything looks wrong, go back
    to step 5 for that field before submitting.
 
-8. **Record the outcome.**
+8. **Record the outcome.** Decide it from the page's own status text after
+   the final Submit, never from the network: an ATS can answer HTTP 200 and
+   still refuse the application (see G32 in
+   `docs/freemotion-ats-findings.md`). Success text ("successfully
+   submitted", "candidature envoyée") → success. Refusal text ("couldn't
+   submit", "already applied", "within the last 30 days") → failure; if it
+   is an employer-wide cooldown, skip that employer's other postings in this
+   batch. Neither → check the inbox for an acknowledgement before recording,
+   and never click Submit again.
    - Success: `node lib/freemotion-submissions.mjs finalize --url
      <workOrder.url> --outcome submitted --run-id <runId> --report
      <workOrder.reportNum|-> --notes "<one line>"`, then, only when

@@ -48,9 +48,9 @@ import { readEngineConfig } from './lib/freemotion-engine-config.mjs';
 import { claimSubmission } from './lib/freemotion-submissions.mjs';
 import { getCareerOpsRoot, resolveTrackerPath } from './path-resolver.mjs';
 import { parseTrackerRow, resolveColumns } from './tracker-parse.mjs';
-import { normalizeCompany } from './tracker-utils.mjs';
 import { parsePdfIndex } from './find.mjs';
 import { loadBlacklist } from './scan.mjs';
+import { matchBlacklist } from './lib/company-cap.mjs';
 
 /** Repo root — this file lives at the top level. */
 const REPO_ROOT = dirname(fileURLToPath(import.meta.url));
@@ -232,7 +232,7 @@ export async function resolveWorkOrder(args = {}) {
   const blacklist = loadBlacklist(under(root, 'data/blacklist.md'));
   const reportsDir = under(root, 'reports');
 
-  const isBlacklisted = (company) => blacklist.get(normalizeCompany(String(company ?? '')));
+  const isBlacklisted = (company) => matchBlacklist(blacklist, String(company ?? ''));
 
   /** Everything a claim needs, plus what the work order will carry. */
   const describe = (candidate) => {

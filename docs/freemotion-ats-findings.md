@@ -535,6 +535,58 @@ the owning-form filter (G25) exists.
 
 ---
 
+### G32. A 200 from the submit endpoint is not a submission
+
+Three Ashby applications to the same employer, submitted minutes apart. All
+three fired the submit call and all three got HTTP 200. All three removed the
+Submit button. One was accepted. The other two were refused: the employer
+takes one application per candidate per 30 days, and the refusal came back as
+a normal GraphQL response carrying an error, rendered in the page as "We
+couldn't submit your application".
+
+So none of the network signals decide success: not the status code, not the
+request having fired, not the button disappearing. Read the page's own status
+text after submit and match it against both outcomes, success ("successfully
+submitted", "thank you for applying", "candidature envoyée") and refusal
+("couldn't submit", "already applied", "within the last N days"). If neither
+matches, the outcome is unknown. Check the inbox for an acknowledgement before
+recording anything, and never re-click.
+
+A refusal like this is also a per-employer cooldown, not a per-posting one.
+Once one employer refuses on those grounds, skip that employer's remaining
+postings for the rest of the batch.
+
+---
+
+### G33. A restored draft can carry an upload that has already expired
+
+Workable keeps an unfinished application in localStorage
+(`evergreen-persistence-{jobId}`) and restores it when the posting is opened
+again. Everything comes back: name, phone, cover letter, salary, consent, and
+the resume. But the resume is only a pointer to a temporary S3 object under
+`tmp/ttl-1d/`, and a draft filled two days earlier points at a file that no
+longer exists. The widget shows the filename as if all is well. Submit then
+fails with a 400 and "Your resume failed to upload", which reads like an
+upload problem and is not one.
+
+Two things did not fix it, and one did:
+
+- Uploading a new file over the restored one: the upload succeeded on the
+  server, but the widget stayed in its error state and kept the dead pointer.
+- Dismissing the file and uploading again, programmatically or through the
+  real file chooser: after a dismiss, the dropzone stopped reacting to new
+  files. No upload request was sent.
+- **Reload the page, then upload into the fresh input.** The draft restored
+  without the resume. One `setInputFiles` produced a new object, and submit
+  returned 201.
+
+General rule: treat any file that shows up already attached in a form you did
+not fill in this session as stale. Re-upload it before the first submit. And
+when a form has already failed a submit, reload it rather than retrying in
+place: some client state does not recover.
+
+---
+
 ## Per-ATS notes
 
 ### Radancy career site proxying Workday (`careers.thalesgroup.com`)
@@ -585,7 +637,153 @@ Single-page form, no wizard — everything is on `/{jobId}/application`.
   no-submit dry run says nothing about whether real submission would clear it.
   Ashby therefore belongs in the same "verify before trusting auto-submit"
   bucket as Lever, not in the safe list.
+- **Live result, 2026-09-11 (Alan):** the invisible reCAPTCHA cleared on all
+  three submits with no visible challenge. Submit is the GraphQL op
+  `ApiSubmitSingleApplicationFormAction`, which answers 200 whether it accepts
+  or refuses (G32). Success page: "Your application was successfully
+  submitted." Refusal page: "We couldn't submit your application … as you
+  have submitted an application within the last 30 days". The cooldown
+  covers the whole employer, so one accepted posting blocks that employer's
+  other postings for 30 days. The acknowledgement email comes from
+  `no-reply@ashbyhq.com`, subject "{First name} x {Company}", and does not
+  name the role.
 
+
+### Flatchr (`careers.flatchr.io/vacancy/{slug}/apply`)
+
+Live, 2026-09-11 (two Bureau des Talents postings, both submitted).
+
+- One plain form: `firstname`, `lastname`, `email`, a country `select` plus an
+  unnamed `tel`, one `file`, a **required** `comment` textarea (the cover
+  message), `linkedin`, `github`, `other`, and a `consent` checkbox. No
+  captcha, no honeypot.
+- Submit is a multipart POST back to the vacancy URL. It answers 200 **with
+  the vacancy record**, not an application receipt, so the body proves nothing
+  (G32).
+- The success signal is a page at `.../apply/success` reading "Merci d'avoir
+  postulé !" with a 5-second countdown, then a redirect to the agency's own
+  homepage. A check that runs after the redirect sees only a marketing page.
+  Watch main-frame navigations, or read the page within the first 5 seconds.
+- No acknowledgement email arrived for either submission within an hour.
+- Agency postings name the end client in `reference` ("Kadensis - DevOps").
+  Record that as the company, with `via=` the agency.
+
+### SmartRecruiters one-click (`jobs.smartrecruiters.com/oneclick-ui/...`)
+
+Live, 2026-09-11 (Meritis, submitted).
+
+- The whole form lives in open shadow roots (`spl-input`, `spl-dropzone`,
+  `spl-textarea`, `spl-dropdown-search`). `document.querySelectorAll` sees
+  none of it. Playwright CSS selectors pierce it.
+- **The id sits on both the host element and the inner input.** `#first-name-input`
+  resolves to the `spl-input` host and `fill()` fails with "Element is not an
+  input". Use `input#first-name-input`.
+- Two dropzones. The first is the "fill in automatically from a resume"
+  import, the second is the actual CV. Upload into the second.
+- The page's first "Postuler" button is **"Postuler via Indeed"**, which opens
+  an Indeed OAuth tab. Match the button name exactly.
+- Two steps: the profile page ("Suivant"), then a screening page. Meritis's
+  screening page held one required privacy-consent checkbox, then "Envoyer".
+- Success: the application API returns 200 with a `candidateId`, and the page
+  moves to `/success` with "Votre candidature a bien été envoyée !". No visible
+  challenge appeared, although the page source mentions a captcha.
+
+### Teamtailor (`{company}.teamtailor.com/jobs/{id}`)
+
+Live, 2026-09-11 (Metanext, submitted). See also the earlier note on the
+future-jobs consent.
+
+- Rails form: every checkbox has a **hidden `0` input with the same name**
+  placed before it. `form.querySelector('[name="candidate[consent_given]"]')`
+  returns the hidden one, whose `.checked` is always false. Read state
+  through `input[type=checkbox][name=...]`, or a ticked box reads as unticked.
+- The resume upload lands in an invisible text input
+  `candidate[resume_remote_url]` (a Teamtailor S3 `tmpuploads/` URL). Also
+  check that the hidden `candidate[delete_resume_remote_url]` is `0`.
+- The phone uses intl-tel-input. Typing `+33 …` selects France by itself.
+- Success: POST `/applications` returns a turbo-stream pointing at
+  `/applications/{uuid}/thanks/...`, and the page reads "Merci pour votre
+  candidature".
+- A company careers site on a custom domain (`jobs.zenika.com`) is still
+  Teamtailor, behind a cookie-preferences dialog that hides the apply button.
+  Its job page may show no apply button at all. Go straight to
+  `/jobs/{id}/applications/new`, which always serves the form.
+- **Range slider questions** (salary on a 0-100 "K euros" scale) are driven
+  by a Stimulus controller that ignores a programmatic value. Setting the
+  value on the input and its hidden `range-custom_number` twin left the
+  display at "0 K euros". Focus the slider, press Home, then ArrowRight N
+  times. The display, the input, and the twin all follow.
+- **Required custom dropdowns** (`data-controller="common--dropdown"`) are
+  validated through a hidden `sr-only` input with no name or id, backed by an
+  ordinary radio group. Ticking the radio leaves the hidden input empty, and
+  the form refuses to submit. Click the "Sélectionner une option" text, then
+  the option text. After picking, press Escape and click outside: the
+  collapsing panel (`max-h-0`) keeps intercepting clicks on the fields below
+  it, the phone input included.
+- **A second application from the same email needs email verification.**
+  The submit POST returns 200 but redirects to
+  `/applications/email_verification_needed` ("Vérifiez votre adresse
+  e-mail"). The application is not complete until the emailed link is opened.
+  `freemotion-inbox.mjs check --domain {careers host}` finds it as a
+  same-site `/applications/verify_email/{uuid}?candidate_uuid=...` link, and
+  opening it lands on the normal thanks page. Seen on the second Zenika
+  application of the day; the first one went straight through.
+
+### SmartRecruiters screening autocomplete
+
+Sopra Steria's screening step added a required
+`role=combobox` autocomplete ("Souhaitez-vous nous faire part de votre
+situation RQTH ?") inside `spl-autocomplete`. Neither clicking the field nor
+opening it with ArrowDown gave options that could be clicked reliably. The
+list closes as focus moves, and its text sits deeper than `textContent`
+reaches. What worked: type the start of the wanted option ("Je ne souhaite")
+into the input to filter the list, then click the single remaining option.
+Confirm the input's value afterwards. The step's question text is only
+available on the `aria-label` of the `spl-autocomplete` ancestor
+("Sélectionner {question}").
+
+### SAP SuccessFactors career site (`career5.successfactors.eu/careers?company=...`)
+
+Seen 2026-09-11 on Atos (`jobs.atos.net`, a SuccessFactors Career Site
+Builder front end).
+
+- **The apply link only works as a click from the job page.** Opening
+  `/talentcommunity/apply/{jobId}/` directly bounced to the careers homepage.
+  Clicking the job page's "Postuler »" link (not the "Postulez maintenant!"
+  talent-community banner) set whatever session state it needs and landed on
+  `career5.successfactors.eu/careers?company=Atos`.
+- New candidates get an inline **create account and apply** form: email ×2,
+  password ×2, first/last name, a `fbclc_ituCode` country-code select, phone,
+  `fbclc_country` residence select, and custom fields. "Utilisateur déjà
+  enregistré ? Connectez-vous" switches it to sign-in.
+- Several custom fields (civility, address country, "Comment avez-vous
+  entendu parler de ce poste ?") are `role=combobox` text inputs. Their
+  options live under the input's `aria-controls` id. Open the input, click the
+  option by exact text, then read the input's value back.
+- **Privacy consent** is a link, "Lire et accepter la déclaration de
+  confidentialité.", that opens a dialog. Its "Accepter" button is inside the
+  `fd-dialog__content` container, not next to the dialog's header element.
+  Afterwards the page reads "La déclaration de confidentialité a été
+  acceptée."
+- **The "Charger un CV" label is inert.** The click handler
+  (`juic.fire(...)`) is on the neighbouring plus icon, `span[role=button]`
+  `{n}:_attachIcon`. That opens a source dialog ("Charger depuis l'appareil",
+  Dropbox, Google) containing an ordinary `input[type=file]`, which accepts
+  `setInputFiles` directly with no native chooser. Success shows as
+  "Le fichier a été chargé avec succès" plus the filename.
+- A salary typed as `42000` is reformatted to `42 000,00`.
+- **The password policy caps length at 18**, and a 20-character generated
+  password is rejected. What the page shows is a generic banner, "Veuillez
+  compléter tous les champs obligatoires et soumettre à nouveau. Les champs
+  suivants nécessitent une entrée valide: Mot de passe", with no rule and no
+  per-field message. The actual policy is readable before submitting, in the
+  element named by the password input's `aria-describedby`
+  (`rcmPwdPolicyAnchor`): at least 8 characters, no more than 18, one
+  lowercase and one uppercase, at least one digit or punctuation mark, no
+  spaces or Unicode. Generate with `--length 16` for this tenant.
+  General rule: when a registration form rejects a generated password, read
+  the field's `aria-describedby` before changing anything else — the visible
+  error names the field, not the rule.
 
 ### Greenhouse (`job-boards.greenhouse.io/{company}`)
 
@@ -891,3 +1089,106 @@ verification click, and the applier cannot resume unattended.
 - **`config/apply-answers.yml` had no email or phone rule.** Found by the
   first generic run, on the two fields every ATS asks for. See the Workable
   note above for why a per-site filler could never have surfaced it.
+
+---
+
+### G34. A DOM value is not a form value
+
+The Welcome to the Jungle ATS board (`ats.welcometothejungle.com`) rejected a
+submit with "Missing information" on the email field while that field visibly
+held the right address, `input.value` read it back correctly, and every
+sibling field filled the same way was accepted.
+
+The form is react-hook-form. Setting `.value` through the native property
+setter and dispatching `input`/`change` updates the DOM and the React
+rendering, but this field's registration had already recorded an empty value,
+so validation ran against the empty one. Nothing on the page says the two
+disagree: the value is there, and the error points at the field holding it.
+
+Refilling through Playwright's own `fill()` — real focus, real keystrokes,
+real blur — fixed it in one call. The stale `aria-invalid` stayed on the
+element until the next submit, so the error text is not a reliable signal
+either; only the submit attempt is.
+
+General rule: fill controlled React forms with `fill()`/`type()`, not with a
+scripted value setter. Keep `browser_evaluate` for reading state and for
+textareas, which in this form accepted the scripted route without complaint.
+And when a submit silently does nothing, check the network for the absence of
+the application POST (G32's converse: no request at all, rather than a request
+that answered 200) before re-clicking.
+
+---
+
+### G35. Flatchr's success page is built from a slug it does not always have
+
+Two OZITEM applications through Flatchr, minutes apart, identical flow. Both
+fired the same multipart POST to `/vacancy/{slug}` and both got 200. The first
+landed on the thanks page. The second landed on a 404.
+
+The difference is not in the submission. After the POST, the client navigates
+to `/fr/company/{companySlug}/vacancy/{slug}/apply/success/` — and
+`companySlug` is `undefined` in both cases. The first time that malformed URL
+still resolved; the second time it went 307 to `/fr/404-not-found`, 308, then
+404. The literal string `company/undefined` is visible in the working URL, so
+the bug is present even when it appears to work.
+
+This leaves a genuinely ambiguous outcome, and G32 still applies in both
+directions: the 200 does not prove the application landed, and the 404 does not
+prove it did not. What is checkable is the POST itself — that it fired, to the
+vacancy endpoint, with a multipart body, and returned 200 rather than a 4xx.
+Record the ambiguity in the tracker note rather than resolving it by guess, and
+do not re-click: a duplicate application is worse than an unconfirmed one.
+
+Flatchr sends no acknowledgement email (G-note under Flatchr), so the inbox
+cannot settle it either. The only reliable confirmation is the employer's own
+candidate space, if the tenant exposes one.
+
+---
+
+### G36. The inbox was never missing credentials, only an env loader
+
+`lib/freemotion-inbox.mjs` reported "missing GMAIL_CLIENT_ID /
+GMAIL_CLIENT_SECRET / GMAIL_REFRESH_TOKEN" through an entire run, and two
+applications were parked at email walls on that basis. All three values were
+in `.env` the whole time, added weeks earlier.
+
+`.envrc` loads them with direnv's `dotenv`, which populates an interactive
+shell on `cd`. A tool-driven shell is not that shell, so `process.env` was
+empty and the script's own error message — accurate about what it could see —
+read as "you have no credentials" rather than "nothing loaded your .env".
+
+Run it as `node -r dotenv/config lib/freemotion-inbox.mjs …`. The same applies
+to every script in this repo that reads a secret from the environment.
+
+The cost of not knowing this was two parked applications and a session spent
+believing the inbox was unreachable. Before concluding a credential is absent,
+check whether anything actually loaded it.
+
+---
+
+### G37. A Teamtailor verify_email link is not a one-click confirm
+
+The second application to one Teamtailor careers host parks at
+`/applications/email_verification_needed` (G-note under Teamtailor). The mail
+that follows carries a link that looks self-contained:
+
+    /jobs/{id}-{slug}/applications/verify_email/{uuid}?candidate_uuid={uuid}
+
+Opening it cold redirects to `/connect/login`. The link verifies an address
+against an authenticated Connect session; it does not create one. So the
+sequence is: open the newest "Log in to {Company}" mail first, click through to
+establish the session, and only then open the verify_email link in that same
+browser context.
+
+Two traps around it. The tenant sends BOTH mails, and the inbox helper scores
+the login link above the verification link, so `check --domain` can hand back
+the wrong one — filter the returned candidates by subject rather than taking
+`link`. And a login link expires: yesterday's returns "Invalid login link,
+please request a new one", which renders as an ordinary signup page rather than
+an error, so it is easy to read as success.
+
+Independent signal that the application is still incomplete: the tenant keeps
+sending "Complete the application for {role}" reminders. Their absence, not the
+presence of a generic "we have received your application" mail, is what
+indicates completion — that acknowledgement is sent per candidate, not per
+posting, and does not name the role.

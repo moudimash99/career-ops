@@ -45,6 +45,28 @@ const TRACKING_PARAMS = [
 ];
 
 /**
+ * Promote a known identity-bearing SPA fragment into a functional query key
+ * before generic URL normalization drops the fragment. Most fragments are
+ * presentation-only; MokaHR is the narrow exception because every job shares
+ * the tenant path and the posting ID exists only in `#/job/{id}`.
+ *
+ * The emitted/public URL remains untouched; this mutates only the URL object
+ * used to build a comparison key.
+ *
+ * @param {URL} url
+ */
+export function promoteKnownFragmentIdentity(url) {
+  if (url.hostname.toLowerCase() !== 'app.mokahr.com') return;
+  const match = /^#\/job\/([^/?#]+)(?:\?[^#]*)?$/.exec(url.hash);
+  if (!match) return;
+  let jobId;
+  try { jobId = decodeURIComponent(match[1]); } catch { return; }
+  if (jobId) url.searchParams.set('mokahr_job_id', jobId);
+}
+
+const CAPGEMINI_REQ_PATH = /^\/job\/.+\/(\d{7,})\/?$/i;
+
+/**
  * Reduce a posting URL to a stable comparison key.
  *
  * @param {string} raw - A posting URL (or any string) from a tracker row / TSV.
@@ -73,7 +95,13 @@ export function normalizeUrl(raw) {
 
   u.protocol = 'https:';            // http vs https is the same posting
   u.hostname = u.hostname.toLowerCase();
-  u.hash = '';                      // fragments never identify the posting
+  promoteKnownFragmentIdentity(u);
+  u.hash = '';
+
+  if (u.hostname === 'careers.capgemini.com') {
+    const match = CAPGEMINI_REQ_PATH.exec(u.pathname);
+    if (match) return `https://careers.capgemini.com/job/${match[1]}`;
+  }                      // fragments never identify the posting
 
   // Drop tracking params, keep functional ones, sort for order-independence.
   const keep = [];

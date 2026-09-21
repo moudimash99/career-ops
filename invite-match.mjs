@@ -30,7 +30,7 @@
  *      node invite-match.mjs --apply [--id N]      (rejection-classified matches only; advances status to Rejected)
  *      node invite-match.mjs --self-test
  *
- * Issue #1495, #2098 — github.com/santifer/career-ops
+ * Issue #1495, #2098 — github.com/career-ops-hq/career-ops
  */
 
 import { readFileSync, existsSync } from 'fs';
@@ -259,6 +259,7 @@ const COMPANY_LINE_PATTERNS = [
   /interview(?:ing)?\s+(?:with|at)\s+([A-Z][\w.,&' -]{1,60}?)(?:[.,\n]|\s+for\s|\s+regarding\s|$)/i,
   /(?:phone screen|screening|interview)\s*[-–—:]\s*([A-Z][\w.,&' -]{1,60}?)(?:\s+opportunity)?(?:[.,\n]|$)/i,
   /schedule your (?:phone screen|interview)\s*(?:[-–—:]\s*)?([A-Z][\w.,&' -]{1,60}?)\s*opportunity/i,
+  /(?:^|\n)\s*from\s*:\s*([^<\n\r]{2,60})/i,
 ];
 
 /**
@@ -559,6 +560,7 @@ const INVITE_PHRASES = [
   'like to set up a time',
   'like to set up a call',
   'book a time',
+  'screening process',
 ];
 
 /**

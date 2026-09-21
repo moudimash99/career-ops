@@ -292,6 +292,22 @@ function resolveCsbMaxPages(entry) {
   return CSB_MAX_PAGES_PER_LOCALE;
 }
 
+// An explicit `locale: xx_XX` on the portals entry, or null when absent.
+//
+// Why an override exists at all, when CSB discovers locales from the language
+// switcher: a tenant can serve a *different index per locale* while advertising
+// only one of them. Capgemini does exactly that — careers.capgemini.com/search/
+// lists en_US alone, so discovery pins en_US and the scan returns Montreal,
+// Stockholm and Atlanta; the same endpoints under fr_FR return Lyon,
+// Aix-en-Provence and Bagnols-sur-Cèze. Discovery is not wrong, it is just
+// blind to an index the switcher never mentions, and a scan of the wrong
+// country reads as a healthy board rather than a miss.
+/** @param {import('./_types.js').PortalEntry} entry */
+function resolveLocale(entry) {
+  const v = entry?.locale;
+  return typeof v === 'string' && /^[a-z]{2}_[A-Z]{2}$/.test(v) ? v : null;
+}
+
 // CSB strategy: discover locales, paginate the JSON jobs API per locale, dedup
 // by id across locales+pages. `total` from the first page bounds pagination;
 // an empty/short page also stops the loop.
@@ -301,13 +317,16 @@ function resolveCsbMaxPages(entry) {
 // NOT read as a dead board — return [] instead of throwing.
 /** @param {import('./_types.js').PortalEntry} entry @param {any} cfg @param {import('./_types.js').Context} ctx @param {{probe?: boolean}} [opts] */
 async function fetchCsb(entry, cfg, ctx, { probe = false } = {}) {
-  let locales = CSB_DEFAULT_LOCALES;
-  try {
-    const html = await ctx.fetchText(cfg.searchPage, { redirect: 'error', headers: { accept: 'text/html' } });
-    const discovered = extractLocales(html);
-    if (discovered.length) locales = discovered;
-  } catch {
-    // Discovery is best-effort; fall back to the default locale set.
+  const pinned = resolveLocale(entry);
+  let locales = pinned ? [pinned] : CSB_DEFAULT_LOCALES;
+  if (!pinned) {
+    try {
+      const html = await ctx.fetchText(cfg.searchPage, { redirect: 'error', headers: { accept: 'text/html' } });
+      const discovered = extractLocales(html);
+      if (discovered.length) locales = discovered;
+    } catch {
+      // Discovery is best-effort; fall back to the default locale set.
+    }
   }
 
   const maxPages = resolveCsbMaxPages(entry);
@@ -372,9 +391,14 @@ async function fetchCsb(entry, cfg, ctx, { probe = false } = {}) {
 async function fetchRmk(entry, cfg, ctx) {
   const jobs = [];
   const seen = new Set();
+  const locale = resolveLocale(entry);
+  // Anonymous requests get the tenant's default index. `locale` is the same
+  // query param /search/ takes, and it selects the index, not just the
+  // wording — see resolveLocale.
+  const localeQs = locale ? `&locale=${locale}` : '';
   let startrow = 0;
   for (let page = 0; page < MAX_PAGES; page++) {
-    const htmlText = await ctx.fetchText(`${cfg.tileApi}?startrow=${startrow}`, {
+    const htmlText = await ctx.fetchText(`${cfg.tileApi}?startrow=${startrow}${localeQs}`, {
       redirect: 'error',
       headers: { accept: 'text/html' },
     });

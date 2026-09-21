@@ -25,7 +25,7 @@
 import fs from 'fs';
 import * as yaml from 'js-yaml';
 import { buildLocationFilter, loadBlacklist, locationHintFromUrl } from './scan.mjs';
-import { normalizeCompany } from './tracker-utils.mjs';
+import { matchBlacklist } from './lib/company-cap.mjs';
 
 const PIPELINE = 'data/pipeline.md';
 const ARCHIVE = 'data/pipeline-archive.md';
@@ -89,9 +89,9 @@ function main() {
       if (line.trim()) other.push(line);
       continue;
     }
-    const key = normalizeCompany(row.company);
-    if (key && blacklist.has(key)) {
-      archived.push({ row, reason: `blacklist: ${blacklist.get(key).company}` });
+    const listed = matchBlacklist(blacklist, row.company);
+    if (listed) {
+      archived.push({ row, reason: `blacklist: ${listed.company}` });
       continue;
     }
     if (OPAQUE_LOCATION_RE.test(row.location)) {
