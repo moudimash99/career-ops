@@ -144,6 +144,11 @@ try {
     // completed, and a deliberate no-submit dry run. Both used to be recorded
     // as failures of the run, which they are not.
     'already-applied', 'rehearsal',
+    // Added 2026-09-20 for Requirement 5: a submit whose page says neither a
+    // success nor a refusal. Not `submitted` (that would invent a success) and
+    // not `errored` (that would invent a fault and invite a second click,
+    // which is how one candidate applies twice).
+    'unknown',
   ]);
 
   // Neither new outcome may bar a later real attempt — only `submitted` does.

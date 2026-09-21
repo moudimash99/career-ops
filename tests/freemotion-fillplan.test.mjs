@@ -481,3 +481,123 @@ const plainGroup = buildFillPlan({
     options: [{ label: 'Male', selector: '#m' }] }],
 }, [{ question: 'Gender', choices: ['Male'] }]);
 check('a normal radio group is still a direct click', [plainGroup.actions[0].op, plainGroup.actions[0].target], ['click', '#m']);
+
+// --- a required consent box in a SIBLING form -----------------------------
+//
+// One live application put its name, email and CV in one <form> and the
+// "I accept creating an account" tickbox in a sibling — required, and sitting
+// directly above the send button in the same visible card. Form scoping
+// discarded it, every check passed, and the submit would have been refused for
+// an unticked box nobody could see was missing. On that site creating the
+// account IS applying.
+//
+// The exception is consent-shaped controls only. The mailing list the scoping
+// exists to avoid was a REQUIRED text input ("Email address without domain"),
+// so "keep anything required" would put the candidate's address on a
+// newsletter — which is the case directly above this one.
+
+const splitConsent = {
+  fields: [
+    { selector: '#fn', label: 'First name', role: 'textbox', tag: 'input', required: true, visible: true, value: '', formIndex: 0 },
+    { selector: '#em', label: 'Email', role: 'textbox', tag: 'input', type: 'email', required: true, visible: true, value: '', formIndex: 0 },
+    { selector: '#tos', label: 'I accept the terms and the creation of an account', role: 'checkbox', tag: 'input', type: 'checkbox', required: true, visible: true, checked: false, formIndex: 7 },
+    { selector: '#promo', label: 'Email address for our newsletter', role: 'textbox', tag: 'input', required: true, visible: true, value: '', formIndex: 9 },
+  ],
+  groups: [],
+  uploads: [{ selector: '#cv', label: 'Upload CV', required: true, filled: false, formIndex: 0 }],
+  errors: [],
+  counts: { fields: 4, groups: 0, uploads: 1, visibleFields: 4, visibleGroups: 0, requiredEmpty: 4 },
+};
+
+const scoped = mod.applicationWork(splitConsent).required.map((i) => i.selector);
+check('the required consent box in a sibling form is kept', scoped.includes('#tos'), true);
+check('the application form\'s own fields are kept', scoped.includes('#fn'), true);
+check('a required NEWSLETTER field in a sibling form is still dropped',
+  scoped.includes('#promo'), false);
+
+// --- does this label name the same field? ---------------------------------
+//
+// Plain containment matched a required consent tickbox to the candidate's
+// email address, because the tickbox's label recited its whole panel and the
+// word "Email" was somewhere inside it. The rule is now: the shorter label's
+// words must all appear as WORDS in the longer one, and the longer one may add
+// only a couple. Decoration passes; a paragraph does not.
+
+const { labelsAgree } = mod;
+const agree = (a, b) => labelsAgree(
+  a.toLowerCase().replace(/[^a-z0-9à-ÿ ]+/gi, ' ').replace(/\s+/g, ' ').trim(),
+  b.toLowerCase().replace(/[^a-z0-9à-ÿ ]+/gi, ' ').replace(/\s+/g, ' ').trim(),
+);
+
+check('a required marker does not stop a match', agree('Email', 'Email *'), true);
+check('a bracketed hint does not stop a match', agree('First name', 'First name (as on your passport)') , true);
+check('a slightly longer French label still matches', agree('Nom', 'Nom de famille'), true);
+check('word order does not matter', agree('name first', 'first name'), true);
+
+const panel = 'Créez votre compte Hellowork et activez votre alerte Créez une alerte '
+  + 'Métier Localité Email Type de contrat CDI CDD Intérim Stage Alternance '
+  + 'Indépendant Franchise Associé Fonctionnaire Freelance Stage de lycée';
+check('a panel that merely CONTAINS the word does not match', agree('Email', panel), false);
+check('nor does it match a two-word key', agree('First name', panel), false);
+
+check('a different field does not match', agree('Email', 'Telephone'), false);
+check('a fragment inside another word does not count',
+  agree('name', 'username'), false);
+check('an empty label matches nothing', agree('', 'Email'), false);
+
+// --- a consent TICKBOX is decided by yes, not by matching ------------------
+//
+// A single tickbox reported as a group has one option and that option is the
+// consent sentence itself. Treating it as a list to choose from fails in both
+// directions, and the second one is serious:
+//
+//   - "yes" matches nothing, because "yes" is not in the sentence; and
+//   - "no" matches the ONLY option there is, so a refusal TICKS the box —
+//     agreeing in the user's name because they said they did not want to.
+//
+// A real Yes/No pair is different and must still work by ordinary matching.
+
+const tickbox = {
+  fields: [],
+  groups: [{
+    group: 'tos', question: 'J\'accepte de créer un compte pour accéder à l\'ensemble des services, soumis à l\'acceptation de nos CGU et notre politique de protection des données.',
+    visible: true, required: true, answered: false, formIndex: 0, role: 'group',
+    options: [{ label: 'J\'accepte de créer un compte pour accéder à l\'ensemble des services, soumis à l\'acceptation de nos CGU et notre politique de protection des données.', selector: '#tos' }],
+  }],
+  uploads: [],
+  errors: [],
+  counts: { fields: 0, groups: 1, uploads: 0, visibleFields: 0, visibleGroups: 1, requiredEmpty: 1 },
+};
+const tickWith = (value) => buildFillPlan(tickbox, [{ question: tickbox.groups[0].question, value }], {});
+
+check('a yes ticks the box', tickWith('yes').actions.length, 1);
+check('a boolean true ticks it too', tickWith(true).actions.length, 1);
+check('"j\'accepte" ticks it', tickWith("J'accepte").actions.length, 1);
+
+check('a NO does not tick it', tickWith('no').actions.length, 0);
+check('and says why rather than going quiet', tickWith('no').unanswered.length, 1);
+check('a French non does not tick it', tickWith('non').actions.length, 0);
+check('an unrecognised answer does not tick it', tickWith('maybe later').actions.length, 0);
+
+// The pair, which must keep working the ordinary way.
+const pair = {
+  fields: [],
+  groups: [{
+    group: 'p', question: 'Do you agree to the privacy policy?', visible: true, required: true,
+    answered: false, formIndex: 0, role: 'radiogroup',
+    options: [{ label: 'Yes', selector: '#y' }, { label: 'No', selector: '#n' }],
+  }],
+  uploads: [],
+  errors: [],
+  counts: { fields: 0, groups: 1, uploads: 0, visibleFields: 0, visibleGroups: 1, requiredEmpty: 1 },
+};
+const pairWith = (value) => buildFillPlan(pair, [{ question: 'Do you agree to the privacy policy?', value }], {});
+check('a real Yes/No pair still answers yes', pairWith('Yes').actions[0].value, 'Yes');
+check('and still answers no, on the No option', pairWith('No').actions[0].value, 'No');
+
+// A truncated question still finds its field: the orchestrator trims long
+// labels before showing them to the model, and the model answers with what it
+// was shown.
+const trimmed = tickbox.groups[0].question.slice(0, 50);
+check('an answer keyed on a truncated label still matches',
+  buildFillPlan(tickbox, [{ question: trimmed, value: 'yes' }], {}).actions.length, 1);

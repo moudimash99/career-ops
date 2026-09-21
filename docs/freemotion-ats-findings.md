@@ -535,6 +535,58 @@ the owning-form filter (G25) exists.
 
 ---
 
+### G32. A 200 from the submit endpoint is not a submission
+
+Three Ashby applications to the same employer, submitted minutes apart. All
+three fired the submit call and all three got HTTP 200. All three removed the
+Submit button. One was accepted. The other two were refused: the employer
+takes one application per candidate per 30 days, and the refusal came back as
+a normal GraphQL response carrying an error, rendered in the page as "We
+couldn't submit your application".
+
+So none of the network signals decide success: not the status code, not the
+request having fired, not the button disappearing. Read the page's own status
+text after submit and match it against both outcomes, success ("successfully
+submitted", "thank you for applying", "candidature envoyée") and refusal
+("couldn't submit", "already applied", "within the last N days"). If neither
+matches, the outcome is unknown. Check the inbox for an acknowledgement before
+recording anything, and never re-click.
+
+A refusal like this is also a per-employer cooldown, not a per-posting one.
+Once one employer refuses on those grounds, skip that employer's remaining
+postings for the rest of the batch.
+
+---
+
+### G33. A restored draft can carry an upload that has already expired
+
+Workable keeps an unfinished application in localStorage
+(`evergreen-persistence-{jobId}`) and restores it when the posting is opened
+again. Everything comes back: name, phone, cover letter, salary, consent, and
+the resume. But the resume is only a pointer to a temporary S3 object under
+`tmp/ttl-1d/`, and a draft filled two days earlier points at a file that no
+longer exists. The widget shows the filename as if all is well. Submit then
+fails with a 400 and "Your resume failed to upload", which reads like an
+upload problem and is not one.
+
+Two things did not fix it, and one did:
+
+- Uploading a new file over the restored one: the upload succeeded on the
+  server, but the widget stayed in its error state and kept the dead pointer.
+- Dismissing the file and uploading again, programmatically or through the
+  real file chooser: after a dismiss, the dropzone stopped reacting to new
+  files. No upload request was sent.
+- **Reload the page, then upload into the fresh input.** The draft restored
+  without the resume. One `setInputFiles` produced a new object, and submit
+  returned 201.
+
+General rule: treat any file that shows up already attached in a form you did
+not fill in this session as stale. Re-upload it before the first submit. And
+when a form has already failed a submit, reload it rather than retrying in
+place: some client state does not recover.
+
+---
+
 ## Per-ATS notes
 
 ### Radancy career site proxying Workday (`careers.thalesgroup.com`)
@@ -585,7 +637,153 @@ Single-page form, no wizard — everything is on `/{jobId}/application`.
   no-submit dry run says nothing about whether real submission would clear it.
   Ashby therefore belongs in the same "verify before trusting auto-submit"
   bucket as Lever, not in the safe list.
+- **Live result, 2026-09-11 (Alan):** the invisible reCAPTCHA cleared on all
+  three submits with no visible challenge. Submit is the GraphQL op
+  `ApiSubmitSingleApplicationFormAction`, which answers 200 whether it accepts
+  or refuses (G32). Success page: "Your application was successfully
+  submitted." Refusal page: "We couldn't submit your application … as you
+  have submitted an application within the last 30 days". The cooldown
+  covers the whole employer, so one accepted posting blocks that employer's
+  other postings for 30 days. The acknowledgement email comes from
+  `no-reply@ashbyhq.com`, subject "{First name} x {Company}", and does not
+  name the role.
 
+
+### Flatchr (`careers.flatchr.io/vacancy/{slug}/apply`)
+
+Live, 2026-09-11 (two Bureau des Talents postings, both submitted).
+
+- One plain form: `firstname`, `lastname`, `email`, a country `select` plus an
+  unnamed `tel`, one `file`, a **required** `comment` textarea (the cover
+  message), `linkedin`, `github`, `other`, and a `consent` checkbox. No
+  captcha, no honeypot.
+- Submit is a multipart POST back to the vacancy URL. It answers 200 **with
+  the vacancy record**, not an application receipt, so the body proves nothing
+  (G32).
+- The success signal is a page at `.../apply/success` reading "Merci d'avoir
+  postulé !" with a 5-second countdown, then a redirect to the agency's own
+  homepage. A check that runs after the redirect sees only a marketing page.
+  Watch main-frame navigations, or read the page within the first 5 seconds.
+- No acknowledgement email arrived for either submission within an hour.
+- Agency postings name the end client in `reference` ("Kadensis - DevOps").
+  Record that as the company, with `via=` the agency.
+
+### SmartRecruiters one-click (`jobs.smartrecruiters.com/oneclick-ui/...`)
+
+Live, 2026-09-11 (Meritis, submitted).
+
+- The whole form lives in open shadow roots (`spl-input`, `spl-dropzone`,
+  `spl-textarea`, `spl-dropdown-search`). `document.querySelectorAll` sees
+  none of it. Playwright CSS selectors pierce it.
+- **The id sits on both the host element and the inner input.** `#first-name-input`
+  resolves to the `spl-input` host and `fill()` fails with "Element is not an
+  input". Use `input#first-name-input`.
+- Two dropzones. The first is the "fill in automatically from a resume"
+  import, the second is the actual CV. Upload into the second.
+- The page's first "Postuler" button is **"Postuler via Indeed"**, which opens
+  an Indeed OAuth tab. Match the button name exactly.
+- Two steps: the profile page ("Suivant"), then a screening page. Meritis's
+  screening page held one required privacy-consent checkbox, then "Envoyer".
+- Success: the application API returns 200 with a `candidateId`, and the page
+  moves to `/success` with "Votre candidature a bien été envoyée !". No visible
+  challenge appeared, although the page source mentions a captcha.
+
+### Teamtailor (`{company}.teamtailor.com/jobs/{id}`)
+
+Live, 2026-09-11 (Metanext, submitted). See also the earlier note on the
+future-jobs consent.
+
+- Rails form: every checkbox has a **hidden `0` input with the same name**
+  placed before it. `form.querySelector('[name="candidate[consent_given]"]')`
+  returns the hidden one, whose `.checked` is always false. Read state
+  through `input[type=checkbox][name=...]`, or a ticked box reads as unticked.
+- The resume upload lands in an invisible text input
+  `candidate[resume_remote_url]` (a Teamtailor S3 `tmpuploads/` URL). Also
+  check that the hidden `candidate[delete_resume_remote_url]` is `0`.
+- The phone uses intl-tel-input. Typing `+33 …` selects France by itself.
+- Success: POST `/applications` returns a turbo-stream pointing at
+  `/applications/{uuid}/thanks/...`, and the page reads "Merci pour votre
+  candidature".
+- A company careers site on a custom domain (`jobs.zenika.com`) is still
+  Teamtailor, behind a cookie-preferences dialog that hides the apply button.
+  Its job page may show no apply button at all. Go straight to
+  `/jobs/{id}/applications/new`, which always serves the form.
+- **Range slider questions** (salary on a 0-100 "K euros" scale) are driven
+  by a Stimulus controller that ignores a programmatic value. Setting the
+  value on the input and its hidden `range-custom_number` twin left the
+  display at "0 K euros". Focus the slider, press Home, then ArrowRight N
+  times. The display, the input, and the twin all follow.
+- **Required custom dropdowns** (`data-controller="common--dropdown"`) are
+  validated through a hidden `sr-only` input with no name or id, backed by an
+  ordinary radio group. Ticking the radio leaves the hidden input empty, and
+  the form refuses to submit. Click the "Sélectionner une option" text, then
+  the option text. After picking, press Escape and click outside: the
+  collapsing panel (`max-h-0`) keeps intercepting clicks on the fields below
+  it, the phone input included.
+- **A second application from the same email needs email verification.**
+  The submit POST returns 200 but redirects to
+  `/applications/email_verification_needed` ("Vérifiez votre adresse
+  e-mail"). The application is not complete until the emailed link is opened.
+  `freemotion-inbox.mjs check --domain {careers host}` finds it as a
+  same-site `/applications/verify_email/{uuid}?candidate_uuid=...` link, and
+  opening it lands on the normal thanks page. Seen on the second Zenika
+  application of the day; the first one went straight through.
+
+### SmartRecruiters screening autocomplete
+
+Sopra Steria's screening step added a required
+`role=combobox` autocomplete ("Souhaitez-vous nous faire part de votre
+situation RQTH ?") inside `spl-autocomplete`. Neither clicking the field nor
+opening it with ArrowDown gave options that could be clicked reliably. The
+list closes as focus moves, and its text sits deeper than `textContent`
+reaches. What worked: type the start of the wanted option ("Je ne souhaite")
+into the input to filter the list, then click the single remaining option.
+Confirm the input's value afterwards. The step's question text is only
+available on the `aria-label` of the `spl-autocomplete` ancestor
+("Sélectionner {question}").
+
+### SAP SuccessFactors career site (`career5.successfactors.eu/careers?company=...`)
+
+Seen 2026-09-11 on Atos (`jobs.atos.net`, a SuccessFactors Career Site
+Builder front end).
+
+- **The apply link only works as a click from the job page.** Opening
+  `/talentcommunity/apply/{jobId}/` directly bounced to the careers homepage.
+  Clicking the job page's "Postuler »" link (not the "Postulez maintenant!"
+  talent-community banner) set whatever session state it needs and landed on
+  `career5.successfactors.eu/careers?company=Atos`.
+- New candidates get an inline **create account and apply** form: email ×2,
+  password ×2, first/last name, a `fbclc_ituCode` country-code select, phone,
+  `fbclc_country` residence select, and custom fields. "Utilisateur déjà
+  enregistré ? Connectez-vous" switches it to sign-in.
+- Several custom fields (civility, address country, "Comment avez-vous
+  entendu parler de ce poste ?") are `role=combobox` text inputs. Their
+  options live under the input's `aria-controls` id. Open the input, click the
+  option by exact text, then read the input's value back.
+- **Privacy consent** is a link, "Lire et accepter la déclaration de
+  confidentialité.", that opens a dialog. Its "Accepter" button is inside the
+  `fd-dialog__content` container, not next to the dialog's header element.
+  Afterwards the page reads "La déclaration de confidentialité a été
+  acceptée."
+- **The "Charger un CV" label is inert.** The click handler
+  (`juic.fire(...)`) is on the neighbouring plus icon, `span[role=button]`
+  `{n}:_attachIcon`. That opens a source dialog ("Charger depuis l'appareil",
+  Dropbox, Google) containing an ordinary `input[type=file]`, which accepts
+  `setInputFiles` directly with no native chooser. Success shows as
+  "Le fichier a été chargé avec succès" plus the filename.
+- A salary typed as `42000` is reformatted to `42 000,00`.
+- **The password policy caps length at 18**, and a 20-character generated
+  password is rejected. What the page shows is a generic banner, "Veuillez
+  compléter tous les champs obligatoires et soumettre à nouveau. Les champs
+  suivants nécessitent une entrée valide: Mot de passe", with no rule and no
+  per-field message. The actual policy is readable before submitting, in the
+  element named by the password input's `aria-describedby`
+  (`rcmPwdPolicyAnchor`): at least 8 characters, no more than 18, one
+  lowercase and one uppercase, at least one digit or punctuation mark, no
+  spaces or Unicode. Generate with `--length 16` for this tenant.
+  General rule: when a registration form rejects a generated password, read
+  the field's `aria-describedby` before changing anything else — the visible
+  error names the field, not the rule.
 
 ### Greenhouse (`job-boards.greenhouse.io/{company}`)
 
@@ -891,3 +1089,389 @@ verification click, and the applier cannot resume unattended.
 - **`config/apply-answers.yml` had no email or phone rule.** Found by the
   first generic run, on the two fields every ATS asks for. See the Workable
   note above for why a per-site filler could never have surfaced it.
+
+---
+
+### G34. A DOM value is not a form value
+
+The Welcome to the Jungle ATS board (`ats.welcometothejungle.com`) rejected a
+submit with "Missing information" on the email field while that field visibly
+held the right address, `input.value` read it back correctly, and every
+sibling field filled the same way was accepted.
+
+The form is react-hook-form. Setting `.value` through the native property
+setter and dispatching `input`/`change` updates the DOM and the React
+rendering, but this field's registration had already recorded an empty value,
+so validation ran against the empty one. Nothing on the page says the two
+disagree: the value is there, and the error points at the field holding it.
+
+Refilling through Playwright's own `fill()` — real focus, real keystrokes,
+real blur — fixed it in one call. The stale `aria-invalid` stayed on the
+element until the next submit, so the error text is not a reliable signal
+either; only the submit attempt is.
+
+General rule: fill controlled React forms with `fill()`/`type()`, not with a
+scripted value setter. Keep `browser_evaluate` for reading state and for
+textareas, which in this form accepted the scripted route without complaint.
+And when a submit silently does nothing, check the network for the absence of
+the application POST (G32's converse: no request at all, rather than a request
+that answered 200) before re-clicking.
+
+---
+
+### G35. Flatchr's success page is built from a slug it does not always have
+
+Two OZITEM applications through Flatchr, minutes apart, identical flow. Both
+fired the same multipart POST to `/vacancy/{slug}` and both got 200. The first
+landed on the thanks page. The second landed on a 404.
+
+The difference is not in the submission. After the POST, the client navigates
+to `/fr/company/{companySlug}/vacancy/{slug}/apply/success/` — and
+`companySlug` is `undefined` in both cases. The first time that malformed URL
+still resolved; the second time it went 307 to `/fr/404-not-found`, 308, then
+404. The literal string `company/undefined` is visible in the working URL, so
+the bug is present even when it appears to work.
+
+This leaves a genuinely ambiguous outcome, and G32 still applies in both
+directions: the 200 does not prove the application landed, and the 404 does not
+prove it did not. What is checkable is the POST itself — that it fired, to the
+vacancy endpoint, with a multipart body, and returned 200 rather than a 4xx.
+Record the ambiguity in the tracker note rather than resolving it by guess, and
+do not re-click: a duplicate application is worse than an unconfirmed one.
+
+Flatchr sends no acknowledgement email (G-note under Flatchr), so the inbox
+cannot settle it either. The only reliable confirmation is the employer's own
+candidate space, if the tenant exposes one.
+
+---
+
+### G36. The inbox was never missing credentials, only an env loader
+
+`lib/freemotion-inbox.mjs` reported "missing GMAIL_CLIENT_ID /
+GMAIL_CLIENT_SECRET / GMAIL_REFRESH_TOKEN" through an entire run, and two
+applications were parked at email walls on that basis. All three values were
+in `.env` the whole time, added weeks earlier.
+
+`.envrc` loads them with direnv's `dotenv`, which populates an interactive
+shell on `cd`. A tool-driven shell is not that shell, so `process.env` was
+empty and the script's own error message — accurate about what it could see —
+read as "you have no credentials" rather than "nothing loaded your .env".
+
+Run it as `node -r dotenv/config lib/freemotion-inbox.mjs …`. The same applies
+to every script in this repo that reads a secret from the environment.
+
+The cost of not knowing this was two parked applications and a session spent
+believing the inbox was unreachable. Before concluding a credential is absent,
+check whether anything actually loaded it.
+
+---
+
+### G37. A Teamtailor verify_email link is not a one-click confirm
+
+The second application to one Teamtailor careers host parks at
+`/applications/email_verification_needed` (G-note under Teamtailor). The mail
+that follows carries a link that looks self-contained:
+
+    /jobs/{id}-{slug}/applications/verify_email/{uuid}?candidate_uuid={uuid}
+
+Opening it cold redirects to `/connect/login`. The link verifies an address
+against an authenticated Connect session; it does not create one. So the
+sequence is: open the newest "Log in to {Company}" mail first, click through to
+establish the session, and only then open the verify_email link in that same
+browser context.
+
+Two traps around it. The tenant sends BOTH mails, and the inbox helper scores
+the login link above the verification link, so `check --domain` can hand back
+the wrong one — filter the returned candidates by subject rather than taking
+`link`. And a login link expires: yesterday's returns "Invalid login link,
+please request a new one", which renders as an ordinary signup page rather than
+an error, so it is easy to read as success.
+
+Independent signal that the application is still incomplete: the tenant keeps
+sending "Complete the application for {role}" reminders. Their absence, not the
+presence of a generic "we have received your application" mail, is what
+indicates completion — that acknowledgement is sent per candidate, not per
+posting, and does not name the role.
+
+### G38. Playwright's `locator.click` is unusable in a VISIBLE Firefox window on this machine
+
+Measured 2026-09-20 on a bare local page with one button — no site involved.
+Three identical clicks:
+
+| engine | click 1 | click 2 | click 3 |
+| --- | --- | --- | --- |
+| Chromium | 109 ms ✅ | 272 ms ✅ | 22 ms ✅ |
+| Firefox, headless | 350 ms ✅ | 29 ms ✅ | 31 ms ✅ |
+| Firefox, headed | 15.7 s ✅ | timeout ✗ | timeout ✗ |
+| Camoufox, headed | 29 s ✅ | timeout ✗ | timeout, **the click fired anyway** |
+
+The last cell is the one that matters: a click that LANDED reported as a
+failure. Anything that retries an unacknowledged click double-clicks, and on a
+Submit button that is two applications.
+
+The mouse is not at fault. Every event the page receives was recorded — all
+seven, `pointermove` through `click`, on the right element, at the right
+coordinates, `isTrusted: true`, byte-identical headed and headless. Protocol
+tracing shows Playwright sends all three `Page.dispatchMouseEvent` messages and
+then waits: acknowledgements came back at 2.0 s, 6.4 s and 14.9 s, growing per
+event, while its own call log stops at `performing click action` and never
+reaches `click action done`. It does not retry — exactly one attempt per click
+over a 45 s window. So the fault is Juggler's ACK of an input command in a
+headed window, not the input itself.
+
+Ruled out: `humanize` on/off · `camoufox-js` vs the upstream Python launcher
+(identical) · the `playwright-core <1.61` peer requirement (identical on
+1.60.0) · window focus and `bringToFront` · hardware acceleration, WebRender
+and APZ prefs · display scaling (coordinates land exactly, DPR 1) · the page
+(a bare local page reproduces it) · antivirus (Kaspersky and Malwarebytes are
+registered in Windows Security Center with no running service or driver; only
+Defender is live).
+
+**Two usable paths.** Raw `page.mouse.move/down/up` in headed Firefox: 6 of 6
+clicks, 20–90 ms — so a headed Firefox run must drive the mouse directly and
+forgo Playwright's actionability checks. Or run headless, where `locator.click`
+works normally and keeps them.
+
+### G39. Camoufox is only usable headless — and is stealthier that way
+
+Headed Camoufox is worse than headed Firefox: 13 s for the first raw-mouse
+click, then 120 s, with `humanize` absent, `false` and `0.1` alike. Headless
+Camoufox does the same six clicks in 10–40 ms and `locator.click` works.
+
+Stealth survives headless and improves slightly. creepjs, headless: `0%
+headless`, `0% stealth`, `chromium: false`, "6% like headless" (13% headed),
+WebRTC candidate and IP zeroed, timezone Europe/Paris matching the worker
+thread, GPU "Apple M1 or similar" at high confidence, device "Mac (MacIntel),
+macOS Catalina, 8 cores" — a coherent Mac rather than a patched Windows box.
+Language is `en-US` against a Paris timezone; `geoip: true` aligns it.
+
+Practical notes: the Python package and the npm port share one cache directory
+and overwrite each other's layout, so whichever `fetch` ran last is the one
+that works. Launch is ~20–26 s.
+
+### G40. A posting's furniture reads as an application form unless you count only what is VISIBLE
+
+One live advert reported 17 fields and 3 groups — every field `visible: false`.
+They were job-alert widgets, a dormant account-creation form, and the cookie
+banner's own checkboxes. `looksLikeApplicationForm` cleared its threshold on
+them and `readiness` returned `ready: true` on a page with no application on
+it; the form was behind the Apply link the whole time.
+
+Worse, the same raw counts suppressed the consent flag: a full-screen cookie
+modal reported `consentWall: false`, because the hidden widgets underneath it
+counted as controls. The wall is now detected by geometry — an ancestor that is
+fixed-position or an open modal dialog covering ≥25% of the viewport — which
+survives a page that keeps a visible widget of its own underneath the overlay.
+
+Two more traps on the same page. The consent buttons are absent from the
+accessibility tree, so `getByRole` finds nothing and they match only by DOM
+text; and the decline button read "Continuer sans accepter", which an
+accept-only vocabulary misses entirely. Consent buttons now carry a `declines`
+flag so the caller can prefer refusing.
+
+### G41. Form scoping dropped the CV, and a datalist was read as a closed picklist
+
+Two defects in `freemotion-fillplan.mjs`, both found on one live form and both
+silent:
+
+- **The upload was scoped out.** The identity fields sat in one `<form>` and
+  the CV file input in its sibling, so `sameFormAs` kept the winning form and
+  discarded the upload — a plan that would submit an application with no CV,
+  against a form that requires one. Scoping may now never be the reason no
+  upload survives: if the page asks for a file and the filter removed every
+  one, they come back.
+- **A suggestion list is not a closed set.** An `<input type="email">` carried a
+  datalist of mail domains ("aol.com", "free.fr"). The reader reported them as
+  options, the planner demanded the answer match one, and refused to type the
+  candidate's own address — `noOptionMatch`. An `<input>` whose HTML type
+  declares the shape of its value (email, tel, url, number, date…) is free
+  text whatever ARIA role the page paints on it. A real picklist is never
+  `type="email"`.
+
+### G42. Driving agy as a controller: what a turn costs, and the two things that break it
+
+Measured 2026-09-20 on the first working end-to-end run of `freemotion-loop.mjs`
+(Hellowork, rehearsal, gates passed): **5 turns, 5 agy calls, 68,843 tokens for
+a complete application.** The same application driven click-by-click through
+the model cost 15–57 turns and 5–24M context tokens. The state handed to agy
+each turn is ~900 characters and the whole prompt ~2.3 KB; the rest of the
+per-turn cost is the runner's own system prompt, which is fixed overhead and
+does not grow with the page.
+
+Two operational traps, both of which cost whole runs before they were found:
+
+- **Pass ABSOLUTE paths.** The prompt is handed over as a file path rather than
+  as an argument, because a multi-line prompt through a Windows shell arrives
+  as loose words (`Error: unexpected argument "are"`). But given a RELATIVE
+  path the runner searches the filesystem for the file instead of opening it,
+  and with `--output-format json` it gets a single turn — so the turn is spent
+  searching and the reply is "I am currently searching for the file...". Two
+  runs died on turn 1 this way.
+- **Use `--json-schema`, with `--output-format json`.** It validates the reply
+  against the move shape before returning it, which removes the chatter-instead-
+  of-an-answer failure entirely: retries went from roughly half the turns to
+  none. The same envelope carries a `usage` block — `input_tokens`,
+  `output_tokens`, `thinking_tokens`, `total_tokens` — which is the only honest
+  per-application cost measurement, and answers the open question in
+  `docs/freemotion-requirements-v2.md` about how to measure agy's spend.
+
+The reply must still be parsed by scanning for BALANCED braces. A lazy regex
+stops at the first `}`, which on a reply carrying an `answers` array is the
+inner object's, and the truncated string will not parse.
+
+**Agy reads screenshots reliably.** Given only a gate screenshot and no other
+context it named the site, listed exactly the field labels the DOM inventory
+had found, and correctly reported that no consent overlay was present.
+
+**Two loop-level rules the run proved necessary.** Confirm an upload by the
+rendered filename and never attach that file again (G15) — without it the loop
+re-attached the same CV every turn, because the re-rendered input reads empty.
+And report only the blockers that belong to the APPLICATION: shown a page-wide
+blocker it had no power to clear, the controller abandoned a fully filled,
+gate-passing form.
+
+### G43. One required tickbox, three separate causes, three failed runs
+
+A required "I accept creating an account" tickbox sat directly above the send
+button, inside the same visible card as the name, email and CV. The form could
+not be submitted without it. Three consecutive runs filled everything else
+perfectly, passed both gates, and left it unticked — each time for a DIFFERENT
+reason, and each time invisibly: nothing errored, and the page looked complete.
+
+**One: form scoping dropped it.** The identity fields were in one `<form>` and
+the tickbox in a sibling, so `sameFormAs` discarded it. The fix is narrow on
+purpose — a required CONSENT control survives scoping, a required data field
+does not. The mailing list this scoping exists to avoid was itself a *required*
+text input ("Email address without domain"), so "keep anything required" puts
+the candidate's address on a newsletter.
+
+**Two: nothing recorded that a control was required.** `pendingWork` encoded
+required-ness by WHICH LIST an entry landed in, never on the entry, so the
+scoping fix above silently did nothing — `it.required` was always `undefined`.
+Entries now carry `required` as well.
+
+**Three: the answer could not be matched back to the field.** The orchestrator
+trims long labels before showing them to a model, so a 300-character consent
+label arrived as its first 50. The model answered with what it was shown, and
+that text no longer matched the field. Worse, plain containment matching made
+it match the WRONG field: the label recites its whole panel — "… Métier
+Localité Email Type de contrat CDI CDD …" — so the word "Email" in there
+handed the tickbox the candidate's email address.
+
+Fixed twice over: labels now match by WORDS (every word of the shorter must
+appear as a word in the longer, which may add about five), and — the real fix —
+the open questions are NUMBERED and the model answers by index, the way it
+already picks click targets by index. No text comparison is involved at all.
+
+**And a fourth, once it was finally reachable: the page had a hidden twin.**
+`[name="HasAcceptedCGU"]` matched two elements, a hidden field and the visible
+checkbox, and `.first()` took the hidden one. Every click timed out at 15
+seconds against an element nobody could see. Clicks now resolve to the first
+VISIBLE match, falling back to the control's `<label for=…>` when the input is
+deliberately 0×0 behind a styled label (G22).
+
+**The general lesson.** Every one of these failed silently in a state that
+looked finished. A form that reports "nothing left to fill" while a required
+box is unticked is the same class of failure as a submit recorded from a click
+rather than from the page (G32): the system is confident and wrong, and only a
+picture of the finished form shows it. The full-page gate screenshot is what
+caught it.
+
+**A consent tickbox is decided by yes, not by matching.** Its only "option" is
+its own sentence, so "yes" matches nothing — and "no" matches the only option
+there is, which meant a REFUSAL ticked the box. A tickbox is now ticked only on
+a recognised affirmative; anything else leaves it alone and says so. A real
+Yes/No pair still goes through ordinary option matching.
+
+### G44. Watching a run: which engines can, and what it costs
+
+Verified 2026-09-21 against a page carrying both traps — a checkbox with an
+invisible twin of the same name, and a 0×0 checkbox reachable only by its
+`<label for>`:
+
+| engine | launch | clicks the visible twin | clicks the 0×0 box via its label |
+| --- | --- | --- | --- |
+| Camoufox, headful | refused by design | — | — |
+| Chromium, headful | 1.8 s | 203 ms (locator) | 44 ms |
+| Firefox, headful | 4.3 s | 974 ms (raw mouse) | 92 ms |
+
+Camoufox refuses `--headful` rather than launch: in a visible window its clicks
+take 13–120 s and sometimes report failure on a click that landed (G38/G39),
+and an engine that silently behaves like that is worse than one that says no.
+
+A visible Firefox is usable at about a second per click once clicks go through
+raw mouse input, against 15–90 s and frequent false failures through
+`locator.click`. Chromium needs no workaround at all and is the cheapest way to
+watch a run, at the cost of no disguise whatsoever.
+
+So the disguise and the ability to watch are mutually exclusive on this
+machine, and the choice is per run: `--engine chromium --headful` to watch,
+the default headless Camoufox to be unremarkable.
+
+### G45. The DOM gate was checking a fifth of the form and reporting "valid"
+
+The most serious defect found so far, and it was invisible because the gate
+reported success.
+
+`DOM_VALIDATION_SCRIPT` identifies each control by `name` → `aria-label` →
+`data-automation-id` → `id`, and `evaluateValidation` matches the caller's
+expectations against THAT. The loop was building its expectations from the
+RENDERED LABEL — the same string it shows a human and hands the answer
+resolver. Those are two different namespaces:
+
+| what the loop sent | what the gate reads |
+| --- | --- |
+| Prénom | `Firstname` |
+| Nom | `LastName` |
+| Email | `Email` |
+| CV | `JweHashResume` |
+| Message au recruteur | `MotivationLetter` |
+
+One field in five matched, and only because that page's email box happens to
+be named `Email` as well. So the gate's headline check — "we sent a value and
+the DOM does not hold it" — never fired for the other four, and every run
+ended with `valid: true, failures: []`.
+
+Everything about the design leans on that check. It is the thing standing
+between a filled form and a Submit, and it was inspecting 20% of the form
+while saying so confidently.
+
+**Fixed** by mapping each planned action back through the inventory, by
+selector, to the identifier the gate will actually use (`name`, falling back to
+`id`). An action whose field cannot be resolved is now OMITTED rather than sent
+under a name that cannot match — a silent non-match is precisely the failure
+being removed. Uploads are excluded: a file input's value is unreadable and
+would always look empty, so an attachment is still confirmed by the rendered
+filename instead (G15).
+
+**The lesson worth keeping.** Two modules each had a perfectly reasonable idea
+of what "the name of a field" means, and nothing connected them. A check that
+cannot fail looks exactly like a check that passes.
+
+### G46. Apply → sign-in: the loop filled a LOGIN form with the candidate's details
+
+A job board's Apply button navigated straight to `/authenticate/signin`. What
+landed was a well-formed form — email, password, a button — so every check
+reported "ready, no blockers", and the run filled BOTH boxes, including the
+password, before exhausting its turns. Nothing was submitted and no real
+credential exists for that site, but the shape of the failure is the point: an
+application loop cannot tell a login from an application by structure alone,
+because structurally they are the same thing.
+
+The tell is a **password field**. Applications do not ask for one. A CV upload
+on the same page overrides it, because some sites genuinely create the account
+as you apply and those must still go through — that is exactly the Hellowork
+flow in G43. So: a visible password field, no upload, and the run abandons with
+the reason recorded, rather than typing into it.
+
+Related: the same board returns **403 to plain `curl`** and loads perfectly in
+headless Camoufox. Liveness checks done with a plain HTTP client will report
+these postings dead when they are not, and a browser is the only honest way to
+check them (AGENTS.md already says this for verification; it holds for triage
+too).
+
+Its consent banner also went unrecognised: the buttons read "No, thanks" /
+"I choose" / "OK for me", none of which the accept/reject vocabulary matched,
+so the page reported no consent wall at all and the widget's container was
+handed to the caller as though it were a form field. Those phrasings are now
+in the vocabulary.
