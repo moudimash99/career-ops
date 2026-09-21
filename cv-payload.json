@@ -4,8 +4,9 @@
   "candidate": {
     "name": "Mohammad Machaka",
     "phone": "+33 7 53 37 78 23",
-    "email": "machaka.mohammad@gmail.com",
+    "email": "mohammad.m.machaka@gmail.com",
     "linkedin": { "url": "https://linkedin.com/in/mohammad-machaka-a63685172", "display": "linkedin.com/in/mohammad-machaka-a63685172" },
+    "github": { "url": "https://github.com/moudimash99", "display": "github.com/moudimash99" },
     "portfolio": { "url": "https://machaka.net", "display": "machaka.net" },
     "location": "Toulouse, France",
     "photo": "",
@@ -24,8 +25,8 @@
   "competencies": ["Administration Systèmes Linux", "Automatisation & IaC", "Exploitation Niveaux 2/3", "AWS & Kubernetes", "Observabilité", "Ingénierie Système (MBSE)"],
   "experience": [
     {
-      "company": "Airbus Electric Center",
-      "role": "Ingénieur Système et Qualité (Stagiaire)",
+      "company": "Airbus Operations",
+      "role": "Systems & Quality Engineering Intern – Electric Center",
       "location": "Toulouse, France",
       "dates": "Mai 2026 - Nov 2026",
       "bullets": [
@@ -64,6 +65,24 @@
       "bullets": [
         "Conception et direction d'une plateforme d'analyse de logs pour détecter les schémas d'échec, identifiant plus de 50 types d'erreurs non détectées auparavant.",
         "Architecture de composants modulaires avec des pipelines de déploiement automatisés sur Kubernetes et Docker."
+      ]
+    },
+    {
+      "company": "UrbanSeller",
+      "role": "Software Developer",
+      "location": "Beyrouth, Liban",
+      "dates": "Juin 2020 - Fév 2021",
+      "bullets": [
+        "Développement d'un logiciel de gestion sur Azure avec C#, .NET, Angular et SQL Server."
+      ]
+    },
+    {
+      "company": "ZAKA",
+      "role": "AI Pipeline Developer",
+      "location": "Beyrouth, Liban",
+      "dates": "Oct 2020 - Sep 2021",
+      "bullets": [
+        "Développement et optimisation d'un pipeline de vision par ordinateur Nvidia DeepStream en C++ et Python."
       ]
     }
   ],
@@ -105,6 +124,16 @@
       "title": "AWS Certified Solutions Architect – Associate",
       "org": "Amazon Web Services",
       "year": "Sep 2023"
+    },
+    {
+      "title": "Machine Learning Specialization",
+      "org": "Coursera / Stanford University",
+      "year": "Août 2020"
+    },
+    {
+      "title": "ICND1",
+      "org": "Cisco",
+      "year": "Avr 2019"
     }
   ],
   "skills": [

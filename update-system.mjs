@@ -287,6 +287,7 @@ const SYSTEM_PATHS = [
   'evals/',
   'openrouter-runner.mjs',
   'jd-similarity.mjs',
+  'reread-jd.mjs',
   'tests/jd-similarity.test.mjs',
   'test-all.mjs',
   'tests/detect-reposts.test.mjs',

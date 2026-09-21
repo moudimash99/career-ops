@@ -137,6 +137,9 @@ opencode.json
 # personal server credentials (e.g. a plugin's API token) once a user adds
 # an MCP server, same risk class as .env.
 .mcp.json
+# The browser-tool launch settings .mcp.json points at: machine paths and a
+# generated browser fingerprint, local to this machine like .mcp.json itself.
+config/playwright-mcp-camoufox.json
 career-dashboard
 career-dashboard.exe
 package-lock.json
@@ -206,3 +209,4 @@ scratch/
 *.db
 *.db-wal
 *.db-shm
+data/agent-inbox.md
