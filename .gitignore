@@ -19,6 +19,11 @@ data/*
 # behind it. It is readable by anyone, including those employers, and git keeps
 # it reachable after a delete or a force-push. He was told and decided anyway.
 !data/applications.md
+# Same reason, 2026-09-21: what the scanner checks to skip jobs it has already
+# seen, and the auto-apply's never-submit-twice log. Reports stay local.
+!data/scan-history.tsv
+!data/pipeline.md
+!data/freemotion-submissions.tsv
 # Received offers/contracts, promise notes, prep reports (PII — never commit)
 data/offers/*   
 !data/offers/.gitkeep
