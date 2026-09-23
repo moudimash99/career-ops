@@ -266,3 +266,7 @@ scratch/
 *.db-wal
 *.db-shm
 data/agent-inbox.md
+
+# Fork (moudimash99): scratch output of runs (agy reports, messages, screenshots, pools).
+# It can hold personal data, and the repo is public.
+tmp/
