@@ -85,13 +85,18 @@ const SITE_NOTES = [
   },
   {
     host: /(^|\.)apec\.fr$/i,
-    text: `- APEC: an account EXISTS (login saved 2026-09-23). The cookie banner: click "Accepter tous les cookies".
+    text: `- APEC: an account EXISTS (login saved 2026-09-23; APEC does not keep you signed in between jobs, so
+  expect to sign in every time). The cookie banner: click "Accepter tous les cookies".
   Clicking "Postuler" (or "Postuler sur le site du partenaire") opens "Vous \u00eates sur le point de postuler /
   Poursuivez votre candidature". Get the login with
   \`node lib/freemotion-credentials.mjs load --domain www.apec.fr\` and sign in with that email and password
   in the "Vous avez d\u00e9j\u00e0 un compte ?" form (Adresse email, Mot de passe), then carry on with the application.
+  - APEC's own form: the message to the recruiter is limited to 500 characters (count before pasting).
+    The "Donn\u00e9es compl\u00e9mentaires" (education) are for APEC's statistics only, never sent to the recruiter.
   - "Postuler sur le site du partenaire": after signing in, APEC sends you to the partner's site. Write the
     exact URL you land on in your report, then apply there; that page is part of this job.
+  - Record the result (record.sh or finalize) with the APEC posting URL given above, even when you applied
+    on the partner's site.
   - "L'offre ... n'est plus disponible" alone does NOT mean the posting is closed: APEC shows it to visitors
     it takes for bots. Reload the posting once after signing in. If it is still there, finalize \`errored\`
     with the note "APEC says unavailable after sign-in".
@@ -149,6 +154,7 @@ ${submitLines}
   outcome = errored (closed posting, broken page, stuck) · blocked-waf (bot-protection block) · captcha ·
   already-applied (site says you applied recently) · validation-failed (form refuses and you cannot fix it).
 - Accounts: \`node lib/freemotion-credentials.mjs load --domain <host>\` (then \`generate\` if none exists).
+  Never write a password into the report, a note, or any file: write "signed in" instead.
 - Email check: \`PYTHONIOENCODING=utf-8 python freemotion-night/imap-link.py "<sender>" "<expected domain>"\`
   (Gmail OAuth is broken; this IMAP access replaces it). Only open a link on the site's own domain.
 
