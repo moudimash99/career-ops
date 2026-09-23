@@ -5548,7 +5548,6 @@ Paste job URLs below as `- [ ] {url}` then run `/career-ops pipeline`.
 - [ ] https://careers-en-nortal.icims.com/jobs/6396/software-architect/job | Nortal | Software Architect
 - [ ] https://careers-en-nortal.icims.com/jobs/6016/ai-driven-architect/job | Nortal | AI-Driven Architect
 - [ ] https://jobs.lever.co/spotify/318f73b5-6a78-49c7-b625-ecb1481042b9 | Spotify | Backend Engineer, Personalization | New York, NY | posted: 2026-09-15
-- [ ] https://sanofi.wd3.myworkdayjobs.com/SanofiCareers/job/Paris/Software-Engineer_R2856134-1 | Sanofi | Software Engineer | Paris | posted: 2026-09-17
 - [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179448471W | SOORS | SRE Engineering Platform Devops F/H | Courbevoie - 92 | posted: 2026-09-19
 - [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179448121W | Synapsys | Ingénieur Cloud Azure - Paris F/H | Paris 09 - 75 | 55000-60000 EUR | posted: 2026-09-19
 - [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179448031W | TEAMIS | Lead DevOps F/H | Paris 01 - 75 | 50000-65000 EUR | posted: 2026-09-19
@@ -5950,12 +5949,441 @@ Paste job URLs below as `- [ ] {url}` then run `/career-ops pipeline`.
 - [ ] https://careers.allianz.com/global/en/job/102582/Senior-Reporting-analyst-Data-engineer | Allianz | Senior Reporting analyst / Data engineer | Sofia- Srebarna 16, Bulgaria | posted: 2026-09-17
 - [ ] https://careers.allianz.com/global/en/job/106304/Senior-Database-Administrator | Allianz | Senior Database Administrator | Mkalles, Lebanon | posted: 2026-09-17
 
+- [ ] https://job-boards.greenhouse.io/anthropic/jobs/5427969008 | Anthropic | Compute & Infrastructure Counsel, Real Estate | San Francisco, CA / Seattle, WA | posted: 2026-09-19
+- [ ] https://job-boards.greenhouse.io/arizeai/jobs/6203648004 | Arize AI | DevOps Support Engineer (Argentina) | Remote (Buenos Aires) | posted: 2026-09-21
+- [ ] https://coreweave.com/careers/job?4715046006&board=coreweave&gh_jid=4715046006 | Weights & Biases (CoreWeave) | Senior Account Solutions Architect | San Francisco, CA | posted: 2026-09-21
+- [ ] https://coreweave.com/careers/job?4714715006&board=coreweave&gh_jid=4714715006 | Weights & Biases (CoreWeave) | Senior Construction Manager - Data Center Construction | West Chicago, IL | posted: 2026-09-21
+- [ ] https://coreweave.com/careers/job?4712768006&board=coreweave&gh_jid=4712768006 | Weights & Biases (CoreWeave) | Specialist Field Engineer - Kubernetes | San Francisco. CA / Sunnyvale, CA / Bellevue, WA | posted: 2026-09-11
+- [ ] https://coreweave.com/careers/job?4714164006&board=coreweave&gh_jid=4714164006 | Weights & Biases (CoreWeave) | Sr Data Center Design Manager | Livingston, NJ / New York, NY / Sunnyvale, CA / San Francisco, CA / Bellevue, WA | posted: 2026-09-21
+- [ ] https://apply.workable.com/j/DB4D7C0EC8 | Hugging Face | Senior Open-Source Python Engineer, ML Developer Tools - EMEA Remote | France | posted: 2026-09-21
+- [ ] https://sumup.com/careers/positions/8644927002?gh_jid=8644927002 | SumUp | Information Security Architect | Sofia, Bulgaria | posted: 2026-09-21
+- [ ] https://sumup.com/careers/positions/8827465002?gh_jid=8827465002 | SumUp | Senior Software Engineer, EU Own Acquiring | Sofia, Bulgaria | posted: 2026-09-21
+- [ ] https://jobs.ashbyhq.com/legora/ebbd06a8-a780-4a66-9f78-a30986da3b98 | Legora | Director of People Technology & Data | New York City | posted: 2026-09-21
+- [ ] https://careers-en-nortal.icims.com/jobs/6355/senior-software-engineer/job | Nortal | Senior Software Engineer
+- [ ] https://nxp.wd3.myworkdayjobs.com/careers/job/Toulouse/Validation-EMC-and-PCB-Simulation-Engineer_R-10066847-1 | NXP | Validation EMC and PCB Simulation Engineer | Toulouse | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179458367W | BLUETHINK | Founding Sales Lead – Biotech & Pharma F/H | Paris 01 - 75 | 90000-100000 EUR | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179458354W | BLUETHINK | Forward Deployed Engineer / SRE F/H | Paris 13 - 75 | 65000-95000 EUR | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179458050W | GROUPE ALLIANCE | TECH LEAD JAVA KAFKA F/H | Paris 01 - 75 | 54000-64000 EUR | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179457608W | VIASANTE Mutuelle | Développeur Full Stack / DevOps F/H | Labège - 31 | 35000 EUR | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179457281W | PROSIM SA | Manager du Développement Logiciel F/H | Labège - 31 | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179301447W | LEO INTERNATIONAL | DÉVELOPPEUR SENIOR JAVA FULLSTACK OU DEVOPS F/H | Paris 01 - 75 | 50000-90000 EUR | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179394322W | LEO INTERNATIONAL | DevOps FullStack F/H | Paris 01 - 75 | 50000-90000 EUR | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179457010W | W.G. CONSULTING | Tech Lead Infrastructure Système, Stockage & Cloud Hybride F/H | Paris 01 - 75 | 55000-60000 EUR | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179354714W | KHONEXIO | DIRECTEUR TECHNIQUE METIER R&D LOGICIEL EMBARQUE F/H | Paris 17 - 75 | 100000-125000 EUR | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179455922W | Hellowork | Architecte Si - Industrie - le Plessis Robinson F/H | Le Plessis-Robinson - 92 | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179455839W | Randstad professional | DÉVELOPPEUR D’APPLICATIONS FULL STACK F/H | Levallois-Perret - 92 | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179455454W | WEBNET | Data Engineer Scala/Apark - Boulogne F/H | Boulogne-Billancourt - 92 | 47000 EUR | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179454966W | Hellowork | Ingénieurs de Production DevOps F/H | Paris 13 - 75 | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179454892W | Hellowork | Tech Lead Vérification Fpga - Soc - Deeptech Européenne F/H | Sèvres - 92 | 75000-85000 EUR | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179454548W | ZZ_Confidentiel | Senior Data / Business Analyst - Power BI & BigQuery F/H | Paris - 75 | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179454514W | PRODUCT DEVELOPMENT EMPLOYENEURSHIP | Expert DevOps GCP F/H | Paris 01 - 75 | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179293473W | ITMA | Ingénieur DevOps F/H | Toulouse - 31 | 40000-50000 EUR | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179454229W | WEBNET | DataOps Engineer confirmé – Azure / Databricks / Big Data - Boulogne F/H | Boulogne-Billancourt - 92 | 47000 EUR | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179454113W | Findyourstaff | Développeur .NET / DevOps F/H | Nanterre - 92 | 36000-44000 EUR | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179287103W | LOBELLIA CONSEIL | Data Engineer Senior – Microsoft Fabric F/H | Montrouge - 92 | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179453999W | SILKHOM SAS | Administrateur Systèmes Linux / DevOps - Client final F/H | Toulouse - 31 | 43000 EUR | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179453874W | OREL SERVICES FRANCE | Data engineer GCP - Projet Datops F/H | Paris 01 - 75 | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179453762W | OREL SERVICES FRANCE | architecte Cloud souverain F/H | Paris 01 - 75 | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179453689W | OREL SERVICES FRANCE | Chef de Projet Cloud AWS F/H | Paris 01 - 75 | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179453401W | Hellowork | Sre Cloud Databases ai Ops F/H | Paris 01 - 75 | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179453125W | SAGEMCOM BROADBAND SAS | Ingénieur DevOps expérimenté - Plateforme Data & Cloud F/H | Bois-Colombes - 92 | 45000-60000 EUR | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179431708W | Groupama Supports et Services | Senior System Architect PEGA (SSA) F/H | Nanterre - 92 | 40000-60000 EUR | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179324192W | Meteojob | Ingénieur Cloud Azure F/H | Paris 09 - 75 | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179451354W | Meteojob | Tech Lead full stack .NET/React.JS F/H | Paris 09 - 75 | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179304543W | Meteojob | Tech Lead Fullstack Java F/H | Labège - 31 | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179450700W | cadremploi | DBA Oracle / Exadata Expert F/H | La Garenne-Colombes - 92 | 40000 EUR | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179450699W | cadremploi | Développeur Java QuickFix Engine - CIB F/H | Paris 01 - 75 | 45000 EUR | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179450698W | cadremploi | Ingénieur.e GCP & Terraform F/H | Boulogne-Billancourt - 92 | 67000 EUR | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179450681W | cadremploi | Expert cloud pour migration CSPM : CSPM, Cloud F/H | Paris 01 - 75 | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179450678W | cadremploi | Consultant Support Fonctionnel et Technique - Cloud F/H | Paris 01 - 75 | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179450651W | cadremploi | Ingénieur Production Cloud et DevOps F/H | Paris 01 - 75 | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179450626W | cadremploi | Coach Technique DevOps F/H | Paris 01 - 75 | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179450613W | cadremploi | Architecte Solutions — Assurance caution & garantie F/H | Paris 01 - 75 | 52000 EUR | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179450536W | cadremploi | Data Engineer GCP — Python / Spark, risque de crédit et risques climatiques F/H | Paris 01 - 75 | 40000 EUR | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179450316W | cadremploi | Ingénieur production DevOps F/H | Paris 01 - 75 | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179450267W | cadremploi | Data engineer python aws apache F/H | La Garenne-Colombes - 92 | 40000 EUR | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179450216W | cadremploi | Data Engineer GCP / BigQuery — Plateforme data d'un grand groupe bancaire F/H | Paris 01 - 75 | 40000 EUR | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179450143W | cadremploi | Data Engineer Hadoop / PySpark — Datalake d'un grand groupe bancaire F/H | Paris 01 - 75 | 40000 EUR | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179450130W | cadremploi | Tech lead java - almt F/H | Paris 01 - 75 | 40000 EUR | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179450082W | cadremploi | Lead tech studio ia & mlops - sénior F/H | Paris 01 - 75 | 40000 EUR | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179450078W | cadremploi | Ingénieurs de Production DevOps F/H | Paris 01 - 75 | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179457133W | LEO INTERNATIONAL | Architecte solution Big Data & Datascience & AI F/H | Paris 01 - 75 | 50000-90000 EUR | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179457782W | POLE INSTITUTIONNEL | Développeur Intéropérabilité (CDI) F/H | Paris 01 - 75 | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179457623W | FISH EYE TECHNOLOGIES | Responsable Infrastructure F/H | Saint-Cloud - 92 | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179457484W | AUBAY - SOLUTEC | INGENIEUR(E) SYSTEMES LINUX/WINDOWS F/H | Puteaux - 92 | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179457202W | ALTRION | Ingénieur Maîtrise de la Solution Wiz (Cloud Security) - Paris F/H | Paris 01 - 75 | 50000-80000 EUR | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179456906W | Bleu | Ingénieur(e) Azure Infrastructure F/H | Bagneux - 92 | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179387293W | LEO INTERNATIONAL | CONSULTANT SAP CLOUD PLATFORM INTEGRATION F/H | Paris 01 - 75 | 50000-80000 EUR | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/178723376W | LEO INTERNATIONAL | CONSULTANT SAP S/4HANA CLOUD F/H | Paris 01 - 75 | 50000-90000 EUR | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179456572W | IT LINK FRANCE | Ingénieur Système F/H | Paris 01 - 75 | 38000-46000 EUR | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179456470W | ALTRION | Tech Lead CloudPrivé (système et infrastructure) - Expert - Paris F/H | Paris 01 - 75 | 50000-80000 EUR | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179456399W | LUTESSA | Ingénieur Réseaux F/H | Paris 02 - 75 | 55000 EUR | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179455356W | Hellowork | Consultant Data Manufacturing F/H | Paris 01 - 75 | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179436325W | COCONFIANCE | Développeur TALEND / .NET – Senior F/H | Neuilly-sur-Seine - 92 | 50000 EUR | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179454421W | PRODUCT DEVELOPMENT EMPLOYENEURSHIP | Data Engineer Big Data/ GCP F/H | Paris 02 - 75 | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179293472W | ITMA | Ingénieur Big Data F/H | Toulouse - 31 | 35000-50000 EUR | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179453255W | Abolis Biotechnologie | Administrateur Système / SysOps F/H | Paris 13 - 75 | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179400133W | SOCIETE POUR L'INFORMATIQUE INDUSTRIELLE | Développeur Full Stack F/H | Paris 01 - 75 | 45000-55000 EUR | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179450610W | cadremploi | Ingénieur Linux Infrastructure Cloud F/H | Paris 01 - 75 | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179450014W | cadremploi | Architecte ia / mlops F/H | Toulouse - 31 | 46000 EUR | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179449991W | cadremploi | Ingénieur OPS / Platform Engineer Kubernetes F/H | Neuilly-sur-Seine - 92 | 40000 EUR | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179449895W | cadremploi | Ingénieur Azure DevOps F/H | Paris 01 - 75 | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179449695W | MICHAEL PAGE INTERNATIONAL FRANCE | Développeur Full Stack Senior Python / React - Assurance IARD F/H | Nanterre - 92 | 65000-70000 EUR | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179448842W | CIORANE | Tech Lead CloudOps F/H | La Garenne-Colombes - 92 | 65000-73000 EUR | posted: 2026-09-20
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179316514W | CLOUD TEMPLE | Lead Data, IA & Performance F/H | Puteaux - 92 | 70000 EUR | posted: 2026-09-20
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179457406W | ALTRION | Architecte cyber sécurité - Expert - Paris F/H | Paris 01 - 75 | 50000-80000 EUR | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179287120W | LOBELLIA CONSEIL | Business Data Analyst Confirmé F/H | Montrouge - 92 | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179435130W | Hellowork | Achitecte Technique Infrastructure F/H | Paris 12 - 75 | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179450676W | cadremploi | Architecte cloud secnum / souverain/ landing zone F/H | Malakoff - 92 | 40000 EUR | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179449963W | cadremploi | Architecte cloud souverain – secnumcloud F/H | Malakoff - 92 | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179449894W | cadremploi | Développeur Python IA F/H | Paris 01 - 75 | 50000 EUR | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179449341W | EMPLOI PUBLIC | Architecte Solution Mise En Concurrence- F/H | Paris 01 - 75 | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179449152W | CO-MARTIN | Achitecte technique infrastructure F/H | Paris 01 - 75 | 50000 EUR | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179448635W | SILKHOM SAS | Responsable Data Center – Intégrateur de solutions F/H | Paris 17 - 75 | 95000 EUR | posted: 2026-09-20
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179457712W | Square Management | Consultant(e) Senior – Data Engineer / ML Engineer F/H | Neuilly-sur-Seine - 92 | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179457157W | NEXTON | Senior Data Engineer F/H | Paris 02 - 75 | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179455926W | Hellowork | Ingénieur Logiciel Python F/H | Toulouse - 31 | 40000-55000 EUR | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179455196W | Hellowork | Scrum Master - Pmo IT Transverse - Écosystème IA F/H | Toulouse - 31 | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179451667W | Meteojob | Ingénieur Linux Red Hat & Kubernetes - F/H | Toulouse - 31 | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179451313W | Meteojob | Data Engineer Streaming (Java / Kafka Stream / Spark) F/H | Paris 09 - 75 | 40000 EUR | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179450660W | cadremploi | Ex data scientist ou data engineer ? Et si tu passais côté utilisateurs ? F/H | Levallois-Perret - 92 | 40000 EUR | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179450624W | cadremploi | Expert DBA Postgres - Cloud F/H | Paris 01 - 75 | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179450264W | cadremploi | Développeur Fullstack Flutter F/H | Paris 01 - 75 | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179449958W | cadremploi | Développeur Python – AI-Native Developer / IT Innovation F/H | Montrouge - 92 | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179449892W | cadremploi | DevOps Google Cloud et Google Kubernetes Engine - Paris F/H | Paris 01 - 75 | 40000 EUR | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179453656W | Hellowork | Tech Lead Développement Cloud et Sécurité Gcp F/H | Puteaux - 92 | 65000-75000 EUR | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179450702W | cadremploi | Data Engineer Sénior - Morphome F/H | Paris 01 - 75 | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179450661W | cadremploi | Data Engineer - DBT Snowflake F/H | Paris 01 - 75 | 58000 EUR | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179450612W | cadremploi | Expert Infrastructure Réseau F/H | Paris 01 - 75 | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179450611W | cadremploi | Ingénieur Réseaux Senior F/H | Paris 01 - 75 | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179450517W | cadremploi | Data engineer gcp F/H | Paris 01 - 75 | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179450172W | cadremploi | Data Engineer Snowflake F/H | Issy-les-Moulineaux - 92 | 40000 EUR | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179457515W | SKIILS | Analytics Engineer (databricks, spark, AWS) - Paris/Lille F/H | Paris 01 - 75 | 42000-60000 EUR | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179301341W | LEO INTERNATIONAL | Consultant/Manager - Transformation Cloud Digital F/H | Paris 01 - 75 | 50000-80000 EUR | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179457163W | NEXTON | Développeur Power BI Senior F/H | Paris 02 - 75 | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179456095W | Hellowork | Software Engineer Fullstack F/H | Paris 03 - 75 | 45000-60000 EUR | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179454917W | Hellowork | Senior Software Engineer - Editeur Saas dans l'Edtech F/H | Paris 02 - 75 | 80000-105000 EUR | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179451446W | Meteojob | Développeur Back-end (Elixir) F/H | Paris 09 - 75 | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179450409W | cadremploi | Data Engineer / Expert Snowflake F/H | Neuilly-sur-Seine - 92 | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179450010W | cadremploi | IT Data & Integration Manager Google Cloud Platform F/H | Paris 01 - 75 | 50000 EUR | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179457737W | ORGANISSAN - INFORMATIQUE | Chef.fe de Projet Data / IA F/H | Puteaux - 92 | 53000-57000 EUR | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179454753W | Hellowork | Head Of Software Engineering F/H | Paris 01 - 75 | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179450091W | cadremploi | Data Engineer F/H | Paris 01 - 75 | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179449879W | cadremploi | Head of software engineering F/H | Paris 01 - 75 | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179448592W | Externatic | AI Lead Engineer @ ETI française - Remote - F/H | Paris 08 - 75 | 50000 EUR | posted: 2026-09-19
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179458498W | MBDA | Architecte d'entreprise business F/H | Le Plessis-Robinson - 92 | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179458178W | Labsoft | Ingénieur Réseaux & Sécurité F/H | Pin-Balma - 31 | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179458055W | Exaion | Administrateur(trice) Systèmes & Support Workplace F/H | Nanterre - 92 | 42000-45000 EUR | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179457934W | MINT CONSEIL | Consultant NetDevOps F/H | Blagnac - 31 | 45000-60000 EUR | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179254553W | NEOS SDI | Développeur Full Stack - Levallois-Perret ( F/H | Levallois-Perret - 92 | 30000 EUR | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179457320W | ALTRION | Devsecops Sécurité et développement ingénieur - Paris F/H | Paris 01 - 75 | 50000-80000 EUR | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179439672W | PMEJOB | Senior HSE Manager - Construction Data Center F/H | Courbevoie - 92 | 85000-90000 EUR | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179456835W | ASSISTANCE PUBLIQUE HOPITAUX DE PARIS | Chef de projet informatique intégration F/H | Paris 12 - 75 | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179457181W | GROUPE IDEC | Responsable Développement- Data Centers F/H | Paris 08 - 75 | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179457097W | Hays France | Ingénieur réseau et sécurité F/H | Toulouse - 31 | 40000-65000 EUR | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179448725W | DSAF CONSULT | Chef de projet technique confirmé/expert – Sûreté & Systèmes F/H | Boulogne-Billancourt - 92 | 44000 EUR | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179456402W | DAVRICOURT | Administrateur Systèmes et Réseaux F/H | Paris 14 - 75 | 45000-50000 EUR | posted: 2026-09-21
+- [ ] https://www.welcometothejungle.com/en/companies/ministere-de-l-interieur/jobs/dgpn-stn-expert-en-systemes-reseaux-et-cloud-h-f-h-f_paris_MDL_ZAXN0gw | Ministère de l'Intérieur | DGPN / STN - Expert en systèmes, réseaux et Cloud H/F H/F | Paris, France | posted: 2026-09-21
+- [ ] https://www.welcometothejungle.com/en/companies/sii/jobs/ingenieur-devops-kubernetes-go-h-f_paris | Groupe SII | Ingénieur Devops Kubernetes/Go H/F | Paris, France | 48000-65000 EUR | posted: 2026-09-21
+- [ ] https://www.welcometothejungle.com/en/companies/artefact/jobs/senior-data-scientist_paris_ARTEF_wy7lRJR | Artefact | Senior Data Scientist | Paris, France | posted: 2026-09-21
+- [ ] https://www.welcometothejungle.com/en/companies/square-management/jobs/consultant-senior-data-engineer-ml-engineer-h-f_neuilly-sur-seine | Square Management | Consultant(e) Senior – Data Engineer / ML Engineer (H/F) | Neuilly-sur-Seine, France | posted: 2026-09-21
+- [ ] https://www.welcometothejungle.com/en/companies/jakala/jobs/data-engineer-confirme-cdi-paris_paris | JAKALA | Data Engineer - Senior Consultant | Caen, France | posted: 2026-09-21
+- [ ] https://www.welcometothejungle.com/en/companies/jakala/jobs/data-analyst-senior-cdi-paris-ou-caen | JAKALA | Analytics Engineer - Senior Consultant | Caen, France | posted: 2026-09-21
+- [ ] https://www.welcometothejungle.com/en/companies/saegus/jobs/ai-engineer-consultant-e-confirme-e-senior_paris_SAEGU_P31zo0w | Saegus | AI Engineer – Consultant·e confirmé·e / senior | Paris, France | posted: 2026-09-21
+- [ ] https://www.welcometothejungle.com/en/companies/webnet/jobs/data-engineer-scala-apark-h-f-boulogne_sevres | Webnet | Data Engineer Scala/Apark H/F - Boulogne | Sèvres, France | 48-51 EUR | posted: 2026-09-21
+- [ ] https://www.welcometothejungle.com/en/companies/webnet/jobs/dataops-engineer-confirme-azure-databricks-big-data-h-f-boulogne_sevres | Webnet | DataOps Engineer confirmé – Azure / Databricks / Big Data H/F - Boulogne | Sèvres, France | 48-51 EUR | posted: 2026-09-21
+- [ ] https://www.welcometothejungle.com/en/companies/asi/jobs/data-ingenieur-f-h_rennes_ASI_rjx9PrR | ASI | Data Ingénieur Snowflake Confirmé (F/H) | Rennes, France | 38000-45000 EUR | posted: 2026-09-20
+- [ ] https://www.welcometothejungle.com/en/companies/ministere-des-armees-fr/jobs/data-engineer_saint-mande | Civils de la Défense - Ministère des Armées et des Anciens combattants | DATA ENGINEER | Saint-Mandé, France | posted: 2026-09-21
+- [ ] https://www.welcometothejungle.com/en/companies/stime/jobs/data-engineer-databricks-azure_chatillon | Stime | Data Engineer (Databricks /Azure) | Châtillon, France | posted: 2026-09-21
+- [ ] https://www.welcometothejungle.com/en/companies/nexton-consulting/jobs/senior-data-engineer-h-f_paris_NEXTO_0JPWjyx | NEXTON | Senior Data Engineer H/F | Paris, France | posted: 2026-09-21
+- [ ] https://www.welcometothejungle.com/en/companies/luxurynsight/jobs/data-engineer-luxurynsight_paris | Luxurynsight | Data Engineer Luxurynsight | Paris, France | 55000-60000 EUR | posted: 2026-09-21
+- [ ] https://www.welcometothejungle.com/en/companies/rollee-1/jobs/backend-engineer-coverage-team_ar_7gddgapz | Rollee | Backend Engineer - Coverage Team | Argentina | posted: 2026-09-21
+- [ ] https://www.welcometothejungle.com/en/companies/bouygues-telecom/jobs/ingenieur-devsecops-kubernetes-elk-f-h_nantes | Bouygues Telecom | Ingénieur DevSecOps Kubernetes / ELK F/H | Nantes, France | posted: 2026-09-21
+- [ ] https://www.welcometothejungle.com/en/companies/exaion/jobs/ingenieur-expert-kubernetes-f-h_paris | Exaion | Ingénieur Expert Kubernetes F/H | Paris, France | 60000-70000 EUR | posted: 2026-09-21
+- [ ] https://www.welcometothejungle.com/en/companies/bpce-infogerance-technologies/jobs/architecte-technique-f-h_toulouse | BPCE INFOGERANCE & TECHNOLOGIES | Architecte technique F/H | Toulouse, France | posted: 2026-09-21
+- [ ] https://www.welcometothejungle.com/en/companies/cgi/jobs/ingenieur-systemes-reseaux-et-securite-n2-n3-f-h_bordeaux | CGI | Ingénieur(e) Systemes réseaux et sécurité N2-N3 F/H | Bordeaux, France | posted: 2026-09-21
+- [ ] https://www.welcometothejungle.com/en/companies/ministere-de-l-interieur/jobs/shfd-31-ingenieur-devsecops-en-charge-des-dispositifs-de-detection-h-f-sic_toulouse | Ministère de l'Intérieur | SHFD (31) - Ingénieur DevSecOPs en charge des dispositifs de détection H/F (SIC) | Toulouse, France | posted: 2026-09-19
+- [ ] https://www.welcometothejungle.com/en/companies/asi/jobs/architecte-technique-manager-d-equipe-f-h_nantes | ASI | Architecte Technique/ Manager d’équipe (F/H) | Nantes, France | 50000-70000 EUR | posted: 2026-09-20
+- [ ] https://www.welcometothejungle.com/en/companies/ministere-de-l-interieur/jobs/acmoss-dt-architecte-it-du-systeme-d-information-de-gestion-telecom-du-rrf-h-f_courbevoie | Ministère de l'Intérieur | ACMOSS - DT -Architecte IT du Système d'information de Gestion Telecom du RRF (H/F) | Courbevoie, France | posted: 2026-09-21
+- [ ] https://www.welcometothejungle.com/en/companies/wigroup/jobs/data-scientist-ai-engineer_paris | Wivoo, a Wavestone company | Data Scientist / AI Engineer | Paris, France | 60000-75000 EUR | posted: 2026-09-21
+- [ ] https://www.welcometothejungle.com/en/companies/jedha/jobs/stagiaire-data-ia_paris_JEDHA_2NOoD07 | JEDHA | Content Creator - Data | Paris, France | 9600 EUR | posted: 2026-09-21
+
+- [ ] https://job-boards.greenhouse.io/anthropic/jobs/5391180008 | Anthropic | AWS GTM Partnership Lead, Enterprise | San Francisco, CA / New York City, NY / Seattle, WA | posted: 2026-08-17
+- [ ] https://job-boards.greenhouse.io/anthropic/jobs/5391184008 | Anthropic | AWS GTM Partnership Lead, Global System Integrators | San Francisco, CA / New York City, NY / Seattle, WA | posted: 2026-08-26
+- [ ] https://job-boards.greenhouse.io/anthropic/jobs/5426135008 | Anthropic | Engineering Manager, Data Infrastructure | San Francisco, CA / New York City, NY | posted: 2026-09-22
+- [ ] https://job-boards.greenhouse.io/anthropic/jobs/5428124008 | Anthropic | Product Designer, Design Systems | San Francisco, CA | posted: 2026-09-22
+- [ ] https://job-boards.greenhouse.io/anthropic/jobs/5430205008 | Anthropic | Security Risk & Compliance, Data Centers & Compute | San Francisco, CA / Seattle, WA / New York City, NY / Washington, DC | posted: 2026-09-22
+- [ ] https://job-boards.greenhouse.io/anthropic/jobs/4942024008 | Anthropic | Software Engineer, Beneficial Deployments | San Francisco, CA / New York City, NY | posted: 2025-10-03
+- [ ] https://job-boards.greenhouse.io/vercel/jobs/6134374004 | Vercel | Software Engineer, Internal Agent | Hybrid - San Francisco | posted: 2026-08-05
+- [ ] https://job-boards.greenhouse.io/vercel/jobs/6137958004 | Vercel | Software Engineer - Next.js | Hybrid - San Francisco, New York City | posted: 2026-09-02
+- [ ] https://job-boards.greenhouse.io/vercel/jobs/5825469004 | Vercel | Strategic Cloud Partnerships Lead | Hybrid - San Francisco | posted: 2026-03-12
+- [ ] https://job-boards.greenhouse.io/arizeai/jobs/6128122004 | Arize AI | Applied AI Engineer | Remote (San Francisco) | posted: 2026-08-27
+- [ ] https://coreweave.com/careers/job?4710741006&board=coreweave&gh_jid=4710741006 | Weights & Biases (CoreWeave) | Engineering Manager, Prime Systems & Services | New York, NY / Sunnyvale, CA / Bellevue, WA | posted: 2026-09-03
+- [ ] https://coreweave.com/careers/job?4709378006&board=coreweave&gh_jid=4709378006 | Weights & Biases (CoreWeave) | Senior Software Engineer, Storage | New York, NY | posted: 2026-08-28
+- [ ] https://coreweave.com/careers/job?4710738006&board=coreweave&gh_jid=4710738006 | Weights & Biases (CoreWeave) | Sr. Software Engineer, Sandboxes & Virtualization | Livingston, NJ / Sunnyvale, CA / Bellevue, WA | posted: 2026-09-02
+- [ ] https://coreweave.com/careers/job?4639868006&board=coreweave&gh_jid=4639868006 | Weights & Biases (CoreWeave) | Staff Product Manager, Training Infrastructure - Weights & Biases | Livingston, NJ / New York, NY / San Francisco, CA / Sunnyvale, CA / Bellevue, WA | posted: 2026-01-08
+- [ ] https://coreweave.com/careers/job?4669836006&board=coreweave&gh_jid=4669836006 | Weights & Biases (CoreWeave) | Staff Software Engineer, File & Block Storage | Livingston, NJ / New York, NY / Sunnyvale, CA / Bellevue, WA | posted: 2026-04-03
+- [ ] https://jobs.ashbyhq.com/lovable/45db5790-4305-4fad-b96b-1fbdf42b88f2 | Lovable | Staff / Principal Software Engineer, Product | Stockholm | posted: 2026-09-22
+- [ ] https://jobs.ashbyhq.com/supabase/f3a7c4bf-3e79-4556-a4e9-04d6987a0e8f | Supabase | AWS Enterprise Segment Lead | Remote, AMER | posted: 2026-08-28
+- [ ] https://jobs.ashbyhq.com/supabase/344787f2-d115-4056-87ca-7668fc14be3d | Supabase | AWS Gaming GTM Segment Lead | Remote, AMER | posted: 2026-08-28
+- [ ] https://jobs.ashbyhq.com/supabase/8e4ddc16-6308-432a-acea-55709c15ddc7 | Supabase | AWS Partner Marketing Manager | Remote, Global | posted: 2026-09-22
+- [ ] https://job-boards.greenhouse.io/hightouch/jobs/5597121004 | Hightouch | Manager, Strategy Consultants (Agentic Customer Data Platform) | Remote (North America) | posted: 2025-07-25
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179465018W | VIVERIS | Ingénieur DevOps - Spatial F/H | Ramonville-Saint-Agne - 31 | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179464842W | CTS Corporate | Développeur(se) Senior Android / Kotlin (App Mobile) F/H | Paris 01 - 75 | 55000 EUR | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179464761W | ACENSI | Administrateur Systèmes F/H | Courbevoie - 92 | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179464620W | AUBAY - SOLUTEC | INGENIEUR(E) DEVOPS F/H | Paris 08 - 75 | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179464596W | VIVERIS | Ingénieur Full Stack / Logiciel distribué / Devops - Défense F/H | Le Plessis-Robinson - 92 | 40000-45000 EUR | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179464522W | OREL SERVICES FRANCE | Tech Lead data F/H | Paris 01 - 75 | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179464270W | CONSORT INFOGERANCE | Ingénieur NetDevOps – Automatisation réseau F/H | Toulouse - 31 | 35000-45000 EUR | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179464413W | SMAC | Responsable IA & Data F/H | Paris 15 - 75 | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179464328W | W HUB | DevOps MLOps – GCP F/H | Paris 03 - 75 | 55000-60000 EUR | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179464304W | W HUB | Devops GCP F/H | Paris 02 - 75 | 60000-70000 EUR | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179464260W | LEO INTERNATIONAL | Directeur Technique / Architecte SI & IA F/H | Paris 01 - 75 | 70000-100000 EUR | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179464080W | TSG FRANCE | Développeur(se) Senior SQL / PHP / API – Microsoft Dynamics 365 Business ... F/H | Le Plessis-Robinson - 92 | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179350497W | R D CONSEIL | Tech Lead — Solution de gestion des données immobilières F/H | Paris 09 - 75 | 50000-60000 EUR | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179463328W | PROBAYES | Architecte Logiciel (Paris) F/H | Paris 15 - 75 | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179447485W | CTS Corporate | Développeur(se) Fullstack Node.js / ReactJS / DevOps - expert F/H | Paris 01 - 75 | 60000 EUR | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179447476W | CTS Corporate | Coach Agile et Formateur DevSecOps / Software Craftsmanship F/H | Paris 01 - 75 | 35000 EUR | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179447907W | Externatic | Senior Software Engineer Fullstack JS - Scaleup SaaS F/H | Paris 08 - 75 | 65000 EUR | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179462585W | Bleu | Ingénieur réseaux et sécurité F/H | Bagneux - 92 | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179462604W | Bleu | Architecte M365 F/H | Bagneux - 92 | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179282780W | NATAN CONSULTING | Développeur JAVA_IA F/H | Paris 01 - 75 | 60000-70000 EUR | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179213776W | NATAN CONSULTING | Développeur Java Backend F/H | Paris 02 - 75 | 55000-60000 EUR | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179424210W | NATAN CONSULTING | Développeur Backend JAVA (Data Hub) F/H | Paris 01 - 75 | 55000-65000 EUR | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179462064W | GECI Int. | Architecte SI - DevOps F/H | Paris 02 - 75 | 65000 EUR | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179422296W | PREREQUIS | Data Analyst F/H | Neuilly-sur-Seine - 92 | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179461967W | Hellowork | Développeur d'Applications Full Stack F/H | Levallois-Perret - 92 | 38000-40000 EUR | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179461863W | Hellowork | Product Manager Ml & Genai F/H | Paris 01 - 75 | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179461559W | Hellowork | Développeur Msbi F/H | Issy-les-Moulineaux - 92 | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179461005W | Hellowork | Ingénieur DevOps Expert en Automatisation Ansible F/H | Paris 13 - 75 | 50000-55000 EUR | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179460819W | Hellowork | Ingénieur Sre Storage & Aiops - N F/H | Paris 17 - 75 | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179343219W | Hellowork | Ingénieur Devsecops Support Outillage d'Ingénierie F/H | Toulouse - 31 | 40000-50000 EUR | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179460651W | Hellowork | Knowledge Architect F/H | Courbevoie - 92 | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179365761W | Hellowork | Administrateur Systèmes Linux - DevOps - Client Final F/H | Toulouse - 31 | 43000-48000 EUR | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179460384W | Hellowork | Architecte Cloud Gcp Direction Technique F/H | Paris 01 - 75 | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179460312W | SAPIENS CONSULTING | Coach Agile Niveau N4 - Coach DevSecOps / DevOps confirmé F/H | Paris 01 - 75 | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179460255W | Hellowork | Consultant·e Senior Ai - Machine Learning Aws F/H | Levallois-Perret - 92 | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179434669W | Hellowork | DevOps Linux - Ansible - Toulouse F/H | Toulouse - 31 | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179342990W | Hellowork | Senior Software Engineer F/H | Paris 02 - 75 | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179364605W | Hellowork | Cloud Developer F/H | Toulouse - 31 | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179429057W | Hellowork | Administrateur Système Linux - Aéronautique Spatial Défense F/H | Toulouse - 31 | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179459481W | cadremploi | Chef de projets infrastructure - Paris F/H | Paris 01 - 75 | 55000 EUR | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179459413W | cadremploi | Developpeur Web prestashop F/H | Paris 01 - 75 | 32000 EUR | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179459394W | cadremploi | Plateform engineer devops/cloud confirme F/H | Levallois-Perret - 92 | 45000 EUR | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179459380W | cadremploi | Ingenieur cloud/devops ia F/H | Levallois-Perret - 92 | 55000 EUR | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179459363W | cadremploi | Architecte technique api management F/H | Levallois-Perret - 92 | 60000 EUR | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179459354W | cadremploi | System architect F/H | Paris 01 - 75 | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179459316W | cadremploi | Senior Software Engineer F/H | Paris 01 - 75 | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179422613W | cadremploi | Data Engineering Talend / Starburst Senior F/H | Paris 01 - 75 | 40000 EUR | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179459159W | cadremploi | Lead Développeur / Manager Technique Full-stack F/H | Paris 01 - 75 | 55000 EUR | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179459147W | cadremploi | Expert devops gcp & openshift F/H | Levallois-Perret - 92 | 60000 EUR | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179459144W | cadremploi | Formateur / coach devsecops — ci/cd, openshift, argocd F/H | Paris 01 - 75 | 58000 EUR | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179459132W | cadremploi | Manager Devops F/H | Paris 01 - 75 | 80000 EUR | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179459126W | cadremploi | Developpeur fullstack react native senior F/H | Levallois-Perret - 92 | 56000 EUR | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179459083W | cadremploi | Ingénieur devops - Plateforme Data & Cloud F/H | Bois-Colombes - 92 | 45000 EUR | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179459021W | cadremploi | Ingénieur Cloud Azure - Paris F/H | Paris 01 - 75 | 55000 EUR | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179458848W | jobs_that_makesense | Développeur/Développeuse Sénior Full Stack (TypeScript) F/H | Levallois-Perret - 92 | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179458737W | CO-MARTIN | DataOps Engineer confirmé – Azure / Databricks / Big Data - Boulog F/H | Boulogne-Billancourt - 92 | 47000 EUR | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179458729W | CO-MARTIN | Data Engineer Scala/Apark - Boulogne F/H | Boulogne-Billancourt - 92 | 47000 EUR | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179458655W | PMEJOB | DevOps SRE Senior - AWS / Terraform / Observabilité F/H | Paris 01 - 75 | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179366972W | CDC Informatique | Tech lead API Gateway & Observabilité Intelligente F/H | Bagneux - 92 | 70000 EUR | posted: 2026-09-04
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179348243W | Hellowork | Sre - DevOps Mobilitytech - Paris F/H | Paris 12 - 75 | 50000-55000 EUR | posted: 2026-09-04
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179345206W | Externatic | SRE / DevOps @MobilityTech - Paris F/H | Paris 12 - 75 | 50000 EUR | posted: 2026-09-01
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179333919W | 3DS OUTSCALE | Site Reliability Engineer F/H | Saint-Cloud - 92 | posted: 2026-08-31
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179320206W | U - CONSULTING GROUPE | Observability expert F/H | Paris 08 - 75 | posted: 2026-08-27
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179465019W | VIVERIS | Tech lead Back-end - Spatial F/H | Ramonville-Saint-Agne - 31 | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179462580W | Collective | Tech Lead IA / MLOps - Création d'IA Factory (GCP / Agentique) - CDI F/H | Paris 04 - 75 | 85000-86000 EUR | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179462773W | Sibylone | Data Engineer F/H | Paris 09 - 75 | 52000-58000 EUR | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179462389W | SOPHIA ENGINEERING | Ingénieur Infrastructure F/H | Toulouse - 31 | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179462279W | Hellowork | Ingénieur Linux Embarqué - Toulouse - CDI F/H | Toulouse - 31 | 37000-48000 EUR | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179428430W | Groupe Optic 2000 | Data Analyst & Modélisation F/H | Clamart - 92 | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179422136W | PREREQUIS | Data Engineer F/H | Neuilly-sur-Seine - 92 | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179461248W | Hellowork | Tech Lead Servicenow F/H | Toulouse - 31 | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179460649W | Hellowork | Ingenieur Systemes Linux - Windows F/H | Puteaux - 92 | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179460340W | Hellowork | Ingénieur Supervision Systèmes et Réseaux F/H | Paris 01 - 75 | 37000-45000 EUR | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179397889W | Hellowork | Consultant Data Gouvernance - CDI F/H | Paris 01 - 75 | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179460175W | Hellowork | Chef de Projet Transition & Transformation - Infrastructure & Cloud F/H | Courbevoie - 92 | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179460055W | Act Digital France | Développeur Calypso F/H | Montrouge - 92 | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179459478W | cadremploi | IT & Data Operations Manager F/H | Paris 01 - 75 | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179459417W | cadremploi | Expert(e) IA Agentique / Développeur(se) Senior Framework BMAD F/H | Nanterre - 92 | 32000 EUR | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179459162W | cadremploi | Analytics Engineer Data F/H | Paris 01 - 75 | 45000 EUR | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179459129W | cadremploi | Ingénieur expert en Infras Cloud Privé Grand Paris F/H | Paris 01 - 75 | 60000 EUR | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179459069W | cadremploi | Tech Lead Data Engineer F/H | Levallois-Perret - 92 | 50000 EUR | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179458931W | AlveoR | Tech Lead IA F/H | Paris 01 - 75 | 55000-75000 EUR | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179463077W | LEO INTERNATIONAL | Architecte d’Entreprise Senior – Aéronautique & Défense F/H | Paris 01 - 75 | 70000-120000 EUR | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179462461W | KAN CONSULTING SERVICES | Architecte Data F/H | Saint-Cloud - 92 | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179461648W | Hellowork | Architecte Solution Microsoft Dynamics - Paris F/H | Paris 01 - 75 | 45000-65000 EUR | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179461619W | Hellowork | Architecte Solution Salesforce Data Cloud F/H | Issy-les-Moulineaux - 92 | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179461461W | CIORANE | Architecte Cloud F/H | Malakoff - 92 | 55000-62000 EUR | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179461280W | ALTRION | Architecte Cloud souverain - Malakoff F/H | Malakoff - 92 | 50000-80000 EUR | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179461282W | Hellowork | Architecte Solution Salesforce Service Cloud F/H | Issy-les-Moulineaux - 92 | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179460232W | Hellowork | Architect ai Generative F/H | Levallois-Perret - 92 | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179341387W | Hellowork | Expert Data - Architecte Fonctionnel - Data Hub F/H | Paris 08 - 75 | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179366855W | HEADMIND PARTNERS AI | Consultant AI Engineer F/H | Paris 16 - 75 | 43000-50000 EUR | posted: 2026-09-04
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179361552W | DGTL Performance | Data Engineer GCP F/H | Paris 01 - 75 | 40000-45000 EUR | posted: 2026-09-03
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179360345W | TECHMATE | Senior Software Engineer F/H | Paris 02 - 75 | 70000-95000 EUR | posted: 2026-09-03
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179359020W | Valoway | Consultant.e AI Engineer F/H | Paris 01 - 75 | 60000-70000 EUR | posted: 2026-09-03
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179358037W | Valoway | Consultant.e Data Engineer Microsoft Fabric F/H | Paris 15 - 75 | 60000-70000 EUR | posted: 2026-09-03
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179349570W | Safran Transmission Systems | Data Engineer - Data industrielle F/H | Colombes - 92 | posted: 2026-09-02
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179310608W | STEP UP | SRE Senior / Lead Platform Engineer F/H | Courbevoie - 92 | 65000-70000 EUR | posted: 2026-09-01
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/178765268W | SOMA GROUP | Analytics Engineer Data F/H | Paris 02 - 75 | 45000-60000 EUR | posted: 2026-09-01
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/178765254W | SOMA GROUP | Data Engineer F/H | Paris 02 - 75 | 45000-60000 EUR | posted: 2026-09-01
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179340185W | Welcome to the Jungle | Lead Software Engineer Java – Data & AI Smart Digital platform F/H | Paris 08 - 75 | 70000-85000 EUR | posted: 2026-09-01
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179340184W | Welcome to the Jungle | Lead Back-End Software & Data Engineer – Streaming de données F/H | Paris 08 - 75 | 75000-95000 EUR | posted: 2026-09-01
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179302903W | INNOVAI TEK | Data Engineer / Data Scientist – IA Générative F/H | Meudon - 92 | 38000-50000 EUR | posted: 2026-08-31
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179199672W | EVERIENCE | AI Solutions Engineer F/H | Courbevoie - 92 | posted: 2026-08-31
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179200201W | EVERIENCE | MLOPS/ AI Ops Engineer F/H | Courbevoie - 92 | posted: 2026-08-31
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179325460W | Hellowork | Ingénieur DevOps - Plateforme Data F/H | Issy-les-Moulineaux - 92 | 45000-70000 EUR | posted: 2026-08-28
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179324648W | CLUBSEC | GCP DevOps Engineer F/H | Paris 01 - 75 | 45000-60000 EUR | posted: 2026-08-28
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179308604W | TEAMIS | Synthetic Data Platform Engineer F/H | Paris 10 - 75 | 60000-80000 EUR | posted: 2026-08-26
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179286857W | EAYS CONSULTING | Analytics Engineer Senior – Data/Power BI — Issy-les-Moulineaux F/H | Issy-les-Moulineaux - 92 | 61000-70000 EUR | posted: 2026-08-25
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179295466W | TEKKIT (CARREVOLUTIS) | Data Analytics Engineer - - CDI F/H | Paris 07 - 75 | 30000 EUR | posted: 2026-08-24
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179465029W | VIVERIS | Architecte logiciel Python confirmé F/H | Ramonville-Saint-Agne - 31 | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179464841W | GESER BEST | Développeur Java Backend Senior F/H | Paris 17 - 75 | 44000-48000 EUR | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179464459W | SERVICES CENTRAUX DG | Chef de projet intégration de flux & API - F/H | Paris 10 - 75 | 46000-55000 EUR | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179464291W | LEO INTERNATIONAL | Head of AI / Directeur de Programme IA & Plateforme F/H | Paris 01 - 75 | 70000-100000 EUR | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179447306W | CHRONOPOST INTERNATIONAL | Ingénieur Système (production) - F/H | Paris 14 - 75 | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179459920W | Meteojob | Architecte Cœur de Réseau E2E F/H | Paris 09 - 75 | 75000 EUR | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179458997W | Proaxian | Ingénieur intégration Linux/Kubernetes F/H | Toulouse - 31 | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179459932W | Meteojob | Responsable d'Ingénierie et Services SI: Systèmes Réseaux et Sécurité F/H | Paris 09 - 75 | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179459296W | cadremploi | Lead Developer Backend — Senior /X F/H | Paris 01 - 75 | 70000 EUR | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179458748W | CO-MARTIN | Data Engineer - F/H | Neuilly-sur-Seine - 92 | 50000 EUR | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179464234W | LEO INTERNATIONAL | Directeur Technique /Principal consultant- Architecture & transfo SI F/H | Paris 02 - 75 | 70000-100000 EUR | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179423574W | cadremploi | Développeur Back-end PHP/Symfony - Projet E-commerce Innovant - Paris F/H | Paris 01 - 75 | 50000 EUR | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179458684W | PMEJOB | Senior Test Engineer Cloud / Lead QA Web F/H | Paris 14 - 75 | posted: 2026-09-21
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179465094W | Collective | Analytics Engineer – Data & BI - CDI F/H | Paris 04 - 75 | 40000-50000 EUR | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179459693W | Meteojob | Business Analyst Data F/H | Paris 09 - 75 | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179422906W | cadremploi | Data Engineer Confirmé F/H | Courbevoie - 92 | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179464891W | Labsoft | Développeur Logiciel Confirmé Java Spring MVC F/H | Labège - 31 | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179464819W | ASSYSTEM | Développeur C# / AVEVA PML F/H | Courbevoie - 92 | 35000-53000 EUR | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179464716W | MENTORY | Responsable infrastructure F/H | Issy-les-Moulineaux - 92 | 70000-80000 EUR | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/178962606W | AGENCE DES COMMUNICATIONS MOBILES OPERATIONNELLES DE SECURITE ET DE SECOURS | Chef du bureau infrastructure et soutien numérique adjoint F/H | Courbevoie - 92 | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179463850W | TSG FRANCE | Ingénieur Réseau - F/H | Le Plessis-Robinson - 92 | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179448755W | Atos | Expert géospatial / GeoAI / Data Science F/H | Toulouse - 31 | 45000-50000 EUR | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179463527W | ZZ_Confidentiel | Project Manager Design & Commissioning (PM D&C) Electrical / Data Center F/H | Paris - 75 | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179446572W | Antea Group | INFRASTRUCTURES - Ingénieur de projet en maîtrise d'oeuvre, spécialisatio... F/H | Antony - 92 | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179121126W | DIRECTION D'ENTREPRISES EN TRANSITION ET ACCOMPAGN | Responsable du pôle systèmes F/H | Courbevoie - 92 | 55000-62000 EUR | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179462750W | ASSYSTEM | Data Owner F/H | Courbevoie - 92 | 35000-53000 EUR | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179446565W | Antea Group | INFRASTRUCTURES - Chef de projets déconstruction, désamiantage, déplombag... F/H | Antony - 92 | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179261486W | iTekway Occitanie | TECHNICIEN / INGENIEUR SUPPORT SYSTEMES & RESEAU (INFRASTRUCTURE ) N1/N2 F/H | Labège - 31 | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179462275W | Hellowork | Expert Système Microsoft F/H | Bagneux - 92 | 60000-70000 EUR | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179461895W | Hellowork | Ingénieur Réseau et Sécurité F/H | Toulouse - 31 | 40000-65000 EUR | posted: 2026-09-22
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179461854W | Hellowork | Responsable Développement - Programmes - Projets Data Centers F/H | Paris 01 - 75 | 50000 EUR | posted: 2026-09-22
+- [ ] https://www.welcometothejungle.com/en/companies/deloitte/jobs/senior-cloud-software-engineer-f-h_bordeaux | Deloitte | Senior Cloud Software Engineer (F/H) | Bordeaux, France | posted: 2026-09-22
+- [ ] https://www.welcometothejungle.com/en/companies/docaposte-1/jobs/ingenieur-de-production-site-reliability-engineering-sre-f-h_sofia | Docaposte | Ingénieur de Production/Site Reliability Engineering (SRE) F/H | Anglet, France | posted: 2026-09-22
+- [ ] https://www.welcometothejungle.com/en/companies/deloitte/jobs/devsecops-engineering-h-f_paris | Deloitte | DevSecOps Engineering (H/F) | Paris, France | posted: 2026-09-22
+- [ ] https://www.welcometothejungle.com/en/companies/viaxoft/jobs/ingenieur-sre-devops-confirme-h-f_marseille | Viaxoft | Ingénieur DevOps confirmé (H/F) | Marseille, France | 48000-56000 EUR | posted: 2026-09-22
+- [ ] https://www.welcometothejungle.com/en/companies/exalt/jobs/devops-openshift_paris | eXalt | DevOps Openshift | Paris, France | posted: 2026-09-22
+- [ ] https://www.welcometothejungle.com/en/companies/azmed/jobs/senior-devops-engineer_paris | Azmed | Senior DevOps Engineer | Paris, France | posted: 2026-09-22
+- [ ] https://www.welcometothejungle.com/en/companies/plus-que-pro/jobs/devops-h-f_strasbourg | Plus que pro | DevOPs H/F | Strasbourg, France | posted: 2026-09-22
+- [ ] https://www.welcometothejungle.com/en/companies/the-adecco-group/jobs/cdi-data-engineer-f-h_toulon | The Adecco Group | CDI - Data Engineer F/H | Toulon, France | 38000-40000 EUR | posted: 2026-09-22
+- [ ] https://www.welcometothejungle.com/en/companies/deloitte/jobs/data-engineer-confirme-f-h_paris | Deloitte | Data Engineer Confirmé F/H | Paris, France | posted: 2026-09-22
+- [ ] https://www.welcometothejungle.com/en/companies/asi/jobs/consultant-data-senior-f-h_rennes | ASI | Consultant Data Senior (F/H) | Rennes, France | 39000-46000 EUR | posted: 2026-09-22
+- [ ] https://www.welcometothejungle.com/en/companies/spacefill/jobs/senior-full-stack-developer_paris | Spacefill | Senior Software Engineer Backend | Paris, France, Remote | 70000-85000 EUR | posted: 2026-09-22
+- [ ] https://www.welcometothejungle.com/en/companies/infomil/jobs/ingenieur-integrateur-linux-h-f_toulouse_INFOM_k4k854z | Infomil | Ingénieur Linux Red Hat & Kubernetes H/F | Toulouse, France | posted: 2026-08-01
+- [ ] https://www.welcometothejungle.com/en/companies/docaposte-1/jobs/devsecops-officer-f-h_la-defense_DOCAP_dKr7Yzr | Docaposte | DevSecOps Officer F/H | La Défense, France | posted: 2026-09-22
+- [ ] https://www.welcometothejungle.com/en/companies/karbonalpha/jobs/8b468d29-6ad1-46b4-9ca6-38c1176636b1 | Karbonalpha | Ingénieur DevOps / SRE | Aix-en-Provence, France, Remote | 55000-70000 EUR | posted: 2026-09-22
+- [ ] https://www.welcometothejungle.com/en/companies/pytheas-capital-treso2/jobs/developpeuse-ou-developpeur-fullstack-javascript_paris_PCAT_KjjpeYY | TRESO2 par Pytheas Capital | Ingénieur.e Fullstack JS - IA | Biarritz, France | posted: 2026-09-22
+- [ ] https://www.welcometothejungle.com/en/companies/sopra-steria/jobs/architecte-technique-solutions-it-air-traffic-management-atm-toulouse_colomiers | Sopra Steria | Architecte Technique/Solutions IT - Air Traffic Management (ATM) - Toulouse | Colomiers, France | posted: 2026-09-22
+- [ ] https://www.welcometothejungle.com/en/companies/naval-group-fr/jobs/cdi-architecte-solution-h-f_toulon | Naval Group \[FR\] | CDI - Architecte solution - H/F | Toulon, France | posted: 2026-09-22
+- [ ] https://www.welcometothejungle.com/en/companies/nexton-consulting/jobs/developpeur-back-end-java-nodejs-kotlin-aws-h-f_nantes | NEXTON | Développeur Back End (Java/NodeJS/Kotlin/AWS) H/F | Nantes, France | posted: 2026-09-04
+- [ ] https://www.welcometothejungle.com/en/companies/exalt/jobs/developpeur-python-senior-aws-devops-h-f_bordeaux | eXalt | Développeur Python Senior / AWS | Bordeaux, France | posted: 2026-09-04
+- [ ] https://www.welcometothejungle.com/en/companies/sii/jobs/tech-lead-python-aws-f-h_le-mans | Groupe SII | Tech Lead Python AWS (F/H) | Le Mans, France | 41000-48000 EUR | posted: 2026-09-01
+- [ ] https://www.welcometothejungle.com/en/companies/safran-aircraft-engines/jobs/expert-e-base-de-donnees-on-premise-aws-f-h_bordeaux | Safran Aircraft Engines | Expert-e Base de Données ON-PREMISE / AWS F/H | Bordeaux, France | posted: 2026-08-28
+- [ ] https://www.welcometothejungle.com/en/companies/safran-aircraft-engines/jobs/expert-e-base-de-donnees-aws-f-h_moissy-cramayel | Safran Aircraft Engines | Expert-e Base de Données AWS F/H | Bordeaux, France | posted: 2026-08-28
+- [ ] https://www.welcometothejungle.com/en/companies/swisslife-france/jobs/ingenieur-socle-aws-experimente-f-h_roubaix | Swiss Life France | Ingénieur Socle AWS expérimenté F/H | Roubaix, France | posted: 2026-08-25
+- [ ] https://www.welcometothejungle.com/en/companies/groupe-credit-agricole/jobs/product-owner-landing-zones-aws-pole-tech-foundation-h-f_guyancourt | Crédit Agricole | Product Owner Landing Zones AWS - Pôle Tech Foundation H/F | Guyancourt, France | posted: 2026-08-19
+- [ ] https://www.welcometothejungle.com/en/companies/sacem/jobs/tech-lead-aws_neuilly-sur-seine_SACEM_y23XjP6 | Sacem | Tech Lead AWS | Neuilly-sur-Seine, France | posted: 2026-08-07
+- [ ] https://www.welcometothejungle.com/en/companies/safran-aircraft-engines/jobs/administrateur-sysops-cloud-aws-f-h_bordeaux_SAE_Xzp6o0K | Safran Aircraft Engines | Administrateur Sysops Cloud AWS F/H | Réau, France | posted: 2026-08-04
+- [ ] https://www.welcometothejungle.com/en/companies/predisurge/jobs/tech-lead_saint-etienne | PrediSurge | Tech Lead | Saint-Etienne, France | 45-50 EUR | posted: 2026-08-27
+- [ ] https://www.welcometothejungle.com/en/companies/sopra-steria/jobs/ingenieur-systemes-linux-lyon_limonest_SS_kZZRDa3 | Sopra Steria | Ingénieur(e) systèmes Linux - Lyon | Limonest, France | posted: 2026-08-25
+- [ ] https://www.welcometothejungle.com/en/companies/the-adecco-group/jobs/ingenieur-systeme-et-reseaux-h-f_angouleme | The Adecco Group | Ingénieur système et réseaux H/F | Angoulême, France | 36000-47000 EUR | posted: 2026-08-10
+- [ ] https://www.welcometothejungle.com/en/companies/deloitte/jobs/senior-ai-software-engineer-f-h_grenoble | Deloitte | Senior AI Software Engineer (F/H) | Grenoble, France | posted: 2026-09-22
+- [ ] https://www.welcometothejungle.com/en/companies/legalplace/jobs/senior-developpeur-se-fullstack-h-f_paris_LEGAL_W1LLDWG | LegalPlace | Senior Développeur(se) Fullstack (H/F) | Paris, France | 70000-90000 EUR | posted: 2026-09-01
+- [ ] https://www.welcometothejungle.com/en/companies/meritis/jobs/data-engineer-h-f_paris | Meritis | Data Engineer (H/F) | Paris, France | posted: 2026-08-08
+- [ ] https://www.welcometothejungle.com/en/companies/mp-data/jobs/data-engineer-toulouse-h-f_balma_MD_WraGZOG | MP DATA | Data Engineer - Toulouse (H/F) | Balma, France | posted: 2026-07-28
+- [ ] https://www.welcometothejungle.com/en/companies/the-adecco-group/jobs/senior-ai-solution-architect-h-f_nanterre | The Adecco Group | Senior AI Solution Architect H/F | Nanterre, France | posted: 2026-09-22
+- [ ] https://www.welcometothejungle.com/en/companies/sopra-steria/jobs/developpeur-se-fullstack-java-espace-defense-securite-bordeaux_merignac_SS_P6gRPgw | Sopra Steria | Développeur(se) Fullstack Java - Espace Défense & Sécurité - Bordeaux | Mérignac, France | posted: 2026-09-22
+- [ ] https://www.welcometothejungle.com/en/companies/deloitte/jobs/solutions-architect-f-h_paris | Deloitte | Solutions Architect F/H | Paris, France | posted: 2026-09-22
+- [ ] https://www.welcometothejungle.com/en/companies/littlebigcode/jobs/data-scientist-senior | Diametral | Data Scientist Senior Lyon | Lyon, France | posted: 2026-09-22
+- [ ] https://www.welcometothejungle.com/en/companies/sii/jobs/architecte-data-f-h_nantes | Groupe SII | Architecte Data (F/H) | Nantes, France | 50000-60000 EUR | posted: 2026-07-30
+- [ ] https://www.welcometothejungle.com/en/companies/sii/jobs/architecte-solution-h-f_lille_GS_qKX74gr | Groupe SII | Architecte Solution (H/F) | Lille, France | 58000-70000 EUR | posted: 2026-08-27
+- [ ] https://www.welcometothejungle.com/en/companies/kiiro/jobs/data-architect-hybride-cdi | Kiiro | Data Architect - Hybride - CDI | Paris, France | 55000-85000 EUR | posted: 2026-08-31
+- [ ] https://www.welcometothejungle.com/en/companies/inoco/jobs/ai-solution-architect_paris | INOCO | AI Solution Architect | Paris, France | 55000-70000 EUR | posted: 2026-08-18
+- [ ] https://www.welcometothejungle.com/en/companies/display-interactive/jobs/devops-senior-h-f_montrouge | Display Interactive | DevOps Senior - H/F | Montrouge, France | 55000-65000 EUR | posted: 2026-08-04
+- [ ] https://www.welcometothejungle.com/en/companies/easypicky/jobs/devops-enginer-h-f_montpellier | Easypicky | DevOps Engineer H/F | Montpellier, France | 43-50 EUR | posted: 2026-07-29
+- [ ] https://www.welcometothejungle.com/en/companies/groupement-les-mousquetaires/jobs/lead-devops-architect_chatillon | Groupement Mousquetaires | LEAD DEVOPS ARCHITECT | Châtillon, France | posted: 2026-07-29
+- [ ] https://www.welcometothejungle.com/en/companies/safran-aircraft-engines/jobs/devsecops-f-h_bordeaux | Safran Aircraft Engines | DevSecOps F/H | Bordeaux, France | posted: 2026-08-28
+- [ ] https://www.welcometothejungle.com/en/companies/safran/jobs/manager-devsecops-augmented-platform-digital-factory-f-h_malakoff | Safran | Manager DevSecOps & augmented platform (Digital Factory) F/H | Malakoff, France | posted: 2026-07-28
+- [ ] https://www.welcometothejungle.com/en/companies/atos/jobs/sales-specialist-cloud-f-h_bezons_ATOS_6GKOD7 | Atos | Sales Specialist Cloud F/H | Bezons, France | 100000-120000 EUR | posted: 2026-07-26
+- [ ] https://www.welcometothejungle.com/en/companies/sopra-steria/jobs/chef-fe-de-projet-transition-transformation-infrastructure-cloud-services-ile-de-france_courbevoie_SS_mlRwA5J | Sopra Steria | Chef(fe) de Projet Transition & Transformation – Infrastructure & Cloud Services – Île-de-France | Courbevoie, France | posted: 2026-09-02
+- [ ] https://www.welcometothejungle.com/en/companies/sopra-steria/jobs/developpeur-se-fullstack-java-cloud-aeroline-bordeaux_merignac | Sopra Steria | Développeur(se) Fullstack Java & Cloud - Aéroline – Bordeaux | Mérignac, France | posted: 2026-08-18
+- [ ] https://www.welcometothejungle.com/en/companies/exalt/jobs/data-engineer-experimente-snowflake-data-cloud_bordeaux | eXalt | Data Engineer expérimenté— Snowflake, Data & Cloud | Bordeaux, France | posted: 2026-08-18
+- [ ] https://www.welcometothejungle.com/en/companies/the-adecco-group/jobs/data-cloud-architect-h-f_villeurbanne | The Adecco Group | Data Cloud Architect H/F | Villeurbanne, France | posted: 2026-08-06
+
+
+
+
+
+
 ## Needs review
 
 <!-- Location reported as a bare count by the ATS; decide by hand, then move up to Pending. -->
 
 
 ## Processed
+- [x] #1516 | https://nttlimited.wd3.myworkdayjobs.com/NTT_Careers/job/Dar-es-Salaam-Tanzania/Systems-Engineer-Cybersecurity--L1-_R-149653 | NTT | Systems Engineer Cybersecurity (L1) | 2.1/5 | PDF ❌
+- [x] #-- | https://nttlimited.wd3.myworkdayjobs.com/NTT_Careers/job/Santiago-Chile/Network-Architect--Bilinge-_R-150377 | NTT | Network Architect (Bilingüe) | skipped (dq:2)
+- [x] #-- | https://nttlimited.wd3.myworkdayjobs.com/NTT_Careers/job/Santiago-Chile/Security-Architect--Bilinge-_R-150375-1 | NTT | Security Architect (Bilingüe) | skipped (dq:2)
+- [x] #1515 | https://thales.wd3.myworkdayjobs.com/Careers/job/PARIS-9me/Ingnieur-Devops-Kubernetes--confirm-_R0339865-1 | Thales | Ingénieur Devops Kubernetes (confirmé) | 4.0/5 | PDF ❌
+- [x] #1514 | https://thales.wd3.myworkdayjobs.com/Careers/job/Limours/Ingnieur-dveloppement-logiciel-modlisation--H-F-_R0339003-1 | Thales | Ingénieur développement logiciel modélisation (H/F) | 1.9/5 | PDF ❌
+- [x] #1513 | https://thales.wd3.myworkdayjobs.com/Careers/job/Limours/Ingnieur-Systmes-Leader-de-Fonction-Radar-F-H_R0340134-1 | Thales | Ingénieur Systèmes Leader de Fonction Radar F/H | 2.6/5 | PDF ❌
+- [x] #1512 | https://thales.wd3.myworkdayjobs.com/Careers/job/Limours/Ingnieur-systme-cyber-et-coordinateur-d-activits-F-H_R0340136-1 | Thales | Ingénieur système cyber et coordinateur d'activités F/H | 2.3/5 | PDF ❌
+- [x] #1511 | https://thales.wd3.myworkdayjobs.com/Careers/job/Limours/Ingnieur-Systme-Fonctionnel-F-H_R0339900-1 | Thales | Ingénieur Système Fonctionnel F/H | 2.0/5 | PDF ❌
+- [x] #1510 | https://thales.wd3.myworkdayjobs.com/Careers/job/Limours/Ingnieur-e--IVVQ--H-F-_R0334053-1 | Thales | Ingénieur(e) IVVQ (H/F) | 2.4/5 | PDF ❌
+- [x] #1509 | https://thales.wd3.myworkdayjobs.com/Careers/job/Elancourt/Responsable-d-Intgration--Vrification--Validation-et-Qualification-pour-les-Senseurs-H-F_R0340071-1 | Thales | Responsable d'Intégration, Vérification, Validation et Qualification pour les Senseurs H/F | 2.3/5 | PDF ❌
+- [x] #1508 | https://thales.wd3.myworkdayjobs.com/Careers/job/Elancourt/Ingnieur-Systmes-Traitements-du-Signal-H-F_R0340066-1 | Thales | Ingénieur Systèmes Traitements du Signal H/F | 2.4/5 | PDF ❌
+- [x] #-- | https://thales.wd3.myworkdayjobs.com/Careers/job/Gennevilliers/Responsable-Technique-Formes-d-Ondes---Building-Block-Assembly---F-H_R0340451-1 | Thales | Responsable Technique Formes d'Ondes - Building Block Assembly - F/H | skipped (dq:6)
+- [x] #1507 | https://thales.wd3.myworkdayjobs.com/Careers/job/Valence/Ingnieur-IVV-quipements-GNSS--F-H-_R0336755-1 | Thales | Ingénieur IVV équipements GNSS (F/H) | 1.7/5 | PDF ❌
+- [x] #1506 | https://thales.wd3.myworkdayjobs.com/Careers/job/Brest/Architecte-systme-Moyens-de-test--F-H-_R0340867-1 | Thales | Architecte système Moyens de test (F/H) | 1.6/5 | PDF ❌
+- [x] #1505 | https://thales.wd3.myworkdayjobs.com/Careers/job/Elancourt/Architecte-systme-CCA_R0340677-1 | Thales | Architecte systéme CCA | 2.0/5 | PDF ❌
+- [x] #1504 | https://thales.wd3.myworkdayjobs.com/Careers/job/Gennevilliers/Architecte-Rseaux-et-Tlcommunications-Aronautique-F-H_R0339891-1 | Thales | Architecte Réseaux et Télécommunications Aéronautique F/H | 1.6/5 | PDF ❌
+- [x] #1503 | https://thales.wd3.myworkdayjobs.com/Careers/job/Vlizy-Villacoublay/Ingnieur-Infrastructure-DevOps-Spcialiste-Automatisations-IS-IT-F-H_R0337361-2 | Thales | Ingénieur Infrastructure DevOps Spécialiste Automatisations IS/IT F/H | 2.9/5 | PDF ❌
+- [x] #-- | https://thales.wd3.myworkdayjobs.com/Careers/job/Palaiseau/Doctorant---Modles-gnratifs-multimodaux-pour-la-synthse--l-amlioration-et-le-transfert-inter-modal-de-donnes-visuelles-en-contexte-de-donnes-limites--H-F-_R0330974-1 | Thales | Doctorant - Modèles génératifs multimodaux pour la synthèse, l'amélioration et le transfert inter-modal de données visuelles en contexte de données limitées (H/F) | skipped (dq:3)
+- [x] #-- | https://thales.wd3.myworkdayjobs.com/Careers/job/Palaiseau/Doctorant-en-IA-neuro-symbolique-pilote-par-ontologie-pour-une-collaboration-explicable-humain-machine-dans-les-systmes-oprationnels-multi-agents--H-F-_R0329769-1 | Thales | Doctorant en IA neuro-symbolique pilotée par ontologie pour une collaboration explicable humain-machine dans les systèmes opérationnels multi-agents (H/F) | skipped (dq:3)
+- [x] #1502 | https://thales.wd3.myworkdayjobs.com/Careers/job/Palaiseau/Ingnieur-de-recherche-pour-la-conception-et-validation-des-architectures-d-IA-gnrative-agentique-de-confiance--H-F-_R0338421-2 | Thales | Ingénieur de recherche pour la conception et validation des architectures d’IA générative/agentique de confiance (H/F) | 1.6/5 | PDF ❌
+- [x] #1501 | https://careers.capgemini.com/job/Nantes-Ing%C3%A9nieure-Ing%C3%A9nieur-logiciel-IA/1200285201/ | Capgemini | Ingénieure / Ingénieur logiciel IA | 2.5/5 | PDF ❌
+- [x] #1500 | https://careers.capgemini.com/job/Nantes-Technical-Lead-Atlassian/1438122433/ | Capgemini | Technical Lead Atlassian | 1.5/5 | PDF ❌
+- [x] #1499 | https://careers.capgemini.com/job/Issy-les-Moulineaux-Consultante-Consultant-Technical-Lead-ServiceNow-ITSM/1438142433/ | Capgemini | Consultante / Consultant Technical Lead ServiceNow ITSM | 1.6/5 | PDF ❌
+- [x] #1498 | https://careers.capgemini.com/job/Issy-les-Moulineaux-Senior-Consultant-Managing-Consultant-Director-en-en-Strat%C3%A9gie-SI-et-Architecture-IA-et-Data/1438974233/ | Capgemini | Senior Consultant / Managing Consultant / Director en en Stratégie SI et Architecture IA et Data | 1.9/5 | PDF ❌
+- [x] #1497 | https://careers.capgemini.com/job/Aix-en-Provence-Associate-Data-Engineer/1195599501/ | Capgemini | Associate Data Engineer | 3.7/5 | PDF ❌
+- [x] #1496 | https://careers.capgemini.com/job/Issy-les-Moulineaux-D%C3%A9veloppeuse-D%C3%A9veloppeur-JavaAngular-Agentic-IA/1255885901/ | Capgemini | Développeuse / Développeur Java/Angular - Agentic IA | 1.6/5 | PDF ❌
+- [x] #1495 | https://careers.capgemini.com/job/Issy-les-Moulineaux-D%C3%A9veloppeuse-D%C3%A9veloppeur-GEN-IA/1255873701/ | Capgemini | Développeuse / Développeur GEN IA | 2.2/5 | PDF ❌
+- [x] #1494 | https://accenture.wd103.myworkdayjobs.com/AccentureCareers/job/Paris/Consultant-Scurit-Cloud-F-H_R00357004 | Accenture | Consultant Sécurité Cloud F/H | 2.3/5 | PDF ❌
+- [x] #1493 | https://accenture.wd103.myworkdayjobs.com/AccentureCareers/job/Saint-Herblain-Liberty-A/Dveloppeur-Expriment-Python---F-H_R00302158 | Accenture | Développeur Expérimenté Python – F/H | 3.4/5 | PDF ❌
+- [x] #1492 | https://accenture.wd103.myworkdayjobs.com/AccentureCareers/job/Paris/Consultant-Data-Manufacturing-F-H_R00358127 | Accenture | Consultant Data Manufacturing F/H | 2.6/5 | PDF ❌
+- [x] #1491 | https://accenture.wd103.myworkdayjobs.com/AccentureCareers/job/Paris/Song-Service---Architecte-Solutions-CCaaS--F-H_R00358678 | Accenture | Song Service – Architecte Solutions CCaaS F/H | 1.6/5 | PDF ❌
+- [x] #1490 | https://accenture.wd103.myworkdayjobs.com/AccentureCareers/job/Paris/Senior-AI-Native-Engineer_R00358957 | Accenture | Senior AI Native Engineer | 1.9/5 | PDF ❌
+- [x] #-- | https://ag.wd3.myworkdayjobs.com/Airbus/job/Marseille-Area/Head-of-AH-Finance-Transformation-and-Systems--Planning---Reporting--f-m-_JR10441598 | Airbus | Head of AH Finance Transformation and Systems: Planning & Reporting (f/m) | skipped (dq:6)
+- [x] #1489 | https://ag.wd3.myworkdayjobs.com/Airbus/job/Toulouse-Area/ATR---Aeronautical-Systems-Safety-Engineer_JR10442239-1 | Airbus | ATR - Aeronautical Systems Safety Engineer | 3.0/5 | PDF ❌
+- [x] #-- | https://ag.wd3.myworkdayjobs.com/Airbus/job/Toulouse-Area/Contrleur-de-gestion-pour-Connected-Intelligence-Geospatial--f-h-_JR10420557 | Airbus | Contrôleur de gestion pour Connected Intelligence Geospatial (f/h) | skipped (dq:5)
+- [x] #-- | https://ag.wd3.myworkdayjobs.com/Airbus/job/Manching/Commercial---Contracts-Manager-for-Combat-Air-Systems-ILS---Development--d-f-m-_JR10420811 | Airbus | Commercial & Contracts Manager for Combat Air Systems ILS & Development (d/f/m) | skipped (dq:5)
+- [x] #1488 | https://ag.wd3.myworkdayjobs.com/Airbus/job/Donauwrth/Fleet-Performance---Reliability-Manager-H145--d-f-m-_JR10436973 | Airbus | Fleet Performance & Reliability Manager H145 (d/f/m) | 2.1/5 | PDF ❌
+- [x] #1487 | https://ag.wd3.myworkdayjobs.com/Airbus/job/Toulouse-Area/Architecte-Automatisation-Tests--f-h-_JR10426430 | Airbus | Architecte Automatisation Tests (f/h) | 3.6/5 | PDF ❌
+- [x] #1486 | https://ag.wd3.myworkdayjobs.com/Airbus/job/Toulouse-Area/Embedded-Software-Development-Engineer---Entry-level-Software-developer--m-f-_JR10427609-2 | Airbus | Embedded Software Development Engineer – Entry-level Software developer (m/f) | 3.1/5 | PDF ❌
+- [x] #1485 | https://ag.wd3.myworkdayjobs.com/Airbus/job/Marseille-Area/XMLNAME--CoRe-Dveloppeur-IM---Solutions-Industrielles--F-H-_JR10424414 | Airbus | #CoRe Développeur IM - Solutions Industrielles (F/H) | 3.4/5 | PDF ❌
+- [x] #1484 | https://ag.wd3.myworkdayjobs.com/Airbus/job/Marseille-Area/XMLNAME--DIGITALCAMPUS-Dveloppeur-MES-Apriso---Solutions-Industrielles--F-H-_JR10430014 | Airbus | #DIGITALCAMPUS Développeur MES Apriso - Solutions Industrielles (F/H) | 2.5/5 | PDF ❌
+- [x] #-- | https://ag.wd3.myworkdayjobs.com/Airbus/job/Toulouse-Area/BMS-Architecture---EN9100-Certification-partner_JR10439168 | Airbus | BMS Architecture & EN9100 Certification partner | skipped (dq:5)
+- [x] #-- | https://ag.wd3.myworkdayjobs.com/Airbus/job/Manching/Ingenieur-Bewaffnungsintegration--d-m-w-_JR10440889-1 | Airbus | Ingenieur Bewaffnungsintegration (d/m/w) | skipped (dq:4)
+- [x] #-- | https://ag.wd3.myworkdayjobs.com/Airbus/job/Toulouse-Area/Airbus-Atlantic---Responsable-Outils-et-Systmes-Financiers--All-Gender-_JR10440863 | Airbus | Airbus Atlantic - Responsable Outils et Systèmes Financiers (All Gender) | skipped (dq:5)
+- [x] #-- | https://ag.wd3.myworkdayjobs.com/Airbus/job/Toulouse-Area/Aftermarket-Supplier-Account-Manager---Equipment---Systems---M-F_JR10434360-1 | Airbus | Aftermarket Supplier Account Manager - Equipment & Systems - M/F | skipped (dq:5)
+- [x] #1483 | https://ag.wd3.myworkdayjobs.com/Airbus/job/Toulouse-Area/Ingnieur-e--Informatique-de-Test-Systmes-Spatiaux---Rfrent-technique--f-h-_JR10432822 | Airbus | Ingénieur(e) Informatique de Test Systèmes Spatiaux - Référent technique (f/h) | 3.7/5 | PDF ❌
+- [x] #-- | https://ag.wd3.myworkdayjobs.com/Airbus/job/Donauwrth/System-Engineer--d-f-m--in-Self-Defense-Systems_JR10441971 | Airbus | Weapon and Electronic Warfare Systems Technical Leader (d/f/m) | skipped (dq:4)
+- [x] #-- | https://ag.wd3.myworkdayjobs.com/Airbus/job/Toulouse-Area/Plant-Supply-Chain-Interface-Coord-AI_JR10409620-1 | Airbus | Plant Supply Chain Interface Coord AI | skipped (dq:5)
+- [x] #-- | https://ag.wd3.myworkdayjobs.com/Airbus/job/Toulouse-Area/Supply-Officer---Aircraft-On-Board-Power---Safety-Systems--D-F-M-_JR10436942-1 | Airbus | Supply Officer - Aircraft On-Board Power & Safety Systems (D/F/M) | skipped (dq:5)
+- [x] #1482 | https://ag.wd3.myworkdayjobs.com/Airbus/job/Manching/Systems-Engineer-for-Training-Simulation---Innovation--d-f-m-_JR10439454 | Airbus | Systems Engineer for Training Simulation & Innovation (d/f/m) | 2.3/5 | PDF ❌
+- [x] #1481 | https://nxp.wd3.myworkdayjobs.com/careers/job/Eindhoven/AI-Engineer---Foundational-Models-with-Multi-Modality--Analog-IC-Design-_R-10066844 | NXP | AI Engineer – Foundational Models with Multi-Modality (Analog IC Design) | 1.7/5 | PDF ❌
+- [x] #1480 | https://sanofi.wd3.myworkdayjobs.com/SanofiCareers/job/Paris/Software-Engineer_R2856134-1 | Sanofi | Software Engineer | 3.4/5 | PDF ❌
 - [x] #1330 | https://thales.wd3.myworkdayjobs.com/Careers/job/Vlizy-Villacoublay/PDA-Cloud---DevSecOps-F-H_R0338721-2 | Thales | PDA Cloud & DevSecOps F/H | 4.0/5 | PDF ❌
 - [x] #1329 | https://thales.wd3.myworkdayjobs.com/Careers/job/Rouen/Ingnieur-Systmes-d-Informations-Industriels--F-H_R0339355-1 | Thales | Ingénieur Systèmes d’Informations Industriels F/H | 4.6/5 | PDF ❌
 - [x] #1328 | https://thales.wd3.myworkdayjobs.com/Careers/job/Site-client---Dgfip-Noisy-Le-Grand/Architecte-applicatif_R0316026-2 | Thales | Architecte applicatif | 4.0/5 | PDF ❌
