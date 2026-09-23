@@ -87,6 +87,15 @@ If `{"status": "update-available", "reason": ..., "local": ..., "remote": ..., "
 
 If yes → `node update-system.mjs apply --confirm`. If no → `node update-system.mjs dismiss`. Every other status (`up-to-date`, `dismissed`, `offline`, `no-remote-version`) → say nothing. The user can force a check anytime ("check for updates" / "update career-ops"); rollback: `node update-system.mjs rollback`.
 
+**Fork override (moudimash99) — this replaces the two bullets and the "If yes" step above:**
+
+This repo is a fork that changes some system files on purpose (for example the auto-submit policy in this file). So `check` will always report `system-files-changed`, even right after an upstream merge.
+
+- `reason` is `system-files-changed` → say nothing. It is expected.
+- `reason` is anything else (a new version) → tell the user: "career-ops v{remote} is out (you have v{local}). Want me to merge it from upstream? Your data and your fork changes are kept."
+- If yes → `git fetch upstream` then `git merge upstream/main`, and resolve any conflicts by keeping the fork's intentional changes.
+- **Never run `node update-system.mjs apply`** on this fork. It overwrites every system file with upstream's copy and would erase the fork's changes.
+
 ## What is career-ops
 
 AI-powered, CLI-agnostic job search automation: pipeline tracking, offer evaluation, CV generation, portal scanning, batch processing. Runs on any AI coding CLI following the [open agent skill standard](https://agentskills.io) (Claude Code, Cursor, Codex, OpenCode, Qwen, Copilot, Kimi, Antigravity CLI, Grok Build CLI). Legacy Gemini API evaluation remains via `gemini-eval.mjs`.
