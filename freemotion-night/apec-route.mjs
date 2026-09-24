@@ -45,7 +45,7 @@
  */
 
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
-import { dirname, join } from 'path';
+import { dirname, join, resolve } from 'path';
 import { fileURLToPath } from 'url';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -58,7 +58,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const argv = process.argv.slice(2);
 const flag = (name, fallback) => { const i = argv.indexOf(name); return i >= 0 ? argv[i + 1] : fallback; };
 const DAYS = Number(flag('--days', 14));
-const OUT = join(ROOT, flag('--out', 'tmp/fm/apec-pool.json'));
+const OUT = resolve(ROOT, flag('--out', 'tmp/fm/apec-pool.json'));
 const CACHE = join(ROOT, 'data/apec-routes.json');
 const MAX = Number(flag('--max', 30)); // new postings asked about per run
 const GAP = Number(flag('--gap', 4)); // seconds between offer-data requests
