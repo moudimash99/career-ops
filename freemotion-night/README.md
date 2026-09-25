@@ -10,6 +10,12 @@ Applies to a list of jobs one at a time while you sleep. Each job gets a fresh A
 2. Put your cover-letter facts and wording rules in `config/freemotion-facts-fr.txt` and
    `config/freemotion-rules-fr.txt`.
 3. Email links: `.env` needs `GMAIL_MACHAKA_USER` and `GMAIL_MACHAKA_APP_PASSWORD`.
+4. Accounts you made by hand (Free-Work): `node lib/freemotion-credentials.mjs save --domain www.free-work.com --email <you>`.
+   It asks for the password and keeps it in `data/freemotion-credentials/`, which git never sees.
+
+Which jobs we look for (search words, title words, what is dropped, points) is `config/targets.yml`,
+the one list the scanner and `make-pool.mjs` both read. `node targets.mjs check` shows what `portals.yml`
+still duplicates.
 
 ## Each night
 
@@ -36,9 +42,9 @@ takes applications (`URL_ONLY` = a partner site, `EMAIL_ONLY` = on APEC itself, 
 
 | File | Job |
 |------|-----|
-| `make-jobs.mjs` | Writes one instruction sheet per job, plus the list of URLs allowed tonight. Site notes (Welcome to the Jungle, APEC sign-in) go only into sheets for that site. |
+| `make-jobs.mjs` | Writes one instruction sheet per job, plus the list of URLs allowed tonight. Site notes (Welcome to the Jungle, APEC and Free-Work sign-in) go only into sheets for that site. |
 | `make-pool.mjs` | Builds tonight's list from `data/scan-history.tsv`: drops what was already applied to or tried (tracker, run log), blacklisted or capped companies and jobs outside the rules; gives each job its apply route; merges duplicates keeping the easiest place to apply; writes `pool.json`, `list.json` and `merges.txt` to `tmp/fm/night/`. No model tokens. |
-| `pool-rules.mjs` | The rules and word lists: same-job keys, Toulouse/Paris places, keep/drop and score. Change them here only. |
+| `pool-rules.mjs` | Same-job keys, Toulouse/Paris places, keep/drop and score. The role words it keeps, drops and scores by are in `config/targets.yml`; the rest (companies handled by hand, defence, seniority and language ranking) is here. |
 | `site-review.mjs` | Weekly: per application site, sent vs failed over the last 7 days, with suggested sites for `data/site-blacklist.md`. |
 | `apec-route.mjs` | For APEC postings: live or gone (APEC search, plain HTTP) and the apply route (read inside one hidden Camoufox page). No model tokens. |
 | `run.sh` | Goes down the list, starts one AI session per sheet, switches to Sonnet when agy is out of quota, retries network failures. |

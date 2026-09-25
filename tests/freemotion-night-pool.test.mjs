@@ -75,8 +75,8 @@ try {
   else fail(`partner = ${JSON.stringify(partner)}`);
   if ('drop' in r('apec', APEC, { gone: true })) pass('a gone APEC posting is dropped');
   else fail('gone APEC posting must drop');
-  if (SCHEDULED.has('apply-here') && SCHEDULED.has('apec-account') && !SCHEDULED.has('linkedin-lead')) pass('only apply-here and apec-account are scheduled');
-  else fail('scheduled set');
+  if (JSON.stringify([...SCHEDULED].sort()) === JSON.stringify(['apec-account', 'apply-here', 'freework-account'])) pass('only apply-here, apec-account and freework-account are scheduled');
+  else fail(`scheduled set = ${JSON.stringify([...SCHEDULED])}`);
 
   // ---- merge -------------------------------------------------------------
   if (linkKey('https://www.hellowork.com/fr-fr/emplois/9.html?utm_campaign=x') === linkKey('https://hellowork.com/fr-fr/emplois/9.html')) pass('linkKey() matches HelloWork by job number');
