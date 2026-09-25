@@ -1,0 +1,70 @@
+# config/targets.yml — the ONE place that says which jobs we look for.
+#
+# Read by (see targets.mjs):
+#   scan.mjs, scan-ats-full.mjs
+#     - `match` words of every group = the title filter: a title must contain one.
+#     - `drop` words = titles always rejected.
+#       While this file exists, title_filter.positive/negative in portals.yml
+#       are ignored. (title_filter_full, the strict list for the full ATS sweep,
+#       still wins there.)
+#     - `search` words of every group = what is typed into the job boards
+#       (WTJ, APEC, HelloWork, Free-Work, France Travail, LinkedIn) whose
+#       portals.yml block has no `queries:` of its own. A block that keeps its
+#       own `queries:` uses them instead (LinkedIn may want fewer: every search
+#       costs pages against its rate limit).
+#   freemotion-night/pool-rules.mjs (tonight's list)
+#     - keeps a job whose title matches a group and no drop word;
+#     - adds each tier's points once (Python Data Engineer: data + python = 1.5,
+#       not 3; Cloud Data Engineer: cloud + data = 3.5);
+#     - ranks `rank_low` titles down (-4).
+#
+# How a word matches a title (the same rules as title_filter, title-keywords.mjs):
+#   plain          anywhere in the title: "devops" matches "DevOps/SRE"
+#   2-3 letters    whole word automatically: "ia" matches "Ingénieur IA", not "média"
+#   word:x         whole word only: "word:lead" matches "Lead Dev", not "Leader"
+#   stem:x         start of a word: "stem:alternan" matches alternance, alternant
+# Case never matters. Write French words WITH their accents: each one also
+# matches the same word typed without them ("ingénieur" = "ingenieur").
+#
+# Check what portals.yml still duplicates: node targets.mjs check
+
+tiers:
+  - points: 2
+    groups:
+      cloud:
+        search: []
+        match: [cloud, aws, azure, gcp, devops, sre, site reliability, platform, infrastructure,
+                kubernetes, devsecops, finops, mlops]
+
+  - points: 1.5
+    groups:
+      data:
+        search: []
+        match: [data engineer, ingénieur data, data platform, analytics engineer, big data, dataops]
+      systems:
+        search: []
+        match: [système, system engineer, systems engineer, "word:mbse", ivv, "word:ivvq", v&v,
+                validation, vérification, intégration, embarqu, embedded, segment sol,
+                ground segment, géomat, geospati, sig, observation de la terre, earth observation]
+      python:
+        search: []
+        match: [python, backend, back-end, software engineer]
+
+  - points: 0.5
+    groups:
+      software:
+        search: []
+        match: [développeur, developer, logiciel, software, fullstack, full-stack, full stack,
+                ml, machine learning, ia, ai engineer, data scientist, data analyst, "word:data",
+                données]
+
+drop:
+  contract: ["word:stage", "word:stagiaire", "word:intern", "word:internship", "stem:alternan",
+             "stem:apprenti", "word:trainee", "word:freelance", "word:intérim"]
+  seniority: ["word:principal", "word:director", "word:directeur", "word:directrice", "word:head of",
+              vp, "word:chief", "word:staff", "word:lead", "word:manager", product owner,
+              chef de projet, tech lead, techlead, responsable, technicien, commercial, "word:sales"]
+  frontend: [frontend, front-end, front end, "word:react", angular, vue, "word:vuejs"]
+
+# Allowed, but ranked low: off our stack.
+rank_low: [salesforce, go, golang, "word:rust", .net, "c#", "word:java", php, sap]
