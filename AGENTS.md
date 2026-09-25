@@ -125,6 +125,10 @@ AI-powered, CLI-agnostic job search automation: pipeline tracking, offer evaluat
 | `interview-prep/story-bank.md` | Accumulated STAR+R stories |
 | `interview-prep/{company}-{role}.md` | Company-specific interview intel |
 | `generate-pdf.mjs` | Playwright: HTML to PDF |
+| `build-cv-rendercv.mjs` | CV payload (pdf-mode JSON schema) → RenderCV YAML |
+| `generate-cv-typst.mjs` | One-page CV PDF via RenderCV + Typst: shrinks through a fixed layout ladder down to `cv.fit_floor`, exits 2 if still over one page; `--preview-steps` renders every step to PNG. Needs `pip install -r requirements-cv.txt` |
+| `cv-write.mjs` | agy writes the CV payload from ONE pasted context (CV rules from `modes/_custom.md` + schema + `cv.md` + posting) in a temp folder; `--render` renders it, `--context-only` just writes the context (Free Motion). ~50–60k tokens per CV vs 1–3.5M when agy reads the files itself |
+| `lib/cv-experiment.mjs` | Free Motion CV experiment (generic 15 / loose 50 / strict 35): per-posting arm draw, append-only `data/cv-experiment.tsv`, callback-rate report per arm (`report --summary`) |
 | `generate-latex.mjs` | LaTeX CV validator + pdflatex compiler |
 | `scan.mjs` | Zero-token portal scanner (Greenhouse/Ashby/Lever APIs, zero LLM cost) |
 | `scan-ats-full.mjs` | Reverse-ATS keyword-first scanner over full public ATS datasets (Greenhouse/Lever/Ashby/Workday/iCIMS), filtered by portals.yml `title_filter`/`location_filter` — no company list needed; checkpoints every 500 companies, `--resume` continues an interrupted sweep |

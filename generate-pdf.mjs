@@ -97,7 +97,7 @@ function canonicalWorkspaceRoot() { return refreshRootCache().canonical; }
  * @returns {string} absPath unchanged when contained.
  * @throws {Error} when the canonical path escapes the tracker workspace.
  */
-function assertInsideWorkspace(absPath, label) {
+export function assertInsideWorkspace(absPath, label) {
   let probe = absPath;
   const tail = [];
   while (!existsSync(probe)) {
@@ -1047,7 +1047,7 @@ export function enforcePageBudget(pageCount, { maxPages = 2, strictPages = false
  * @param {Buffer} pdfBuffer - PDF bytes returned by Chromium.
  * @returns {number}
  */
-function countRenderedPdfPages(pdfBuffer) {
+export function countRenderedPdfPages(pdfBuffer) {
   const pdf = pdfBuffer.toString('latin1');
   const objects = new Map();
   const objectPattern = /(?:^|[\r\n])(\d+)\s+(\d+)\s+obj\b([\s\S]*?)\bendobj\b/g;
@@ -1167,7 +1167,7 @@ export function injectPrintPageCss(html, format = 'a4') {
  * CVs supersede stale entries). The file is gitignored: it references
  * gitignored output/ artifacts and is meaningless on another machine.
  */
-function updatePDFManifest(reportNum, pdfPath, htmlPath, format) {
+export function updatePDFManifest(reportNum, pdfPath, htmlPath, format) {
   const manifestPath = resolvePdfIndexPath(trackerPath);
   const toRel = (p) => relative(workspaceRoot, p).split(sep).join('/');
   const relPDF = toRel(pdfPath);

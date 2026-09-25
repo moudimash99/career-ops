@@ -112,25 +112,27 @@ check('  ...and the blacklisted row still has no ledger entry',
   [...readCurrentState({ root }).values()].map((r) => r.company), ['Best Co']);
 
 result = await resolveWorkOrder({ next: true, root, runId: 'fm-next-2' });
-check('--next again moves down to the next unclaimed row',
-  [result.ok, result.workOrder.company], [true, 'Acme']);
+check('--next again moves down to the next unclaimed row (no pre-built PDF needed)',
+  [result.ok, result.workOrder.company], [true, 'NoPdf Co']);
 
 result = await resolveWorkOrder({ next: true, minScore: 4.5, root, runId: 'fm-next-3' });
 check('--min-score excludes everything left', [result.ok, result.reason], [false, 'no-eligible-row']);
 check('  ...and says how many rows it considered', /score>=4.5/.test(result.detail), true);
 
-// The three rows --next must never pick up, each for its own reason.
+// The rows --next must never pick up, each for its own reason.
 root = freshRoot();
 const picked = [];
-for (let i = 0; i < 5; i++) {
+for (let i = 0; i < 6; i++) {
   const r = await resolveWorkOrder({ next: true, root, runId: `fm-drain-${i}` });
   if (!r.ok) break;
   picked.push(r.workOrder.company);
 }
 check('--next drains only the eligible rows, best score first',
-  picked, ['BadCo', 'Best Co', 'Acme', 'Slow Co']);
-check('  ...never an already-Applied row, a row with no PDF, or an unscored backfill',
-  picked.some((c) => ['Sent Co', 'NoPdf Co', 'Backfill Co'].includes(c)), false);
+  picked, ['BadCo', 'Best Co', 'NoPdf Co', 'Acme', 'Slow Co']);
+check('  ...including a row with no PDF yet (the CV is built at apply time)',
+  picked.includes('NoPdf Co'), true);
+check('  ...but never an already-Applied row or an unscored backfill',
+  picked.some((c) => ['Sent Co', 'Backfill Co'].includes(c)), false);
 
 // ── 5. Ad-hoc --url: no report, same claim discipline ──────────────────────
 root = freshRoot();

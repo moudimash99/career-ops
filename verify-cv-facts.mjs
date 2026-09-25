@@ -320,6 +320,9 @@ export function stripMarkup(text, { keepLineBreaks = false } = {}) {
 export function normalizeClaim(claim) {
   return String(claim)
     .toLowerCase()
+    // French typography puts a (non-breaking) space before "%": "80 %" is the
+    // same claim as "80%", not a new one.
+    .replace(/(\d)[\s\u00a0\u202f]+%/g, '$1%')
     .replace(/(\d)[,.\s\u00a0\u202f](?=\d{3}(?!\d))/g, '$1')
     .replace(/[,\s]+/g, ' ')
     .trim();

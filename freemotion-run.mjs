@@ -46,6 +46,8 @@ import { flagValue, hasFlag, validateFlags } from './lib/cli-flags.mjs';
 import { isMainModule } from './lib/is-main-module.mjs';
 import { readEngineConfig } from './lib/freemotion-engine-config.mjs';
 import { claimSubmission } from './lib/freemotion-submissions.mjs';
+import { assignArm } from './lib/cv-experiment.mjs';
+import * as yaml from 'js-yaml';
 import { getCareerOpsRoot, resolveTrackerPath } from './path-resolver.mjs';
 import { parseTrackerRow, resolveColumns } from './tracker-parse.mjs';
 import { parsePdfIndex } from './find.mjs';
@@ -186,6 +188,25 @@ function resolvePdfPath(root, reportNum) {
 }
 
 /**
+ * Absolute path of the generic CV (config/apply-answers.yml → resume), or null
+ * when it is unset or missing on disk.
+ *
+ * @param {string} root
+ * @returns {string|null}
+ */
+function readGenericCvPath(root) {
+  try {
+    const answers = yaml.load(readFileSync(under(root, 'config/apply-answers.yml'), 'utf-8')) || {};
+    const rel = String(answers.resume ?? '').trim();
+    if (!rel) return null;
+    const absolute = under(root, rel);
+    return existsSync(absolute) ? absolute : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
  * The evaluation's `## H) Draft Application Answers` block, if it wrote one.
  *
  * An optimization, never a requirement: any failure here (no report, no block,
@@ -214,10 +235,12 @@ function readDraftAnswers(reportPath) {
  * Resolve one posting into a work order, claiming it in the submissions ledger.
  *
  * @param {{report?: number, url?: string, company?: string, role?: string,
- *          next?: boolean, minScore?: number, runId?: string, root?: string}} args
+ *          next?: boolean, minScore?: number, runId?: string, root?: string,
+ *          forceArm?: 'generic'|'loose'|'strict'}} args
  * @returns {Promise<
  *   { ok: true, workOrder: { runId: string, url: string, company: string, role: string,
- *       reportNum: number|null, reportPath: string|null, pdfPath: string|null,
+ *       reportNum: number|null, reportPath: string|null, cvArm: 'generic'|'loose'|'strict',
+ *       genericCvPath: string|null, pdfPath: string|null,
  *       draftAnswers: object|null, engineConfig: object } }
  *   | { ok: false, reason: 'blacklisted'|'already-submitted'|'in-progress'|'unkeyable'
  *                        |'no-eligible-row'|'not-found', detail?: string }>}
@@ -242,20 +265,44 @@ export async function resolveWorkOrder(args = {}) {
     return { ...candidate, reportPath };
   };
 
-  const finish = (candidate) => ({
-    ok: true,
-    workOrder: {
-      runId,
-      url: candidate.url,
-      company: candidate.company,
-      role: candidate.role,
-      reportNum: candidate.reportNum,
-      reportPath: candidate.reportPath,
-      pdfPath: resolvePdfPath(root, candidate.reportNum),
-      draftAnswers: readDraftAnswers(candidate.reportPath),
-      engineConfig,
-    },
-  });
+  // CV experiment (lib/cv-experiment.mjs): drawn only here, AFTER the claim,
+  // so a skipped posting never draws an arm. `generic` uploads the fixed CV
+  // right away; `loose`/`strict` leave pdfPath null — the mode tailors and
+  // renders a fresh one-page CV for this posting before the upload step.
+  const finish = async (candidate) => {
+    const genericCvPath = readGenericCvPath(root);
+    let cvArm = 'generic';
+    let cvArmError = null;
+    try {
+      ({ arm: cvArm } = await assignArm(candidate.url, {
+        report: candidate.reportNum,
+        company: candidate.company,
+        role: candidate.role,
+        forceArm: args.forceArm || null,
+        root,
+      }));
+    } catch (err) {
+      // Never let the experiment stop an application: send the generic CV.
+      cvArmError = err.message;
+    }
+    return {
+      ok: true,
+      workOrder: {
+        runId,
+        url: candidate.url,
+        company: candidate.company,
+        role: candidate.role,
+        reportNum: candidate.reportNum,
+        reportPath: candidate.reportPath,
+        cvArm,
+        ...(cvArmError ? { cvArmError } : {}),
+        genericCvPath,
+        pdfPath: cvArm === 'generic' ? genericCvPath : null,
+        draftAnswers: readDraftAnswers(candidate.reportPath),
+        engineConfig,
+      },
+    };
+  };
 
   const claim = async (candidate) => claimSubmission(candidate.url, {
     runId,
@@ -280,8 +327,9 @@ export async function resolveWorkOrder(args = {}) {
           : urlFromReport(reportPath);
         return { row, score, reportNum, reportPath, url, company: row.company, role: row.role };
       })
+      // No PDF requirement: the CV experiment builds (or picks) the CV at
+      // apply time, so a row without a pre-rendered PDF is just as eligible.
       .filter((c) => c.row.status === NEXT_ELIGIBLE_STATUS
-        && c.row.pdf === '✅'
         && c.url !== ''
         && c.score !== null
         && c.score >= minScore)
@@ -292,12 +340,12 @@ export async function resolveWorkOrder(args = {}) {
       // row behind it, and it must never reach the ledger.
       if (isBlacklisted(candidate.company)) continue;
       const claimed = await claim(candidate);
-      if (claimed.claimed) return finish(candidate);
+      if (claimed.claimed) return await finish(candidate);
     }
     return {
       ok: false,
       reason: 'no-eligible-row',
-      detail: `${candidates.length} row(s) matched status=${NEXT_ELIGIBLE_STATUS}, pdf=✅, score>=${minScore}; all were blacklisted, claimed or already submitted`,
+      detail: `${candidates.length} row(s) matched status=${NEXT_ELIGIBLE_STATUS}, score>=${minScore}; all were blacklisted, claimed or already submitted`,
     };
   }
 
@@ -348,13 +396,15 @@ export async function resolveWorkOrder(args = {}) {
   const claimed = await claim(candidate);
   if (!claimed.claimed) return { ok: false, reason: claimed.reason };
 
-  return finish(candidate);
+  return await finish(candidate);
 }
 
 const USAGE = `Usage:
   node freemotion-run.mjs --report N [--run-id ID]
   node freemotion-run.mjs --url <url> --company <c> --role <r> [--run-id ID]
   node freemotion-run.mjs --next [--min-score X] [--run-id ID]
+
+  --force-arm generic|loose|strict   dry runs only: pin the CV experiment arm
 
 Resolves ONE posting into a work order and claims it in
 data/freemotion-submissions.tsv before any browser opens. Prints the result as
@@ -365,7 +415,7 @@ Exit codes:
   2  expected refusal — ${EXPECTED_REFUSALS.join(', ')} — take the next posting
   1  usage error, an unknown --report N, or an unexpected failure`;
 
-const VALUE_FLAGS = ['--report', '--url', '--company', '--role', '--min-score', '--run-id', '--root'];
+const VALUE_FLAGS = ['--report', '--url', '--company', '--role', '--min-score', '--run-id', '--root', '--force-arm'];
 const KNOWN_FLAGS = [...VALUE_FLAGS, '--next', '--help', '-h'];
 
 /**
@@ -403,6 +453,7 @@ async function main() {
     ...(minScoreRaw !== undefined ? { minScore: Number(minScoreRaw) } : {}),
     runId: flagValue(argv, '--run-id'),
     root: flagValue(argv, '--root'),
+    forceArm: flagValue(argv, '--force-arm'),
   });
 
   console.log(JSON.stringify(result, null, 2));
