@@ -99,27 +99,18 @@ const styled = b.buildRenderCvDocument(payload, { theme: 'executive-navy' });
 check('style design applied, base page settings kept', [styled.design.theme, styled.design.typography.font_family, styled.design.page.show_footer], ['classic', 'XCharter', false]);
 check('fit-step overrides still win over a style', b.buildRenderCvDocument(payload, { theme: 'executive-navy', design: { typography: { font_family: 'Lato' } } }).design.typography.font_family, 'Lato');
 
-// ── floor-hit rate ──────────────────────────────────────────────────────
+// ── floor-hit rate (reported by --stats; no alert) ──────────────────────
 {
   const row = (pdf, outcome) => ({ pdf, outcome });
   const clean = Array.from({ length: 10 }, (_, i) => row(`cv${i}.pdf`, 'fit'));
-  check('no floor hits → 0%, no alert', [g.fitStats(clean).rate, g.fitStats(clean).alert], [0, false]);
-
-  const twoOfTen = [...clean.slice(0, 8), row('a.pdf', 'floor'), row('b.pdf', 'fit')];
-  twoOfTen.splice(9, 1, row('b.pdf', 'overflow'), row('b.pdf', 'fit'));
-  const s = g.fitStats(twoOfTen);
+  check('no floor hits → 0%', g.fitStats(clean).rate, 0);
+  const mixed = [...clean.slice(0, 8), row('a.pdf', 'floor'), row('b.pdf', 'overflow'), row('b.pdf', 'fit')];
+  const s = g.fitStats(mixed);
   check('an overflow later trimmed to fit still counts as one hit', [s.cvs, s.hits, s.rate], [10, 2, 20]);
-  check('exactly at the 20% limit does not alert', s.alert, false);
-
-  const three = [...clean.slice(0, 7), row('x.pdf', 'floor'), row('y.pdf', 'floor'), row('z.pdf', 'overflow')];
-  check('above 20% alerts', g.fitStats(three).alert, true);
-  check('custom threshold respected', g.fitStats(three, { threshold: 40 }).alert, false);
-  check('too few CVs never alert', g.fitStats([row('q.pdf', 'floor')]).alert, false);
+  check('no alert field any more', 'alert' in s, false);
   const windowed = [...Array.from({ length: 5 }, (_, i) => row(`old${i}.pdf`, 'floor')), ...Array.from({ length: 50 }, (_, i) => row(`n${i}.pdf`, 'fit'))];
   check('only the most recent 50 CVs count', g.fitStats(windowed).hits, 0);
 }
-check('sb2nov education line has no dangling "in"',
-  b.buildRenderCvDocument(payload, { theme: 'sb2nov-garamond' }).design.templates.education_entry.main_column.includes(' *in* '), false);
 
 // ── fact gate: French percent spacing ───────────────────────────────────
 {

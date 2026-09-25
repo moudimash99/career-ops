@@ -146,9 +146,6 @@ policy, or what gets submitted.
        length budget in `modes/_custom.md`): the script cuts it to one page
        itself. Exit 2 means the priority-1 bullets alone do not fit: rank
        fewer as 1 and rerun once. Never ask the user; this mode does not pause.
-     - `floorRate.alert: true` in the output → log it as an anomaly
-       (`--event anomaly --detail "cv floor rate <rate>%"`) and write shorter
-       CVs for the rest of the run. Mention it in the end-of-run summary.
      - Any other failure (RenderCV missing, a fact-gate block on `strict` you
        cannot fix by removing the claim): use `workOrder.genericCvPath` and run
        `node lib/cv-experiment.mjs fallback --url <workOrder.url> --reason "<why>"`.
