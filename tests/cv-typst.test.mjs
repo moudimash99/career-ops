@@ -216,3 +216,19 @@ check('"80 %" gets a non-breaking space so it never splits',
   check('...but its low-priority bullets still are, and old roles still go', [labels.includes('EC: "b"'), labels.includes('role Old (r)')], [true, true]);
   check('applyCut refuses to drop the current role', g.applyCut(ranked, { kind: 'role', role: ranked.experience[0] }, { now: sept2026 }), false);
 }
+
+// ── always-keep roles ───────────────────────────────────────────────────
+{
+  const keepRoles = ['Airbus SAS', 'Airbus Electric Center'];
+  const p = { experience: [
+    { company: 'Airbus Electric Center', role: 'r', bullets: ['a'] },
+    { company: 'Airbus SAS', role: 'r', priority: 3, bullets: [{ text: 'b', priority: 3 }] },
+    { company: 'ZAKA', role: 'r', priority: 3, bullets: ['c'] },
+  ] };
+  check('kept roles match ignoring case and accents', [g.isKeptRole({ company: 'AIRBUS SAS' }, keepRoles), g.isKeptRole({ company: 'Murex' }, keepRoles)], [true, false]);
+  const labels = g.cutPlan(p, { keepRoles }).map(o => o.label);
+  check('a kept role is never offered as a whole-role cut, others still are', [labels.includes('role Airbus SAS (r)'), labels.includes('role ZAKA (r)')], [false, true]);
+  check('applyCut refuses to drop a kept role', g.applyCut(p, { kind: 'role', role: p.experience[1] }, { keepRoles }), false);
+  check('a kept role keeps its last bullet', g.applyCut(p, { kind: 'bullet', role: p.experience[1], bullet: p.experience[1].bullets[0] }, { keepRoles }), false);
+  check('missing kept roles are reported', g.missingKeptRoles({ experience: [p.experience[0]] }, keepRoles), ['Airbus SAS']);
+}

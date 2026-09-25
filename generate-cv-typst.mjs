@@ -126,7 +126,19 @@ const bulletLabel = (b) => {
  * section). Within a tier, the last-listed project and the bullet furthest
  * down its role's best-first list go first; role age only breaks ties.
  */
-export function cutPlan(payload, { now = new Date() } = {}) {
+/** Whether a role's company is on the always-keep list (case/accents ignored, substring). */
+export function isKeptRole(role, keepRoles = []) {
+  const f = (x) => String(x ?? '').normalize('NFD').replace(/\p{M}/gu, '').toLowerCase().trim();
+  const company = f(role?.company);
+  return keepRoles.some((k) => f(k) && company.includes(f(k)));
+}
+
+/** Always-keep companies missing from the payload's experience. */
+export function missingKeptRoles(payload, keepRoles = []) {
+  return keepRoles.filter((k) => !(payload.experience || []).some((role) => isKeptRole(role, [k])));
+}
+
+export function cutPlan(payload, { now = new Date(), keepRoles = [] } = {}) {
   const ops = [];
   const projects = [...(payload.projects || [])].reverse();
   const roles = [...(payload.experience || [])].reverse();
@@ -155,7 +167,7 @@ export function cutPlan(payload, { now = new Date() } = {}) {
   for (const role of roles) {
     // The current role is never cut whole: without it the CV reads as a gap
     // since the previous job. Its bullets can still be trimmed.
-    if (priorityOf(role) === 3 && !isCurrentRole(role, now)) ops.push({ kind: 'role', role, label: `role ${role.company} (${role.role})` });
+    if (priorityOf(role) === 3 && !isCurrentRole(role, now) && !isKeptRole(role, keepRoles)) ops.push({ kind: 'role', role, label: `role ${role.company} (${role.role})` });
   }
   projectOps(2);
   bulletOps(2);
@@ -163,7 +175,7 @@ export function cutPlan(payload, { now = new Date() } = {}) {
 }
 
 /** Apply one cut in place. Returns false when a guard refuses it. */
-export function applyCut(payload, op, { now = new Date() } = {}) {
+export function applyCut(payload, op, { now = new Date(), keepRoles = [] } = {}) {
   if (op.kind === 'project') {
     const i = (payload.projects || []).indexOf(op.project);
     if (i === -1) return false;
@@ -172,7 +184,7 @@ export function applyCut(payload, op, { now = new Date() } = {}) {
   }
   if (op.kind === 'role') {
     const i = (payload.experience || []).indexOf(op.role);
-    if (i === -1 || payload.experience.length <= 1 || isCurrentRole(op.role, now)) return false;
+    if (i === -1 || payload.experience.length <= 1 || isCurrentRole(op.role, now) || isKeptRole(op.role, keepRoles)) return false;
     payload.experience.splice(i, 1);
     return true;
   }
@@ -195,7 +207,7 @@ export function applyCut(payload, op, { now = new Date() } = {}) {
  * @param {Array<{name: string, design: object}>} steps - base first, floor last.
  * @param {(payload: object, step: object) => Promise<{pages: number}>|{pages: number}} render
  */
-export async function fitWithCuts(payload, steps, render, { now = new Date() } = {}) {
+export async function fitWithCuts(payload, steps, render, { now = new Date(), keepRoles = [] } = {}) {
   const work = structuredClone(payload);
   work.experience = sortNewestFirst(work.experience);
   const tried = [];
@@ -207,8 +219,8 @@ export async function fitWithCuts(payload, steps, render, { now = new Date() } =
   };
   let result = await attempt(steps[0]);
   if (result.pages === 1) return { fit: true, step: steps[0], result, tried, dropped, payload: work };
-  for (const op of cutPlan(work, { now })) {
-    if (!applyCut(work, op, { now })) continue;
+  for (const op of cutPlan(work, { now, keepRoles })) {
+    if (!applyCut(work, op, { now, keepRoles })) continue;
     dropped.push(op.label);
     result = await attempt(steps[0]);
     if (result.pages === 1) return { fit: true, step: steps[0], result, tried, dropped, payload: work };
@@ -336,7 +348,7 @@ function parseArgs(argv) {
 }
 
 /** Load the input as a base RenderCV document (design overrides are applied per step). */
-function loadBaseDocument(inputPath, { theme, explicitTheme, format, required = DEFAULT_REQUIRED_SECTIONS }) {
+function loadBaseDocument(inputPath, { theme, explicitTheme, format, required = DEFAULT_REQUIRED_SECTIONS, keepRoles = [] }) {
   const raw = readFileSync(inputPath, 'utf-8');
   if (extname(inputPath).toLowerCase() === '.json') {
     const payload = JSON.parse(raw);
@@ -348,7 +360,11 @@ function loadBaseDocument(inputPath, { theme, explicitTheme, format, required = 
     if (missing.length) {
       throw new Error(`CV payload is missing required section(s): ${missing.join(', ')} (config/profile.yml → cv.required_sections). Only optional sections such as projects may be dropped.`);
     }
-    return { doc: buildRenderCvDocument(payload, { theme }), payload, format: payload.page_format || 'a4' };
+    const missingRoles = missingKeptRoles(payload, keepRoles);
+    if (missingRoles.length) {
+      throw new Error(`CV payload leaves out role(s) that must always appear: ${missingRoles.join(', ')} (config/profile.yml → cv.always_keep_roles). Keep each with at least one bullet.`);
+    }
+    return { doc: buildRenderCvDocument(payload, { theme }), payload, keepRoles, format: payload.page_format || 'a4' };
   }
   const doc = yaml.load(raw);
   if (!doc?.cv) throw new Error(`${inputPath} is not a RenderCV document (no "cv" key)`);
@@ -421,7 +437,8 @@ async function main() {
     // --format wins; otherwise config/profile.yml → cv.page_format pins the
     // size for every CV, whatever the payload says.
     const pinnedFormat = ['a4', 'letter'].includes(profileCv.page_format) ? profileCv.page_format : undefined;
-    base = loadBaseDocument(inputPath, { theme, explicitTheme: opts.theme, format: opts.format || pinnedFormat, required });
+    const keepRoles = Array.isArray(profileCv.always_keep_roles) ? profileCv.always_keep_roles.map(String) : [];
+    base = loadBaseDocument(inputPath, { theme, explicitTheme: opts.theme, format: opts.format || pinnedFormat, required, keepRoles });
   } catch (err) {
     console.error(err.message);
     process.exit(1);
@@ -457,7 +474,7 @@ async function main() {
 
     // A JSON payload can be cut (rank-and-cut); a YAML file is only re-laid-out.
     const outcome = base.payload
-      ? await fitWithCuts(base.payload, stepsUpTo(floor), (p, step) => renderDoc(buildRenderCvDocument(p, { theme }), step))
+      ? await fitWithCuts(base.payload, stepsUpTo(floor), (p, step) => renderDoc(buildRenderCvDocument(p, { theme }), step), { keepRoles: base.keepRoles })
       : await fitToOnePage((step) => renderStep(step), stepsUpTo(floor));
     const dropped = outcome.dropped || [];
     const tried = outcome.tried.map(t => `${t.name}${t.dropped ? `-${t.dropped}cut` : ''}=${t.pages}p`).join(', ');
