@@ -218,7 +218,7 @@ After detecting archetype, read `modes/_profile.md` for the user's specific fram
 | Write | Temporary HTML for PDF, applications.md, reports .md |
 | Edit | Update tracker |
 | Canva MCP | Optional visual CV generation. Duplicate base design, edit text, export PDF. Requires `cv.canva_resume_design_id` in profile.yml. |
-| Bash | `node generate-pdf.mjs` |
+| Bash | `node generate-cv-typst.mjs` (one-page CV via RenderCV) · `node generate-pdf.mjs` (HTML fallback, cover letters) |
 
 ### Subagent delegation (cost guardrail)
 

@@ -1,0 +1,102 @@
+# Named CV styles for generate-cv-typst.mjs — RenderCV themes with design
+# overrides. `cv.theme` in config/profile.yml may name a built-in RenderCV
+# theme (classic, sb2nov, engineeringresumes, ...) or any style below.
+# Each style = a built-in `theme` plus a `design` block merged over it
+# (keys: https://docs.rendercv.com — typography, colors, section_titles, header).
+
+sb2nov-garamond:
+  theme: sb2nov
+  design:
+    typography:
+      font_family: EB Garamond
+
+sb2nov-sans:
+  theme: sb2nov
+  design:
+    typography:
+      font_family: Lato
+    colors:
+      name: rgb(20,40,80)
+      section_titles: rgb(20,40,80)
+
+executive-navy:
+  theme: classic
+  design:
+    typography:
+      font_family: XCharter
+    colors:
+      name: rgb(20,40,80)
+      headline: rgb(20,40,80)
+      connections: rgb(40,40,40)
+      section_titles: rgb(20,40,80)
+      links: rgb(20,40,80)
+    section_titles:
+      type: with_full_line
+    header:
+      connections:
+        show_icons: false
+        separator: "|"
+
+minimal-left:
+  theme: classic
+  design:
+    typography:
+      font_family: Open Sauce Sans
+      small_caps:
+        section_titles: true
+    colors:
+      name: rgb(0,0,0)
+      headline: rgb(0,0,0)
+      connections: rgb(60,60,60)
+      section_titles: rgb(0,0,0)
+      links: rgb(0,0,0)
+    section_titles:
+      type: without_line
+    header:
+      alignment: left
+      connections:
+        show_icons: false
+        separator: "·"
+
+charter-centered:
+  theme: classic
+  design:
+    typography:
+      font_family: XCharter
+    colors:
+      name: rgb(0,0,0)
+      headline: rgb(0,0,0)
+      connections: rgb(0,0,0)
+      section_titles: rgb(0,0,0)
+      links: rgb(0,0,0)
+    section_titles:
+      type: centered_with_full_line
+    header:
+      connections:
+        show_icons: false
+        separator: "•"
+
+modern-teal:
+  theme: classic
+  design:
+    typography:
+      font_family:
+        body: Noto Sans
+        name: Raleway
+        headline: Noto Sans
+        connections: Noto Sans
+        section_titles: Raleway
+    colors:
+      name: rgb(0,105,115)
+      headline: rgb(0,105,115)
+      connections: rgb(0,105,115)
+      section_titles: rgb(0,105,115)
+      links: rgb(0,105,115)
+
+roboto-clean:
+  theme: engineeringresumes
+  design:
+    typography:
+      font_family: Roboto
+    colors:
+      section_titles: rgb(60,60,60)

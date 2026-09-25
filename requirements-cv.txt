@@ -1,0 +1,3 @@
+# One-page CV rendering (generate-cv-typst.mjs). Typst ships inside RenderCV.
+# Install: pip install -r requirements-cv.txt
+rendercv[full]==2.8

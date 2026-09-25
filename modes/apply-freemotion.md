@@ -120,6 +120,36 @@ policy, or what gets submitted.
    plan, check `honeypot` before typing. Filling one is the single thing that
    marks an application as automated.
 
+2b. **Get the CV for this posting's arm (CV experiment).**
+   `workOrder.cvArm` was drawn when the posting was claimed
+   (`lib/cv-experiment.mjs`: generic 15% / loose 50% / strict 35%). The rules
+   for each arm live in `modes/_custom.md` → "CV experiment". Follow them. Do
+   this before the fill plan, because the upload step uses the PDF.
+
+   - `generic` → `workOrder.pdfPath` is already the generic CV. Use it as-is,
+     even when the report has an older tailored PDF.
+   - `loose` / `strict` → tailor a CV for THIS posting now, the way `modes/pdf.md`
+     steps 1–17 describe. The JD is the report's archived JD when
+     `workOrder.reportPath` is set, otherwise the posting page you just read.
+     Write the payload to `output/tailored-cv/freemotion/cv-{company-slug}-{arm}.json`,
+     then render it:
+     `node generate-cv-typst.mjs <payload.json> output/tailored-cv/freemotion/cv-{company-slug}-{arm}.pdf`
+     (`--report=<reportNum>` when there is one; add `--skip-fact-check` for
+     `loose` only). Use the printed `pdf` as `workOrder.pdfPath` from here on.
+     - Write the payload once, ranked (see `modes/pdf.md` Step 21 and the
+       length budget in `modes/_custom.md`): the script cuts it to one page
+       itself. Exit 2 means the priority-1 bullets alone do not fit: rank
+       fewer as 1 and rerun once. Never ask the user; this mode does not pause.
+     - `floorRate.alert: true` in the output → log it as an anomaly
+       (`--event anomaly --detail "cv floor rate <rate>%"`) and write shorter
+       CVs for the rest of the run. Mention it in the end-of-run summary.
+     - Any other failure (RenderCV missing, a fact-gate block on `strict` you
+       cannot fix by removing the claim): use `workOrder.genericCvPath` and run
+       `node lib/cv-experiment.mjs fallback --url <workOrder.url> --reason "<why>"`.
+       Log it as an anomaly and carry on.
+   - `workOrder.cvArmError` set → the draw itself failed; the arm is `generic`.
+     Carry on.
+
 3. **Build the fill plan from the inventory, not from the snapshot.**
 
    ```
@@ -335,8 +365,11 @@ policy, or what gets submitted.
      <workOrder.reportNum|-> --notes "<one line>"`, then, only when
      `workOrder.reportNum` is not null:
      `node set-status.mjs <reportNum> Applied --note "Free Motion:
-     submitted <timestamp>"` and `node followup-seed.mjs <reportNum>
+     submitted <timestamp> cv=<workOrder.cvArm>"` and `node followup-seed.mjs <reportNum>
      --json`.
+     Always, report or not: `node lib/cv-experiment.mjs sent --url
+     <workOrder.url> --pdf <the PDF you uploaded>`. Only sent postings count
+     in the experiment, so skipping this loses the data point.
    - Any failure branch (CAPTCHA, WAF block, account-verification pending,
      a Tier-3 failure that does not clear after 3 retries, an unhandled
      error): `node lib/freemotion-submissions.mjs finalize --url

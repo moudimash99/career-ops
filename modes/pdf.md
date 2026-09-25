@@ -41,21 +41,27 @@ Run `npm run jd:similarity -- {bundle-root}/jd/current.md {bundle-root}/jd/previ
 15. Apply the six-second clarity gate from `modes/heuristics/recruiter-side.md`: top third must make target role, strongest fit, and proof obvious
 16. Read `name` from `config/profile.yml` → normalize to kebab-case lowercase (e.g. "John Doe" → "john-doe") → `{candidate}`
 17. Build the render payload (see the **JSON Input Schema** below) from the tailored content — emit compact structured JSON, **not** full HTML markup — and write it to `/tmp/cv-{candidate}-{company}.json`
-18. Run `node build-cv-html.mjs /tmp/cv-{candidate}-{company}.json {html-path} {template}`, where `{html-path}` is the active bundle's `cv/tailored/vNNN/cv.html` or `output/cv-{candidate}-{company}.html` for a one-off CV, and `{template}` is the path printed by **Selecting the template** below (omit it to use the base template). The script owns every tag, CSS class, and HTML escaping. Keep the HTML outside temporary storage because the dashboard's `D` hotkey regenerates from it.
-19. Run the fact gate against the generated HTML: `node verify-cv-facts.mjs {html-path}`
+18. Build the RenderCV file: `node build-cv-rendercv.mjs /tmp/cv-{candidate}-{company}.json {yaml-path}`, where `{yaml-path}` is the active bundle's `cv/tailored/vNNN/cv.yaml` or `output/cv-{candidate}-{company}.yaml` for a one-off CV. The theme comes from `config/profile.yml` → `cv.theme`. The script owns the mapping and every escape; never hand-write the YAML. Keep the payload JSON too: Step 21 renders from it.
+19. Run the fact gate against the payload: `node verify-cv-facts.mjs /tmp/cv-{candidate}-{company}.json`
     - This is a hard gate before PDF rendering.
-    - If it fails, stop and fix the generated HTML by removing invented metrics or adding verified evidence to `cv.md`, `article-digest.md`, or `config/cv-facts.json`.
+    - If it fails, stop and fix the payload by removing invented metrics or adding verified evidence to `cv.md`, `article-digest.md`, or `config/cv-facts.json`.
 20. **Hiring-manager audit — off by default, opt-in only.** Run `modes/pdf/hm-audit.md` if and only if one of these is true; otherwise skip straight to Step 21 without prompting.
     - The invocation carried `--hm-audit` (`/career-ops pdf --hm-audit`, or the same flag on a natural-language request).
     - `modes/_custom.md` turns it on as a house rule.
 
     The fact gate proves nothing was invented; it cannot tell you whether these are the *right* bullets for the role. The audit researches the likely reviewer, dispatches a separate subagent role-playing them, and returns a bullet-by-bullet keep/cut/rewrite verdict plus a blunt "would I advance this to a screen?" call. It adds a subagent dispatch plus web research on top of the tailoring, which is why it is opted into rather than run on every PDF.
 
-    The audit recommends; the user decides. If they take any rewrite, return to Step 17, rebuild the payload and the HTML, and re-run the fact gate before rendering. The audit is persisted only once that decision is known, and records which rewrites were applied — so the `## HM Audit` section never describes a CV the rendered PDF no longer matches. Do not re-run the audit against the rebuilt CV: a second dispatch doubles the cost for a verdict the user has already acted on.
-21. Execute: `node generate-pdf.mjs {html-path} {pdf-path} --format={letter|a4} --report={report number}`, where `{pdf-path}` is the active bundle's `cv/tailored/vNNN/cv.pdf` or `output/cv-{candidate}-{company}-{YYYY-MM-DD}.pdf` for a one-off CV. `{report number}` is the NNN from the report filename/link (e.g. `008` for `reports/008-acme-….md`), not the tracker `#` column. Pass it whenever the application has (or will have) a report; it records the PDF↔report linkage in `data/pdf-index.tsv` so the dashboard can open and regenerate the exact nested or flat HTML/PDF pair. Omit it only for one-off CVs with no tracker entry.
-    - The rendered PDF has a two-page warning threshold by default. `--max-pages=N` accepts a positive integer; pass `--max-pages=1` when the user or market prefers a one-page CV.
-    - If the rendered PDF exceeds its threshold, generation warns loudly with the actual and allowed page counts plus trimming guidance, then reports and indexes the unchanged PDF so existing longer-CV flows keep working.
-    - Pass `--strict-pages` only when the user or market requires a hard limit. Strict overflow leaves the draft available for inspection but does not report or index it as successful; trim lower-priority content and rerun.
+    The audit recommends; the user decides. If they take any rewrite, return to Step 17, rebuild the payload and the YAML, and re-run the fact gate before rendering. The audit is persisted only once that decision is known, and records which rewrites were applied — so the `## HM Audit` section never describes a CV the rendered PDF no longer matches. Do not re-run the audit against the rebuilt CV: a second dispatch doubles the cost for a verdict the user has already acted on.
+21. Render: `node generate-cv-typst.mjs /tmp/cv-{candidate}-{company}.json {pdf-path} --report={report number}`, where `{pdf-path}` is the active bundle's `cv/tailored/vNNN/cv.pdf` or `output/cv-{candidate}-{company}-{YYYY-MM-DD}.pdf` for a one-off CV. `{report number}` is the NNN from the report filename/link (e.g. `008` for `reports/008-acme-….md`), not the tracker `#` column. Pass it whenever the application has (or will have) a report; it records the PDF↔report linkage in `data/pdf-index.tsv`. Omit it only for one-off CVs with no tracker entry. Page size follows the payload's `page_format`.
+    - **The CV is always exactly one page, in one model pass.** Write the payload once, ranked and a little long: an experience bullet may be `{"text": "...", "priority": 1|2|3}`, and a role or project may carry `"priority"` (1 = must keep, the default for anything unranked; 2 = keep if room; 3 = drop first). The script first cuts ranked content at normal size (projects, then priority-3 bullets, then priority-3 roles, then priority-2 bullets; a role never loses its last bullet), and only then tries the tighter layouts (`base → font-9.5 → margins → spacing → font-9`), never past `config/profile.yml` → `cv.fit_floor`. Never render, read the PDF and rewrite: rank instead. `dropped` in the output lists what was cut. `modes/_custom.md` may set a length budget.
+    - A payload missing a required section (`cv.required_sections`, default: summary, experience, education, skills, certifications) is refused.
+    - Exit 2 means even the must-keep (priority 1) content does not fit at the floor. Rank fewer bullets as 1, rebuild the payload and rerun. Never shrink the text by other means.
+    - The script re-runs the fact gate on the rendered text and keeps the YAML that produced the PDF next to it (`{pdf-path}` with `.yaml`), so a person can edit it and re-render.
+    - `--preview-steps` renders every ladder step to PNG side by side (no fit, no index). Use it to choose `cv.fit_floor` by eye.
+    - Every render is logged to `data/cv-fit-log.tsv`. If more than `cv.floor_alert_pct` (default 20%) of recent CVs only fit at the floor or overflowed, the output carries `floorRate.alert: true` and a warning. That means the tailoring writes too much for one page: tell the user, and propose a tighter content budget (fewer bullets per role, a shorter summary) for `modes/_custom.md`. `node generate-cv-typst.mjs --stats` shows the current rate.
+    - Requires RenderCV (`pip install -r requirements-cv.txt`). If it is missing, say so and give that command. Do not fall back to HTML on your own.
+
+    **Fallback: HTML renderer.** Ranked bullets are RenderCV-only; write plain strings for this path. Only when the user asks for it, or `config/profile.yml` sets `cv.renderer: html`: run `node build-cv-html.mjs <payload.json> {html-path} {template}` (template from **Selecting the template** below), then `node generate-pdf.mjs {html-path} {pdf-path} --format={letter|a4} --report={report number} --max-pages=1 --strict-pages`.
 22. Report: PDF path, number of pages, keyword coverage %, and any skill gaps from Step 4 still unaddressed
 
 ## ATS Rules (clean parsing)
@@ -70,7 +76,7 @@ Run `npm run jd:similarity -- {bundle-root}/jd/current.md {bundle-root}/jd/previ
 - Distributed JD keywords: Summary (top 5), first bullet of each role, Skills section
 - No hidden text, keyword stuffing, or white-font tricks. Optimize for parseability plus human review.
 
-**Optional parseability check:** after generating the HTML you can score it for ATS-friendliness with `node verify-ats.mjs output/cv-{candidate}-{company}.html` (see `modes/ats.md`). This is deterministic, read-only, and advisory — it reports a 0-100 score plus concrete issues but never blocks generation (unlike the `verify-cv-facts.mjs` fact gate in Step 18).
+**Optional parseability check:** after generating the HTML you can score it for ATS-friendliness with `node verify-ats.mjs output/cv-{candidate}-{company}.html` (see `modes/ats.md`). This is deterministic, read-only, and advisory — it reports a 0-100 score plus concrete issues but never blocks generation (unlike the `verify-cv-facts.mjs` fact gate in Step 19).
 
 ## Recruiter Review Gates
 
@@ -81,14 +87,7 @@ Run `npm run jd:similarity -- {bundle-root}/jd/current.md {bundle-root}/jd/previ
 
 ## PDF Design
 
-- **Fonts**: Space Grotesk (headings, 600-700) + DM Sans (body, 400-500)
-- **Fonts self-hosted**: `fonts/`
-- **Header**: name in Space Grotesk 24px bold + gradient line `linear-gradient(to right, hsl(187,74%,32%), hsl(270,70%,45%))` 2px + contact row
-- **Section headers**: Space Grotesk 13px, uppercase, letter-spacing 0.05em, color cyan primary
-- **Body**: DM Sans 11px, line-height 1.5
-- **Company names**: accent purple color `hsl(270,70%,45%)`
-- **Margins**: 0.6in
-- **Background**: pure white
+The RenderCV theme decides the look (`config/profile.yml` → `cv.theme`: classic, engineeringresumes, sb2nov, moderncv, …). Do not restyle it per CV. The footer and "last updated" note are switched off. One page, always (Step 21).
 
 ## Section order (optimized "6-second recruiter scan")
 

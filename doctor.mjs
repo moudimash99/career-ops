@@ -501,6 +501,18 @@ function checkFonts() {
   return { pass: true, label: 'Fonts directory ready' };
 }
 
+// RenderCV renders the one-page CV (generate-cv-typst.mjs). A warning, not a
+// failure: everything except CV rendering works without it.
+async function checkRenderCv() {
+  const { renderCvAvailable } = await import('./generate-cv-typst.mjs');
+  if (renderCvAvailable()) return { pass: true, label: 'RenderCV installed (one-page CV renderer)' };
+  return {
+    warn: true,
+    label: 'RenderCV not installed — tailored CVs cannot be rendered',
+    fix: 'pip install -r requirements-cv.txt',
+  };
+}
+
 function checkAutoDir(name) {
   const dirPath = join(projectRoot, name);
   if (existsSync(dirPath)) {
@@ -659,6 +671,7 @@ async function main() {
     checkScanExtractor(projectRoot),
     ...USER_LAYER_PREREQS.map(checkPrereq),
     checkFonts(),
+    await checkRenderCv(),
     checkPersonalization(projectRoot),
     checkAutoDir('data'),
     checkPipelineFile(),
