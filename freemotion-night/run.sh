@@ -12,6 +12,7 @@ RUN=$(cat tmp/fm/night/run-id 2>/dev/null) || { echo "no tmp/fm/night/run-id: ru
 FLAG=tmp/fm/night/use-sonnet      # contents: "5h <epoch>" or "weekly <epoch>"
 mkdir -p tmp/fm/usage
 prompt() { echo "Read the file $ROOT/tmp/fm/night/job-$1.md and carry out the task it describes, from start to finish, without stopping to ask."; }
+RUN_START=$(date -u +%Y-%m-%dT%H:%M:%SZ)  # the end-of-run letter sample covers this run only
 url_of() { grep -m1 -oE '^   https?://\S+' "tmp/fm/night/job-$1.md" | tr -d ' '; }
 result_of() { awk -F'\t' -v u="$1" -v r="$RUN" '$2==u && $8==r {o=$6} END {print o}' data/freemotion-submissions.tsv; }
 close_open() { node lib/freemotion-submissions.mjs finalize --url "$1" --outcome errored --run-id $RUN --notes "$2" > /dev/null 2>&1; }
@@ -70,4 +71,6 @@ for n in "$@"; do
   [ "$(result_of "$u")" = in-progress ] && close_open "$u" "run ended without recording a result; check by hand before any retry"
   echo "job $n ($d): $(result_of "$u")"
 done
+# Always: 3 random letters written this run, to skim (nothing to approve).
+node letter-write.mjs --sample 3 --since "$RUN_START" || true
 echo "ALL DONE"

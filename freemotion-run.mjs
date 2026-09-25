@@ -47,6 +47,7 @@ import { isMainModule } from './lib/is-main-module.mjs';
 import { readEngineConfig } from './lib/freemotion-engine-config.mjs';
 import { claimSubmission } from './lib/freemotion-submissions.mjs';
 import { assignArm } from './lib/cv-experiment.mjs';
+import { assignLetterArm } from './lib/letter-experiment.mjs';
 import * as yaml from 'js-yaml';
 import { getCareerOpsRoot, resolveTrackerPath } from './path-resolver.mjs';
 import { parseTrackerRow, resolveColumns } from './tracker-parse.mjs';
@@ -236,7 +237,7 @@ function readDraftAnswers(reportPath) {
  *
  * @param {{report?: number, url?: string, company?: string, role?: string,
  *          next?: boolean, minScore?: number, runId?: string, root?: string,
- *          forceArm?: 'generic'|'loose'|'strict'}} args
+ *          forceArm?: 'generic'|'loose'|'strict', forceLetterArm?: 'none'|'short'|'full'}} args
  * @returns {Promise<
  *   { ok: true, workOrder: { runId: string, url: string, company: string, role: string,
  *       reportNum: number|null, reportPath: string|null, cvArm: 'generic'|'loose'|'strict',
@@ -285,6 +286,19 @@ export async function resolveWorkOrder(args = {}) {
       // Never let the experiment stop an application: send the generic CV.
       cvArmError = err.message;
     }
+    // Letter experiment (lib/letter-experiment.mjs): none / short / full.
+    // Same rule: a failed draw must not stop the application; it means a
+    // short letter.
+    let letterArm = 'short';
+    try {
+      ({ arm: letterArm } = await assignLetterArm(candidate.url, {
+        report: candidate.reportNum,
+        company: candidate.company,
+        role: candidate.role,
+        forceArm: args.forceLetterArm || null,
+        root,
+      }));
+    } catch { /* keep 'short' */ }
     return {
       ok: true,
       workOrder: {
@@ -296,6 +310,7 @@ export async function resolveWorkOrder(args = {}) {
         reportPath: candidate.reportPath,
         cvArm,
         ...(cvArmError ? { cvArmError } : {}),
+        letterArm,
         genericCvPath,
         pdfPath: cvArm === 'generic' ? genericCvPath : null,
         draftAnswers: readDraftAnswers(candidate.reportPath),
@@ -405,6 +420,7 @@ const USAGE = `Usage:
   node freemotion-run.mjs --next [--min-score X] [--run-id ID]
 
   --force-arm generic|loose|strict   dry runs only: pin the CV experiment arm
+  --force-letter-arm none|short|full dry runs only: pin the letter experiment arm
 
 Resolves ONE posting into a work order and claims it in
 data/freemotion-submissions.tsv before any browser opens. Prints the result as
@@ -415,7 +431,7 @@ Exit codes:
   2  expected refusal — ${EXPECTED_REFUSALS.join(', ')} — take the next posting
   1  usage error, an unknown --report N, or an unexpected failure`;
 
-const VALUE_FLAGS = ['--report', '--url', '--company', '--role', '--min-score', '--run-id', '--root', '--force-arm'];
+const VALUE_FLAGS = ['--report', '--url', '--company', '--role', '--min-score', '--run-id', '--root', '--force-arm', '--force-letter-arm'];
 const KNOWN_FLAGS = [...VALUE_FLAGS, '--next', '--help', '-h'];
 
 /**
@@ -454,6 +470,7 @@ async function main() {
     runId: flagValue(argv, '--run-id'),
     root: flagValue(argv, '--root'),
     forceArm: flagValue(argv, '--force-arm'),
+    forceLetterArm: flagValue(argv, '--force-letter-arm'),
   });
 
   console.log(JSON.stringify(result, null, 2));

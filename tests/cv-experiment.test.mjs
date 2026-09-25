@@ -141,6 +141,7 @@ const makeRoot = (tracker = '') => {
 `);
   const loose = await resolveWorkOrder({ report: 1, root: root2, runId: 'fm-exp-2', forceArm: 'loose' });
   check('tailored arm leaves pdfPath null for the mode to build', [loose.workOrder?.cvArm, loose.workOrder?.pdfPath], ['loose', null]);
+  check('work order carries a letter arm too', ['none', 'short', 'full'].includes(loose.workOrder?.letterArm), true);
 
   const blocked = await resolveWorkOrder({ report: 3, root, runId: 'fm-exp-3' });
   check('a blacklisted posting is refused', blocked.reason, 'blacklisted');

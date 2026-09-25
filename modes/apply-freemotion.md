@@ -43,6 +43,8 @@ policy, or what gets submitted.
    cheapest wins available: the account already exists, so resume each one
    through "The emailed verification link" below before starting fresh
    postings.
+4. Note the run's start time as an ISO timestamp (`runStart`). The end-of-run
+   letter sample uses it.
 
 ## Per posting
 
@@ -253,6 +255,31 @@ policy, or what gets submitted.
      letters, "additional information" boxes and messages to a hiring team.
      A form answer that reads as machine-written costs the application, and
      the candidate can tell at a glance.
+   - **Cover letter / motivation fields** (a label like cover letter, lettre
+     de motivation, motivation, "why are you interested", message to the
+     hiring team, or a letter file upload) follow `workOrder.letterArm`
+     (lib/letter-experiment.mjs), not the essay answers:
+     - `none` → an optional letter field stays EMPTY and an optional letter
+       upload is skipped: the one exception to "never leave a field blank".
+       A required one is treated as `short`.
+     - `short` / `full` →
+       1. `node letter-write.mjs --jd <the jds/ file from step 2b> --version
+          <short|full> --format form --context-only tmp/fm/letter-context.md`
+          (`--format pdf` for a file upload). Note the printed
+          `promptVersion`.
+       2. Read `tmp/fm/letter-context.md`, only that file, and write the
+          letter JSON it asks for to
+          `output/letters/freemotion/<company-slug>-<role-slug>.json`.
+       3. `node letter-write.mjs --jd <same jd> --version <same> --check
+          <that json> --prompt-version <promptVersion> --company <c> --role
+          <r> --arm <letterArm>` (add `--pdf <path>.pdf --contact "Toulouse,
+          France | <email> | <phone>"` for an upload). `status: ok` → type
+          the printed text file's content (or upload the PDF). `status:
+          rejected` → rewrite once, fixing exactly the listed problems, and
+          check again. Rejected twice → treat the field as `none` (a required
+          field gets two plain sentences: why this job, availability) and run
+          `node lib/letter-experiment.mjs fallback --url <workOrder.url>
+          --reason "<first problem>"`.
    - `status: 'needs-model-judgment'` → decide the most probable answer for
      this candidate yourself, right now, grounded in whatever cv.md /
      profile.yml / article-digest.md context is closest to the question —
@@ -371,8 +398,10 @@ policy, or what gets submitted.
      submitted <timestamp> cv=<workOrder.cvArm>"` and `node followup-seed.mjs <reportNum>
      --json`.
      Always, report or not: `node lib/cv-experiment.mjs sent --url
-     <workOrder.url> --pdf <the PDF you uploaded>`. Only sent postings count
-     in the experiment, so skipping this loses the data point.
+     <workOrder.url> --pdf <the PDF you uploaded>` and `node
+     lib/letter-experiment.mjs sent --url <workOrder.url> --letter <the letter
+     text file, or none>`. Only sent postings count in the experiments, so
+     skipping this loses the data point.
    - Any failure branch (CAPTCHA, WAF block, account-verification pending,
      a Tier-3 failure that does not clear after 3 retries, an unhandled
      error): `node lib/freemotion-submissions.mjs finalize --url
@@ -380,6 +409,16 @@ policy, or what gets submitted.
      <workOrder.reportNum|-> --notes "<what happened>"`. Do not call
      `set-status.mjs`/`followup-seed.mjs` on a non-`submitted` outcome.
    - Continue to the next posting either way.
+
+## End of run
+
+Always, at the end of every run (nothing for the user to approve):
+`node letter-write.mjs --sample 3 --since <runStart>`. Put its output in the
+end-of-run summary as is: "Hey, here are 3 letters from this run:" followed
+by the letters. If you notice something that could be better in them (a
+phrase that reads machine-written, a claim that looks stretched, the same
+opening twice), add one or two lines saying what and why. If nothing stands
+out, say nothing more.
 
 ## Account creation
 
