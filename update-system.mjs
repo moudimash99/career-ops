@@ -433,6 +433,7 @@ const SYSTEM_PATHS = [
   'build-cv-html.mjs',
   'build-cv-rendercv.mjs',
   'generate-cv-typst.mjs',
+  'cv-write.mjs',
   'requirements-cv.txt',
   'lib/cv-experiment.mjs',
   'cv-sections-core.mjs',

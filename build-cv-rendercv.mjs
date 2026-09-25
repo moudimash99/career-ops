@@ -75,7 +75,10 @@ const SECTION_ORDER = [
 
 const PAGE_SIZES = { a4: 'a4', letter: 'us-letter' };
 
-const text = (v) => (typeof v === 'string' ? v.trim() : (typeof v === 'number' ? String(v) : ''));
+// A number and its "%" never split across lines ("80 %" is French spacing):
+// the space becomes a non-breaking one, whoever wrote the text.
+const glueUnits = (s) => s.replace(/(\d)[  ](?=%)/g, '$1 ');
+const text = (v) => (typeof v === 'string' ? glueUnits(v.trim()) : (typeof v === 'number' ? String(v) : ''));
 const joinItems = (items) => (Array.isArray(items) ? items.map(text).filter(Boolean).join(', ') : text(items));
 // A bullet is a string, or {text, priority} when the payload is ranked for the
 // one-page cut (generate-cv-typst.mjs). The priority never reaches the render.
@@ -94,6 +97,59 @@ export function missingRequiredSections(payload, required = DEFAULT_REQUIRED_SEC
     if (Array.isArray(v)) return v.length === 0;
     return !text(v);
   });
+}
+
+// ── Dates ────────────────────────────────────────────────────────────────
+// Payload dates are free text in any language ("Avr. 2026 – Nov. 2026",
+// "Jan 2025 – Aug 2025", "Juin 2020 – Février 2021", "2023 – present").
+// Parsed only to keep roles newest-first and to spot the current role.
+const MONTHS = {
+  jan: 1, janv: 1, janvier: 1, january: 1, feb: 2, fev: 2, fevr: 2, fevrier: 2, february: 2,
+  mar: 3, mars: 3, march: 3, apr: 4, avr: 4, avril: 4, april: 4, may: 5, mai: 5,
+  jun: 6, juin: 6, june: 6, jul: 7, juil: 7, juillet: 7, july: 7, aug: 8, aou: 8, aout: 8, august: 8,
+  sep: 9, sept: 9, septembre: 9, september: 9, oct: 10, octobre: 10, october: 10,
+  nov: 11, novembre: 11, november: 11, dec: 12, decembre: 12, december: 12,
+};
+const PRESENT_RE = /\b(present|présent|aujourd'hui|now|current|ongoing|en cours|actuel(?:lement)?|today)\b/i;
+const fold = (s) => s.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase().replace(/\./g, ' ');
+
+/** One date point → yyyymm, Infinity for "present", or null. */
+function parseDatePoint(s, isEnd) {
+  if (PRESENT_RE.test(s)) return Infinity;
+  const year = s.match(/\b(19|20)\d{2}\b/);
+  if (!year) return null;
+  const words = fold(s.slice(0, year.index)).split(/[^a-z]+/).filter(Boolean);
+  const month = words.length ? MONTHS[words[words.length - 1]] : undefined;
+  return Number(year[0]) * 100 + (month || (isEnd ? 12 : 1));
+}
+
+/** "Avr. 2026 – Nov. 2026" → {start: 202604, end: 202611}; null when unreadable. */
+export function parseDateRange(dates) {
+  const s = text(dates);
+  if (!s) return null;
+  const parts = s.split(/\s*[–—]\s*|\s+-\s+|\s+(?:to|à|au)\s+/i).filter(Boolean);
+  const start = parseDatePoint(parts[0], false);
+  const end = parseDatePoint(parts[parts.length - 1], true);
+  return start === null || end === null ? null : { start, end };
+}
+
+const nowYyyymm = (now = new Date()) => now.getFullYear() * 100 + now.getMonth() + 1;
+
+/** A role whose end date is "present" or not reached yet. */
+export function isCurrentRole(role, now = new Date()) {
+  const r = parseDateRange(role?.dates || role?.period);
+  return Boolean(r) && r.end >= nowYyyymm(now);
+}
+
+/**
+ * Roles newest-first (end date, then start date). If any role's dates are
+ * unreadable, the payload's own order is kept rather than half-sorted.
+ */
+export function sortNewestFirst(entries) {
+  if (!Array.isArray(entries)) return entries;
+  const keyed = entries.map((e, i) => ({ e, i, r: parseDateRange(e?.dates || e?.period) }));
+  if (keyed.some(k => !k.r)) return entries;
+  return keyed.sort((a, b) => (b.r.end - a.r.end) || (b.r.start - a.r.start) || (a.i - b.i)).map(k => k.e);
 }
 
 /** Username from a profile URL: linkedin.com/in/<user>, github.com/<user>. */
@@ -214,7 +270,7 @@ export function buildCv(payload) {
         if (items.length) put(key, [items.join(', ')]);
         break;
       }
-      case 'experience': put(key, buildExperience(value)); break;
+      case 'experience': put(key, buildExperience(sortNewestFirst(value))); break;
       case 'projects': put(key, buildProjects(value)); break;
       case 'education': put(key, buildEducation(value)); break;
       case 'certifications':

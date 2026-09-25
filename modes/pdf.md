@@ -40,7 +40,7 @@ Run `npm run jd:similarity -- {bundle-root}/jd/current.md {bundle-root}/jd/previ
 14. Inject keywords naturally into existing achievements (NEVER invent)
 15. Apply the six-second clarity gate from `modes/heuristics/recruiter-side.md`: top third must make target role, strongest fit, and proof obvious
 16. Read `name` from `config/profile.yml` → normalize to kebab-case lowercase (e.g. "John Doe" → "john-doe") → `{candidate}`
-17. Build the render payload (see the **JSON Input Schema** below) from the tailored content — emit compact structured JSON, **not** full HTML markup — and write it to `/tmp/cv-{candidate}-{company}.json`
+17. Build the render payload (see the **JSON Input Schema** below) from the tailored content, or have agy write it with `node cv-write.mjs` (one pasted context: CV rules + schema + `cv.md` + posting; `modes/_custom.md` may make that the default) — emit compact structured JSON, **not** full HTML markup — and write it to `/tmp/cv-{candidate}-{company}.json`
 18. Build the RenderCV file: `node build-cv-rendercv.mjs /tmp/cv-{candidate}-{company}.json {yaml-path}`, where `{yaml-path}` is the active bundle's `cv/tailored/vNNN/cv.yaml` or `output/cv-{candidate}-{company}.yaml` for a one-off CV. The theme comes from `config/profile.yml` → `cv.theme`. The script owns the mapping and every escape; never hand-write the YAML. Keep the payload JSON too: Step 21 renders from it.
 19. Run the fact gate against the payload: `node verify-cv-facts.mjs /tmp/cv-{candidate}-{company}.json`
     - This is a hard gate before PDF rendering.
@@ -137,6 +137,7 @@ Write a JSON file with this structure, then run `node build-cv-html.mjs <input.j
   "page_format": "letter",
   "candidate": {
     "name": "Jane Smith",
+    "headline": "Senior Platform Engineer · Kubernetes & CI/CD",
     "phone": "+1 415 555 0100",
     "email": "jane@example.com",
     "linkedin": { "url": "https://linkedin.com/in/janesmith", "display": "linkedin.com/in/janesmith" },
@@ -193,6 +194,7 @@ Write a JSON file with this structure, then run `node build-cv-html.mjs <input.j
 | `lang` | string | CV language code (`en`, `es`, `zh-CN`, `ja`, `ar`). Drives language-specific CSS: `zh-CN` enables Simplified Chinese fonts and strict CJK line breaking; `ja` enables a Japanese CJK font fallback; `ar` enables RTL + Arabic fonts. Defaults to `en`. |
 | `page_format` | string | `letter` → `8.5in` page width, `a4` → `210mm`. Defaults to `letter`. Pass the SAME value to `generate-pdf.mjs --format`. |
 | `candidate.name` | string | From `profile.yml`. |
+| `candidate.headline` | string | Optional — one short line under the name: the target role in the posting's words. Rendered by the RenderCV path. |
 | `candidate.phone` | string | Optional — **omit or leave empty** to drop the `tel:` link and its separator (no empty cell). |
 | `candidate.email` | string | From `profile.yml`. |
 | `candidate.linkedin` | `{url, display}` | Optional — omit to drop the item and its separator. |

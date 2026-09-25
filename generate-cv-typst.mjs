@@ -32,7 +32,7 @@ import { appendFileSync, copyFileSync, existsSync, mkdirSync, mkdtempSync, readF
 import { tmpdir } from 'os';
 import { basename, dirname, extname, join, resolve } from 'path';
 import * as yaml from 'js-yaml';
-import { buildRenderCvDocument, DEFAULT_REQUIRED_SECTIONS, listThemes, mergeDesign, missingRequiredSections, resolveTheme } from './build-cv-rendercv.mjs';
+import { buildRenderCvDocument, DEFAULT_REQUIRED_SECTIONS, isCurrentRole, listThemes, mergeDesign, missingRequiredSections, resolveTheme, sortNewestFirst } from './build-cv-rendercv.mjs';
 import { validatePayload } from './lib/cv-payload-schema.mjs';
 import { getCareerOpsRoot } from './path-resolver.mjs';
 import { isMainModule } from './lib/is-main-module.mjs';
@@ -126,7 +126,7 @@ const bulletLabel = (b) => {
  * section). Within a tier, the last-listed project and the bullet furthest
  * down its role's best-first list go first; role age only breaks ties.
  */
-export function cutPlan(payload) {
+export function cutPlan(payload, { now = new Date() } = {}) {
   const ops = [];
   const projects = [...(payload.projects || [])].reverse();
   const roles = [...(payload.experience || [])].reverse();
@@ -153,7 +153,9 @@ export function cutPlan(payload) {
   projectOps(3);
   bulletOps(3);
   for (const role of roles) {
-    if (priorityOf(role) === 3) ops.push({ kind: 'role', role, label: `role ${role.company} (${role.role})` });
+    // The current role is never cut whole: without it the CV reads as a gap
+    // since the previous job. Its bullets can still be trimmed.
+    if (priorityOf(role) === 3 && !isCurrentRole(role, now)) ops.push({ kind: 'role', role, label: `role ${role.company} (${role.role})` });
   }
   projectOps(2);
   bulletOps(2);
@@ -161,7 +163,7 @@ export function cutPlan(payload) {
 }
 
 /** Apply one cut in place. Returns false when a guard refuses it. */
-export function applyCut(payload, op) {
+export function applyCut(payload, op, { now = new Date() } = {}) {
   if (op.kind === 'project') {
     const i = (payload.projects || []).indexOf(op.project);
     if (i === -1) return false;
@@ -170,7 +172,7 @@ export function applyCut(payload, op) {
   }
   if (op.kind === 'role') {
     const i = (payload.experience || []).indexOf(op.role);
-    if (i === -1 || payload.experience.length <= 1) return false;
+    if (i === -1 || payload.experience.length <= 1 || isCurrentRole(op.role, now)) return false;
     payload.experience.splice(i, 1);
     return true;
   }
@@ -193,8 +195,9 @@ export function applyCut(payload, op) {
  * @param {Array<{name: string, design: object}>} steps - base first, floor last.
  * @param {(payload: object, step: object) => Promise<{pages: number}>|{pages: number}} render
  */
-export async function fitWithCuts(payload, steps, render) {
+export async function fitWithCuts(payload, steps, render, { now = new Date() } = {}) {
   const work = structuredClone(payload);
+  work.experience = sortNewestFirst(work.experience);
   const tried = [];
   const dropped = [];
   const attempt = async (step) => {
@@ -204,8 +207,8 @@ export async function fitWithCuts(payload, steps, render) {
   };
   let result = await attempt(steps[0]);
   if (result.pages === 1) return { fit: true, step: steps[0], result, tried, dropped, payload: work };
-  for (const op of cutPlan(work)) {
-    if (!applyCut(work, op)) continue;
+  for (const op of cutPlan(work, { now })) {
+    if (!applyCut(work, op, { now })) continue;
     dropped.push(op.label);
     result = await attempt(steps[0]);
     if (result.pages === 1) return { fit: true, step: steps[0], result, tried, dropped, payload: work };

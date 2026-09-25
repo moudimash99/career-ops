@@ -128,10 +128,16 @@ policy, or what gets submitted.
 
    - `generic` → `workOrder.pdfPath` is already the generic CV. Use it as-is,
      even when the report has an older tailored PDF.
-   - `loose` / `strict` → tailor a CV for THIS posting now, the way `modes/pdf.md`
-     steps 1–17 describe. The JD is the report's archived JD when
-     `workOrder.reportPath` is set, otherwise the posting page you just read.
-     Write the payload to `output/tailored-cv/freemotion/cv-{company-slug}-{arm}.json`,
+   - `loose` / `strict` → tailor a CV for THIS posting now. Do NOT open
+     `modes/pdf.md`, `modes/_custom.md` or `cv.md` for this: one command
+     pastes everything you need into one file.
+     1. Save the posting text to `jds/{company-slug}-{role-slug}.md` (the
+        report's archived JD when `workOrder.reportPath` is set, otherwise the
+        posting page you just read).
+     2. `node cv-write.mjs --jd jds/{company-slug}-{role-slug}.md --arm <arm> --context-only tmp/fm/cv-context.md`
+        (add `--lang fr|en` when the language is clear).
+     3. Read `tmp/fm/cv-context.md` — only that file — and follow it. Write
+        the payload to `output/tailored-cv/freemotion/cv-{company-slug}-{arm}.json`,
      then render it:
      `node generate-cv-typst.mjs <payload.json> output/tailored-cv/freemotion/cv-{company-slug}-{arm}.pdf`
      (`--report=<reportNum>` when there is one; add `--skip-fact-check` for

@@ -185,3 +185,34 @@ check('custom required list respected', b.missingRequiredSections({ ...payload, 
   check('builder renders ranked bullets as plain text',
     b.buildRenderCvDocument({ ...payload, experience: [{ company: 'A', role: 'B', bullets: [{ text: 'hello', priority: 3 }] }] }).cv.sections['Expérience'][0].highlights, ['hello']);
 }
+check('"80 %" gets a non-breaking space so it never splits',
+  b.buildRenderCvDocument({ ...payload, summary: 'réduit de 80 % et 90 %' }).cv.sections.Profil[0], 'réduit de 80 % et 90 %');
+
+// ── dates: newest-first order and the current role ──────────────────────
+{
+  check('French and English date ranges parse', [
+    b.parseDateRange('Avr. 2026 – Nov. 2026'), b.parseDateRange('Jan 2025 – Août 2025'),
+    b.parseDateRange('Juin 2020 – Février 2021'), b.parseDateRange('Sep 2023 - present'),
+    b.parseDateRange('2021–2024'), b.parseDateRange('bientôt'),
+  ], [{ start: 202604, end: 202611 }, { start: 202501, end: 202508 }, { start: 202006, end: 202102 },
+    { start: 202309, end: null }, { start: 202101, end: 202412 }, null].map(r => (r && r.end === null ? { ...r, end: Infinity } : r)));
+  const roles = [
+    { company: 'SAS', role: 'r', dates: 'Janv. 2023 – Juin 2024' },
+    { company: 'GP', role: 'r', dates: 'Jan 2025 – Août 2025' },
+    { company: 'EC', role: 'r', dates: 'Avr 2026 – Nov 2026' },
+  ];
+  check('roles are sorted newest-first', b.sortNewestFirst(roles).map(r => r.company), ['EC', 'GP', 'SAS']);
+  check('an unreadable date keeps the payload order', b.sortNewestFirst([...roles, { company: 'X', role: 'r', dates: '??' }]).map(r => r.company), ['SAS', 'GP', 'EC', 'X']);
+  const sept2026 = new Date(2026, 8, 25);
+  check('a role ending after today is current', [b.isCurrentRole(roles[2], sept2026), b.isCurrentRole(roles[1], sept2026)], [true, false]);
+  check('builder renders roles newest-first', b.buildRenderCvDocument({ ...payload, experience: roles.map(r => ({ ...r, bullets: ['x'] })) }).cv.sections['Expérience'].map(e => e.company), ['EC', 'GP', 'SAS']);
+
+  const ranked = { experience: [
+    { company: 'EC', role: 'r', dates: 'Avr 2026 – Nov 2026', priority: 3, bullets: ['a', { text: 'b', priority: 3 }] },
+    { company: 'Old', role: 'r', dates: 'Mai 2021 – Janv. 2022', priority: 3, bullets: ['c'] },
+  ] };
+  const labels = g.cutPlan(ranked, { now: sept2026 }).map(o => o.label);
+  check('the current role is never offered as a whole-role cut', labels.includes('role EC (r)'), false);
+  check('...but its low-priority bullets still are, and old roles still go', [labels.includes('EC: "b"'), labels.includes('role Old (r)')], [true, true]);
+  check('applyCut refuses to drop the current role', g.applyCut(ranked, { kind: 'role', role: ranked.experience[0] }, { now: sept2026 }), false);
+}

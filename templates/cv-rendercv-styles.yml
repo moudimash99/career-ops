@@ -9,6 +9,19 @@ sb2nov-garamond:
   design:
     typography:
       font_family: EB Garamond
+      font_size:
+        name: 24pt
+    header:
+      space_below_name: 0.35cm
+      space_below_headline: 0.3cm
+      space_below_connections: 0.45cm
+    sections:
+      space_between_regular_entries: 0.9em
+    templates:
+      # One line per degree: "ISAE-SUPAERO — Mastère Spécialisé …   2025 – 2026".
+      education_entry:
+        main_column: "**INSTITUTION** — *AREA*\nHIGHLIGHTS"
+        date_and_location_column: "*DATE*"
 
 sb2nov-sans:
   theme: sb2nov
