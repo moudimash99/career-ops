@@ -15,6 +15,10 @@
  *     stores no URLs), any status;
  *   - data/blacklist.md — loadBlacklist() + matchBlacklist();
  *   - the per-company cap — countByCompany() + checkCompany().
+ * Also re-runs portals.yml location_filter (buildLocationFilter() from
+ * scan.mjs) on every row: a row saved before today's block list grew (e.g.
+ * the US "City, ST" entries added 2026-09-26) would otherwise still be in
+ * scan-history.tsv and reach the model / the list.
  * Then the night-list rules (pool-rules.mjs), the apply route of each posting,
  * and the merge of duplicates.
  *
@@ -304,8 +308,13 @@ async function main() {
   const drop = (why) => (drops[why] = (drops[why] || 0) + 1);
 
   // "Never twice" inputs — the same ones the run-time claim uses.
-  const { loadBlacklist } = await import('../scan.mjs');
+  const { loadBlacklist, buildLocationFilter, PORTALS_PATH } = await import('../scan.mjs');
   const blacklist = loadBlacklist();
+  // The scan's own location filter (portals.yml location_filter), run again
+  // here: rows saved before a block entry was added (US "City, ST" boards
+  // until 2026-09-26) would otherwise reach the model and the list.
+  const { default: yaml } = await import('js-yaml');
+  const inFrance = buildLocationFilter(existsSync(PORTALS_PATH) ? yaml.load(readFileSync(PORTALS_PATH, 'utf8'))?.location_filter : null);
   const trackerText = readFileSync(join(ROOT, 'data/applications.md'), 'utf8');
   const trackerLines = trackerText.split(/\r?\n/);
   const colmap = resolveColumns(trackerLines);
@@ -321,6 +330,7 @@ async function main() {
     if (logged && logged.outcome !== 'rehearsal') { drop('already tried (run log)'); continue; }
     if (x.co && trackerKeys.has(`${companyKey(x.co)}|${titleKey(x.title)}`)) { drop('already in tracker'); continue; }
     if (x.co && matchBlacklist(blacklist, x.co)) { drop('blacklisted company'); continue; }
+    if (!inFrance(x.loc || '', x.url, x.title)) { drop('outside France (location filter)'); continue; }
     if (x.co && !checkCompany(x.co, capCounts).allowed) { drop('company cap reached'); continue; }
     const v = judge(x);
     if (!v.ok) { drop(v.why); continue; }

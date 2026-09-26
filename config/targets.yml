@@ -39,7 +39,7 @@ tiers:
       cloud:
         search: []
         match: [cloud, aws, azure, gcp, devops, sre, site reliability, platform, infrastructure,
-                kubernetes, devsecops, finops, mlops]
+                kubernetes, devsecops, finops, mlops, terraform, observability, observabilité]
 
   - points: 1.5
     groups:
@@ -48,8 +48,9 @@ tiers:
         match: [data engineer, ingénieur data, data platform, analytics engineer, big data, dataops]
       systems:
         search: []
-        match: [système, system engineer, systems engineer, "word:mbse", ivv, "word:ivvq", v&v,
-                validation, vérification, intégration, embarqu, embedded, segment sol,
+        match: [système, system engineer, systems engineer, system architect, systems architect,
+                "word:mbse", "word:sysml", capella, "word:doors", requirements, exigences,
+                ivv, "word:ivvq", v&v, intégration, segment sol,
                 ground segment, géomat, geospati, sig, observation de la terre, earth observation]
       python:
         search: []
@@ -61,7 +62,9 @@ tiers:
         search: []
         match: [développeur, developer, logiciel, software, fullstack, full-stack, full stack,
                 ml, machine learning, ia, ai engineer, data scientist, data analyst, "word:data",
-                données]
+                données,
+                # Embedded and bare validation titles: found, but ranked low (user, 2026-09-26).
+                embarqu, embedded, validation, vérification]
 
 drop:
   contract: ["word:stage", "word:stagiaire", "word:intern", "word:internship", "stem:alternan",
@@ -97,20 +100,23 @@ too_many_years: 8
 # security_clearance / work_authorization from config/profile.yml
 # application_answers. A value written here wins over those.
 candidate:
-  trade: Computer scientist; digital work is the main strength.
+  trade: Cloud & data engineer with formal systems-engineering training; digital work is the main strength.
+  # Same order as config/profile.yml target_roles (ranked by the user).
   target_work:
     - Cloud / DevOps / SRE / platform engineering (AWS, Kubernetes, Terraform)
-    - Data engineering (Databricks, Python, SQL)
-    - Backend development in Python
-    - Space systems engineering (IVV, ground segment, MBSE)
+    - Systems engineering / MBSE (requirements, interfaces, V&V, IVV, ground segment), especially aerospace and space
+    - Data engineering (Airflow, Python, SQL, geospatial pipelines)
+    - Backend development (Python, C++, TypeScript)
     - AI engineering
   also_fits:
     - Pre-sales / solutions engineering
     - Technical consulting
     - IT product roles
     - Team or project lead on a digital team
-  degree: University Master (not a French "ingénieur diplômé"), with a minor in business administration
-  certificates: [AWS Certified Solutions Architect – Associate]
-  languages: English C2, French B1–B2
-  places: Toulouse first, then Paris
+  degree: >-
+    Mastère Spécialisé in Systems Engineering, ISAE-SUPAERO (Bac+6, 2026) and a Master's in
+    Computer Science for Aerospace (Université Toulouse III); not a French "ingénieur diplômé"
+  certificates: [INCOSE Associate Systems Engineering Professional (ASEP), AWS Certified Solutions Architect – Associate]
+  languages: English C2, Arabic C2, French B2
+  places: Toulouse first, then anywhere in France; fully remote from France also fine
   contract: CDI
