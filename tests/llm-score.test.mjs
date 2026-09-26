@@ -27,7 +27,7 @@ const answer = (scores = {}, extra = {}) => JSON.stringify({
 
 try {
   const m = await import(pathToFileURL(join(ROOT, 'freemotion-night/llm-score.mjs')).href);
-  const { parseAnswer, overallScore, buildInstructions, buildJobPrompt, versionStamp, scoreJobs, readScores, evalMetrics, readGolden, RESPONSE_SCHEMA, FACTORS } = m;
+  const { parseAnswer, overallScore, verdictOf, buildInstructions, buildJobPrompt, versionStamp, scoreJobs, readScores, evalMetrics, readGolden, RESPONSE_SCHEMA, FACTORS } = m;
 
   // ---- answers --------------------------------------------------------------
   const ok = parseAnswer(answer());
@@ -55,14 +55,19 @@ try {
     [F(5, 5, 5, 5, 5), 5],
     [F(5, 5, 3, 3, 5), 4.4],   // a good title, nothing else stated
     [F(3, 3, 3, 3, 5), 3.2],   // adjacent work: just a go
-    [F(2, 5, 5, 5, 5), 2],     // role ≤ 2 caps
-    [F(5, 1, 5, 5, 5), 2],     // core skills missing caps
-    [F(5, 5, 1, 5, 5), 2],     // 5+ years above caps
-    [F(5, 5, 5, 5, 1), 2],     // a blocker caps
+    [F(2, 3, 3, 3, 5), 2.8],   // partly digital, nothing stated: a stretch, not dropped
+    [F(4, 1, 5, 3, 5), 2.9],   // core skills missing: at most a stretch (Salesforce consultant)
+    [F(3, 1, 3, 3, 5), 2.7],   // adjacent + missing skills: stretch
+    [F(1, 5, 5, 5, 5), 1.5],   // not digital: hard limit
+    [F(5, 5, 1, 5, 5), 1.5],   // 5+ years above: hard limit
+    [F(5, 5, 5, 1, 5), 1.5],   // native French required: hard limit
+    [F(5, 5, 5, 5, 1), 1.5],   // a blocker: hard limit
   ];
   const wrong = cases.filter(([f, want]) => overallScore(f) !== want).map(([f, want]) => `${JSON.stringify(f)} want ${want} got ${overallScore(f)}`);
-  if (wrong.length === 0) pass('overallScore(): weighted 35/25/20/10/10, capped at 2 by role ≤ 2 or any other factor at 1');
+  if (wrong.length === 0) pass('overallScore(): weighted 35/25/20/10/10; a hard limit caps it at 1.5 (no-go), missing core skills at 2.9 (stretch)');
   else fail(`overallScore wrong: ${wrong.join('; ')}`);
+  if (verdictOf(3) === 'go' && verdictOf(2.9) === 'stretch' && verdictOf(2) === 'stretch' && verdictOf(1.9) === 'no-go') pass('verdictOf(): go ≥ 3, stretch 2–2.9, no-go below 2');
+  else fail('verdictOf thresholds wrong');
 
   // ---- instructions ---------------------------------------------------------
   const cand = { trade: 'Computer scientist', target_work: ['Cloud', 'Data'], years_experience: null, languages: 'English C2' };
@@ -136,22 +141,24 @@ try {
   // ---- eval metrics ------------------------------------------------------------
   const rows = [
     { id: 'a', label: 'go', overall: 4.4, overall2: 4.2 },
-    { id: 'b', label: 'go', overall: 2.6, overall2: 3.1 },   // missed, and flips
-    { id: 'c', label: 'no-go', overall: 2, overall2: 2 },
-    { id: 'd', label: 'no-go', overall: 3.4 },              // noise
-    { id: 'e', label: 'go', overall: null },                // unanswered
+    { id: 'b', label: 'stretch', overall: 1.8, overall2: 2.2 }, // missed (dropped), and flips keep/drop
+    { id: 'c', label: 'no-go', overall: 1.5, overall2: 1.5 },
+    { id: 'd', label: 'no-go', overall: 2.4 },                  // noise (kept)
+    { id: 'f', label: 'go', overall: 2.6 },                     // go scored as stretch: kept, for information
+    { id: 'e', label: 'go', overall: null },                    // unanswered
   ];
   const em = evalMetrics(rows);
-  if (em.answered === 4 && em.missed.join() === 'b' && em.noise.join() === 'd' && em.noisePct === 50 && em.scoredTwice === 3 && em.sameVerdictPct === 66.7 && em.within05Pct === 100 && em.passes === false) {
-    pass('evalMetrics(): missed, noise, stability over the rows scored twice, pass/fail');
+  if (em.answered === 5 && em.missed.join() === 'b' && em.noise.join() === 'd' && em.noisePct === 50 && em.goAsStretch.join() === 'f'
+      && em.scoredTwice === 3 && em.sameVerdictPct === 66.7 && em.within05Pct === 100 && em.passes === false) {
+    pass('evalMetrics(): a dropped go/stretch is missed, a kept no-go is noise, go-as-stretch is reported, stability on keep/drop');
   } else fail(`evalMetrics = ${JSON.stringify(em)}`);
 
   // ---- the sample set ------------------------------------------------------------
   const golden = readGolden(join(ROOT, 'evals/night-fit/golden.tsv'));
   const ids = new Set(golden.map((g) => g.id));
   if (golden.length >= 100 && ids.size === golden.length
-      && golden.every((g) => ['go', 'no-go'].includes(g.label) && ['claude', 'claude-guess', 'user'].includes(g.labeled_by) && g.title)) {
-    pass(`evals/night-fit/golden.tsv: ${golden.length} rows, unique ids, every row labeled go/no-go with who labeled it`);
+      && golden.every((g) => ['go', 'stretch', 'no-go'].includes(g.label) && ['claude', 'claude-guess', 'user'].includes(g.labeled_by) && g.title)) {
+    pass(`evals/night-fit/golden.tsv: ${golden.length} rows, unique ids, every row labeled go / stretch / no-go with who labeled it`);
   } else fail('golden.tsv malformed');
 } catch (err) {
   fail(`llm-score suite crashed: ${err.message}`);

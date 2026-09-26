@@ -10,8 +10,11 @@
  * order forces it), and the code computes the overall from those:
  *
  *   role 35% · skills 25% · experience 20% · language 10% · blockers 10%
- *   caps: role ≤ 2, or any other factor at 1  →  overall ≤ 2
- *   go = overall ≥ 3.0
+ *   a hard limit (role, experience, language or blockers at 1) → overall ≤ 1.5
+ *   core skills missing (skills 1)                            → overall ≤ 2.9
+ *   go ≥ 3.0 · stretch 2.0–2.9 (applied to when nothing better is left) · no-go < 2.0
+ * The candidate applies to digital roles they are under-qualified for: those
+ * are stretch, never no-go.
  *
  * Every answer is kept once, ever, in data/llm-scores.tsv (append-only, one
  * row per same-job key from pool-rules.mjs, the last row wins), with a short
@@ -45,6 +48,12 @@ export const DEFAULT_MODEL = 'gemini-3.5-flash-lite';
 export const FACTORS = ['role', 'skills', 'experience', 'language', 'blockers'];
 export const WEIGHTS = { role: 0.35, skills: 0.25, experience: 0.2, language: 0.1, blockers: 0.1 };
 export const GO_AT = 3;
+/** Below this the job is dropped (no-go); from here to GO_AT it is a stretch. */
+export const STRETCH_AT = 2;
+/** A hard limit (role, experience, language or blockers at 1) caps the overall here: no-go. */
+export const HARD_LIMIT_CAP = 1.5;
+/** Core skills missing (skills at 1) caps it here: a stretch, applied to when nothing better is left. */
+export const STRETCH_CAP = 2.9;
 
 // ── Instructions ──────────────────────────────────────────────────────────
 
@@ -53,15 +62,16 @@ const SCALE = `Rate five factors. For each one, FIRST write "evidence": a short 
 role — the day-to-day work:
   5 = the candidate's target work, or a tech role with a people or business side (pre-sales, solutions engineering, technical consulting, IT product, lead of a digital team)
   4 = close to the target work
-  3 = digital but mostly business, or adjacent tech (business analysis, IT project management, networks, IT operations, software testing)
-  2 = mostly outside the candidate's field, with a small digital part
-  1 = not digital work (sales with no technical side, mechanical / electrical / RF hardware, aircraft or rail engineering, HR, finance, trades, health care)
+  3 = digital but mostly business, or adjacent tech (business analysis, IT project management, digital or IT operations, workforce / people operations run on digital tools, networks, software testing)
+  2 = engineering or business work with a real digital part (algorithms, simulation, embedded software, control systems, navigation, industrial supervision, data-heavy business roles)
+  1 = not digital work: hands-on physical engineering (test benches, ground or flight testing, electrical / RF / telecom-radio hardware, aircraft structures and certification, maintenance), trades, health care, hospitality, sales with no technical side, HR, finance, procurement, audit
+  Give 1 ONLY with clear evidence: posting text showing that kind of work, or a title that cannot mean anything else ("Plombier", "Infirmier"). An ambiguous title with no text is 2 or 3, never 1.
 skills — the skills the posting requires vs the candidate's:
   5 = the candidate has almost all of them
   4 = most of them
   3 = about half, or they transfer; also when nothing is stated
   2 = few of them
-  1 = the core skills are ones the candidate does not have (e.g. SAP, Salesforce, RF hardware, a language they don't write)
+  1 = the core skills are ones the candidate does not have yet but could learn on the job (e.g. Salesforce, SAP, a specific database)
 experience — the years or level asked vs the candidate's:
   5 = at or below the candidate's
   4 = one year above
@@ -82,15 +92,18 @@ blockers — hard requirements the candidate cannot meet (security clearance, na
 Also give "years_required": the number of years of experience the posting asks for, ONLY if the posting text states a number; otherwise null. Never guess it from the title.
 And "summary": one short sentence on the fit.
 
-Judge the work, not the wording: an unusual title for the candidate's kind of work fits; a familiar word in a title for other work does not ("Reliability Engineer" in a factory is not SRE). When only the title is given, judge from the title and use "not stated" where the title says nothing.`;
+Judge the work, not the wording: an unusual title for the candidate's kind of work fits; a familiar word in a title for other work does not ("Reliability Engineer" for electrical products is not SRE). The candidate applies to digital roles they are under-qualified for: missing skills lower "skills", they do not make the role "not digital". When only the title is given, judge from the title and use "not stated" where the title says nothing.`;
 
 const EXAMPLES = `Worked examples (for calibration; they are not the job to rate):
 
 Job: "Ingénieur Cloud AWS / Terraform" — text: "3 ans d'expérience sur AWS et Terraform, anglais courant, CDI Toulouse."
 → role {evidence "Ingénieur Cloud AWS / Terraform", 5}, skills {"AWS et Terraform", 5}, experience {"3 ans d'expérience", 5}, language {"anglais courant", 5}, blockers {"not stated", 5}, years_required 3.
 
-Job: "Responsable Maintenance Industrielle" — title only.
-→ role {"maintenance of industrial equipment", 1}, skills {"not stated", 3}, experience {"not stated", 3}, language {"not stated", 3}, blockers {"not stated", 5}, years_required null.
+Job: "Consultant Salesforce Commerce Cloud" — text: "Vous maîtrisez Apex et Lightning, 2 ans d'expérience sur Salesforce."
+→ role {"Consultant Salesforce", 4}, skills {"Apex et Lightning", 1}, experience {"2 ans d'expérience", 5}, language {"not stated", 3}, blockers {"not stated", 5}, years_required 2.
+
+Job: "Technicien de Maintenance Industrielle" — title only.
+→ role {"Technicien de Maintenance Industrielle: maintenance of industrial equipment", 1}, skills {"not stated", 3}, experience {"not stated", 3}, language {"not stated", 3}, blockers {"not stated", 5}, years_required null.
 
 Job: "Consultant Avant-Vente Data" — text: "10 ans minimum en avant-vente, français courant avec les clients, habilitation secret défense requise."
 → role {"Avant-Vente Data", 5}, skills {"avant-vente data", 4}, experience {"10 ans minimum", 1}, language {"français courant avec les clients", 2}, blockers {"habilitation secret défense requise", 1}, years_required 10.`;
@@ -197,18 +210,22 @@ export function parseAnswer(raw) {
 }
 
 /**
- * The overall, computed here, not by the model: weighted average, then caps.
+ * The overall, computed here, not by the model: weighted average, then the
+ * caps. A hard limit makes it a no-go; core skills missing (skills 1) make it
+ * at most a stretch: the candidate applies to those, but last.
  * @param {Record<string, {score: number}>} factors
  * @returns {number} one decimal
  */
 export function overallScore(factors) {
   let sum = 0;
   for (const f of FACTORS) sum += WEIGHTS[f] * factors[f].score;
-  const capped = factors.role.score <= 2 || FACTORS.some((f) => f !== 'role' && factors[f].score === 1);
-  return Math.round(Math.min(sum, capped ? 2 : 5) * 10) / 10;
+  const hardLimit = ['role', 'experience', 'language', 'blockers'].some((f) => factors[f].score === 1);
+  const cap = hardLimit ? HARD_LIMIT_CAP : factors.skills.score === 1 ? STRETCH_CAP : 5;
+  return Math.round(Math.min(sum, cap) * 10) / 10;
 }
 
-export const verdictOf = (overall) => (overall >= GO_AT ? 'go' : 'no-go');
+/** go (≥ 3) · stretch (2–2.9: applied to when nothing better is left) · no-go (< 2). */
+export const verdictOf = (overall) => (overall >= GO_AT ? 'go' : overall >= STRETCH_AT ? 'stretch' : 'no-go');
 
 // ── Store: data/llm-scores.tsv ────────────────────────────────────────────
 
@@ -367,24 +384,32 @@ export function readGolden(path) {
 }
 
 /**
- * Metrics for one eval run.
+ * Metrics for one eval run. Labels: go / stretch / no-go.
+ *   missed  a go or stretch job scored below STRETCH_AT (it would be dropped)
+ *   noise   a no-go job scored STRETCH_AT or more (it would be kept)
+ *   tier    for information: go scored as stretch and the reverse
+ *   stable  the same keep/drop on both runs, and the overall within 0.5
  * @param {Array<{ id: string, label: string, overall: number|null, overall2?: number|null }>} rows
  */
 export function evalMetrics(rows) {
   const answered = rows.filter((r) => r.overall != null);
-  const go = answered.filter((r) => r.label === 'go');
+  const kept = (o) => o >= STRETCH_AT;
+  const wanted = answered.filter((r) => r.label === 'go' || r.label === 'stretch');
   const nogo = answered.filter((r) => r.label === 'no-go');
-  const missed = go.filter((r) => r.overall < GO_AT);
-  const noise = nogo.filter((r) => r.overall >= GO_AT);
+  const missed = wanted.filter((r) => !kept(r.overall));
+  const noise = nogo.filter((r) => kept(r.overall));
+  const goAsStretch = answered.filter((r) => r.label === 'go' && verdictOf(r.overall) === 'stretch');
+  const stretchAsGo = answered.filter((r) => r.label === 'stretch' && verdictOf(r.overall) === 'go');
   const twice = answered.filter((r) => r.overall2 != null);
-  const sameVerdict = twice.filter((r) => verdictOf(r.overall) === verdictOf(r.overall2));
+  const sameVerdict = twice.filter((r) => kept(r.overall) === kept(r.overall2));
   const close = twice.filter((r) => Math.abs(r.overall - r.overall2) <= 0.5);
-  const pct = (a, b) => (b ? Math.round((1000 * a) / b) / 10 : null);
+  const pct = (x, y) => (y ? Math.round((1000 * x) / y) / 10 : null);
   return {
     answered: answered.length, unanswered: rows.length - answered.length,
     right: answered.length - missed.length - noise.length,
     accuracyPct: pct(answered.length - missed.length - noise.length, answered.length),
     missed: missed.map((r) => r.id), noisePct: pct(noise.length, nogo.length), noise: noise.map((r) => r.id),
+    goAsStretch: goAsStretch.map((r) => r.id), stretchAsGo: stretchAsGo.map((r) => r.id),
     scoredTwice: twice.length, sameVerdictPct: pct(sameVerdict.length, twice.length), within05Pct: pct(close.length, twice.length),
     passes: missed.length <= 3 && (pct(noise.length, nogo.length) ?? 0) <= 10
       && (twice.length === 0 || (pct(sameVerdict.length, twice.length) >= 95 && pct(close.length, twice.length) >= 90)),
@@ -421,17 +446,19 @@ async function runEval(path, { generate, candidate, stability, sleep, rpm, model
   const show = (id) => {
     const r = byId.get(id);
     const f = r.answer.factors;
-    return `  ${id} ${r.label.padEnd(5)} ${String(r.overall).padStart(3)}  ${r.title}${r.labeledBy === 'claude-guess' ? '  (unsure)' : ''}\n`
+    return `  ${id} ${r.label.padEnd(7)} ${String(r.overall).padStart(3)} ${verdictOf(r.overall).padEnd(7)} ${r.title}\n`
       + FACTORS.map((k) => `        ${k.padEnd(10)} ${f[k].score}  ${f[k].evidence}`).join('\n');
   };
   console.log(`\nmodel ${model} · instructions ${versionStamp(instructions)} · ${m.answered} answered, ${m.unanswered} unanswered`);
   console.log(`right: ${m.right}/${m.answered} (${m.accuracyPct}%)`);
-  console.log(`missed go jobs (bar ≤ 3): ${m.missed.length}`);
-  console.log(`noise, no-go let through (bar ≤ 10%): ${m.noise.length} (${m.noisePct}%)`);
-  if (m.scoredTwice) console.log(`stability over ${m.scoredTwice} scored twice: same verdict ${m.sameVerdictPct}% (bar ≥ 95), overall within 0.5 ${m.within05Pct}% (bar ≥ 90)`);
+  console.log(`missed, a go or stretch job dropped (bar ≤ 3): ${m.missed.length}`);
+  console.log(`noise, a no-go job kept (bar ≤ 10%): ${m.noise.length} (${m.noisePct}%)`);
+  console.log(`for information: go scored as stretch ${m.goAsStretch.length}, stretch scored as go ${m.stretchAsGo.length}`);
+  if (m.scoredTwice) console.log(`stability over ${m.scoredTwice} scored twice: same keep/drop ${m.sameVerdictPct}% (bar ≥ 95), overall within 0.5 ${m.within05Pct}% (bar ≥ 90)`);
   console.log(m.passes ? '\nPASSES the bar.' : '\nDOES NOT pass the bar.');
   if (m.missed.length) console.log(`\nMissed:\n${m.missed.map(show).join('\n')}`);
   if (m.noise.length) console.log(`\nNoise:\n${m.noise.map(show).join('\n')}`);
+  if (m.goAsStretch.length) console.log(`\nGo scored as stretch (for information):\n${m.goAsStretch.map(show).join('\n')}`);
   const out = join(getCareerOpsRoot(), 'tmp/fm/night', `eval-${new Date().toISOString().replace(/[:.]/g, '-')}.json`);
   mkdirSync(dirname(out), { recursive: true });
   writeFileSync(out, JSON.stringify({ model, version: versionStamp(instructions), metrics: m, rows }, null, 1));

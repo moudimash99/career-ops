@@ -17,7 +17,7 @@ console.log('\nfreemotion-night — model scores in the night list, posting text
 const load = (p) => import(pathToFileURL(join(ROOT, p)).href);
 
 try {
-  const { applyScores } = await load('freemotion-night/make-pool.mjs');
+  const { applyScores, rankOrder } = await load('freemotion-night/make-pool.mjs');
   const { jobKey } = await load('freemotion-night/llm-score.mjs');
 
   const job = (n, extra = {}) => ({ title: `Job ${n}`, co: `Co${n}`, url: `https://x/${n}`, score: 10, points: 2, needsModel: false, ...extra });
@@ -25,10 +25,10 @@ try {
   const jobs = [
     job(1),                                   // matched, not scored → kept as is
     job(2, { needsModel: true, points: 0 }),  // unmatched, not scored → waits
-    job(3, { needsModel: true, points: 0 }),  // unmatched, 3.4 → kept
-    job(4, { needsModel: true, points: 0 }),  // unmatched, 2.6 → dropped (below 3)
-    job(5),                                   // matched, 2.6 → kept, ranked down
-    job(6),                                   // matched, 1.5 → dropped
+    job(3, { needsModel: true, points: 0 }),  // unmatched, 3.4 → kept, go
+    job(4, { needsModel: true, points: 0 }),  // unmatched, 2.6 → kept, stretch
+    job(5),                                   // matched, 2.6 → kept, stretch
+    job(6),                                   // matched, 1.5 → dropped (no-go)
     job(7),                                   // model reads 10 years, no text number → dropped
     job(8),                                   // model reads 10 years, text says 5 → kept
     job(9),                                   // text says 9 years → dropped
@@ -41,16 +41,26 @@ try {
   const { kept, dropped } = applyScores(jobs, scores, { tooManyYears: 8, textYears });
   const keptIds = kept.map((x) => x.title.slice(4)).join();
   const why = Object.fromEntries(dropped.map((d) => [d.row.title.slice(4), d.why]));
-  if (keptIds === '1,3,5,8') pass('applyScores() keeps the right jobs');
+  if (keptIds === '1,3,4,5,8') pass('applyScores() keeps go and stretch jobs, drops no-go');
   else fail(`kept ${keptIds}; dropped ${JSON.stringify(why)}`);
-  if (why[2] === 'waiting for the model' && why[4] === 'model: below 3' && why[6] === 'model: not a fit'
+  if (why[2] === 'waiting for the model' && why[6] === 'model: no-go'
       && why[7] === 'asks 8+ years (model)' && why[9] === 'asks 8+ years') {
-    pass('each drop says why: waiting, below 3, not a fit, years from the model or the text');
+    pass('each drop says why: waiting, no-go, years from the model or the text');
   } else fail(`why = ${JSON.stringify(why)}`);
   const k = Object.fromEntries(kept.map((x) => [x.title.slice(4), x]));
-  if (k[1].score === 10 && k[1].fit === undefined && k[3].score === 11.4 && k[3].fit === 3.4 && k[5].score === 5 && k[3].factors.role === 5) {
-    pass('the overall replaces the role-word points (overall − 2; −3 below 3) and travels with the job');
-  } else fail(`scores = ${JSON.stringify(kept.map((x) => [x.title, x.score, x.fit]))}`);
+  if (k[1].tier === 'go' && k[1].fit === undefined && k[3].tier === 'go' && k[4].tier === 'stretch' && k[5].tier === 'stretch'
+      && k[3].score === 11.4 && k[5].score === 8.6 && k[3].factors.role === 5) {
+    pass('each kept job carries its tier; the overall replaces the role-word points (overall − 2)');
+  } else fail(`kept = ${JSON.stringify(kept.map((x) => [x.title, x.tier, x.score, x.fit]))}`);
+  const order = [
+    { title: 'stretch, high score', route: 'apply-here', tier: 'stretch', score: 50 },
+    { title: 'go, low score', route: 'apply-here', tier: 'go', score: 1 },
+    { title: 'go, not scheduled', route: 'linkedin-lead', tier: 'go', score: 99 },
+    { title: 'go, high score', route: 'apply-here', tier: 'go', score: 9 },
+  ].sort(rankOrder).map((x) => x.title);
+  if (order.join() === 'go, high score,go, low score,stretch, high score,go, not scheduled') {
+    pass('the night list ranks scheduled first, then every go job before any stretch job, then score');
+  } else fail(`order = ${order.join(' | ')}`);
 
   // ---- posting text fetch ----------------------------------------------------------
   const { jobPostingText, linkedinPostingText, fetchPostingText } = await load('lib/posting-fetch.mjs');
@@ -69,12 +79,13 @@ try {
   const throttle = async () => 0;
   const a = await fetchPostingText('https://www.hellowork.com/fr-fr/emplois/82647998.html', { fetchImpl, throttle });
   const b = await fetchPostingText('https://www.linkedin.com/jobs/view/devops-engineer-at-acme-4012345678', { fetchImpl, throttle });
+  const w = await fetchPostingText('https://www.welcometothejungle.com/en/companies/acme/jobs/cloud-engineer_toulouse', { fetchImpl, throttle });
   const c = await fetchPostingText('https://evil.example.com/job/1', { fetchImpl, throttle });
   const d = await fetchPostingText('http://www.hellowork.com/fr-fr/emplois/1.html', { fetchImpl, throttle });
-  if (/5 ans/.test(a) && /Own reporting/.test(b) && c === null && d === null
-      && asked.length === 2 && asked[1] === 'https://www.linkedin.com/jobs-guest/jobs/api/jobPosting/4012345678') {
-    pass('fetchPostingText() reads HelloWork and LinkedIn (guest endpoint) only, over https');
-  } else fail(`fetch = ${JSON.stringify({ a, b, c, d, asked })}`);
+  if (/5 ans/.test(a) && /Own reporting/.test(b) && /5 ans/.test(w) && c === null && d === null
+      && asked.length === 3 && asked[1] === 'https://www.linkedin.com/jobs-guest/jobs/api/jobPosting/4012345678') {
+    pass('fetchPostingText() reads HelloWork, WTJ (JSON-LD) and LinkedIn (guest endpoint) only, over https');
+  } else fail(`fetch = ${JSON.stringify({ a, b, w, c, d, asked })}`);
 } catch (err) {
   fail(`night-list model suite crashed: ${err.message}`);
 }

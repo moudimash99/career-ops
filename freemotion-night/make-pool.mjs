@@ -41,16 +41,16 @@
  * MODEL — freemotion-night/llm-score.mjs, one plain Gemini API call per job
  * (never an agent). Jobs without a stored answer are scored best first, at most
  * --llm-max a night (default 300); an answer is stored once, ever, in
- * data/llm-scores.tsv. HelloWork and LinkedIn send titles only, so their text
- * is fetched first (lib/posting-fetch.mjs) and a posting asking
+ * data/llm-scores.tsv. HelloWork, WTJ and LinkedIn send no description, so their
+ * text is fetched first (lib/posting-fetch.mjs) and a posting asking
  * too_many_years or more is dropped before any call. The answer then:
- *   overall < 2                  → dropped
+ *   overall < 2 (no-go)          → dropped
  *   the model reads 8+ years     → dropped, unless the text states fewer
- *   otherwise                    the overall replaces the role-word points
- *                                (overall − 2; −3 below 3)
+ *   2–2.9 (stretch)              kept, ranked after every go job: applied to
+ *                                only when the list has room left
+ *   3+ (go)                      the overall replaces the role-word points
  * A title that needs the model (none of our role words, a rescue word, or a
- * non-fit word next to a role word) goes on the list only with an overall of
- * 3 or more; with no answer yet it waits. --no-llm, or no GEMINI_API_KEY:
+ * non-fit word next to a role word) waits until it has an answer. --no-llm, or no GEMINI_API_KEY:
  * no calls, stored answers still count.
  *
  * Writes (tmp/fm/night/):
@@ -66,7 +66,7 @@ import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 
 import { MAX_AGE_DAYS, capPerCompany, companyKey, judge, titleKey } from './pool-rules.mjs';
-import { DEFAULT_MODEL, FACTORS, GO_AT, geminiGenerate, jobKey, readScores, scoreJobs } from './llm-score.mjs';
+import { DEFAULT_MODEL, FACTORS, STRETCH_AT, geminiGenerate, jobKey, readScores, scoreJobs, verdictOf } from './llm-score.mjs';
 import normalizeUrl from '../url-key.mjs';
 import { readCurrentState } from '../lib/freemotion-submissions.mjs';
 import { checkCompany, countByCompany, matchBlacklist } from '../lib/company-cap.mjs';
@@ -76,7 +76,7 @@ import { loadTargets } from '../targets.mjs';
 import { getCareerOpsRoot } from '../path-resolver.mjs';
 import { requiredYears } from '../lib/required-years.mjs';
 import { clipText, loadPostingTexts, savePostingTexts } from '../lib/posting-text.mjs';
-import { fetchPostingText, isHellowork } from '../lib/posting-fetch.mjs';
+import { fetchPostingText, needsTextFetch } from '../lib/posting-fetch.mjs';
 import { localToday } from '../lib/local-today.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -205,23 +205,31 @@ export function applyScores(candidates, scores, { tooManyYears, textYears }) {
     const s = scores.get(jobKey(x));
     if (!s) {
       if (x.needsModel) out(x, 'waiting for the model');
-      else kept.push(x);
+      else kept.push({ ...x, tier: 'go' }); // a role-word title, not scored yet
       continue;
     }
     const overall = Number(s.overall);
     const modelYears = s.years_required === '' || s.years_required == null ? null : Number(s.years_required);
-    if (overall < 2) { out(x, 'model: not a fit'); continue; }
+    if (overall < STRETCH_AT) { out(x, 'model: no-go'); continue; }
     if (tooManyYears !== null && modelYears !== null && modelYears >= tooManyYears && fromText === null) { out(x, `asks ${tooManyYears}+ years (model)`); continue; }
-    if (x.needsModel && overall < GO_AT) { out(x, `model: below ${GO_AT}`); continue; }
     kept.push({
       ...x,
-      score: +(x.score - (x.points || 0) + (overall >= GO_AT ? overall - 2 : -3)).toFixed(2),
+      tier: verdictOf(overall), // go, or stretch: applied to only when no go job is left
+      score: +(x.score - (x.points || 0) + (overall - 2)).toFixed(2),
       fit: overall,
       factors: Object.fromEntries(FACTORS.map((f) => [f, Number(s[f])])),
       summary: s.summary,
     });
   }
   return { kept, dropped };
+}
+
+/** Night-list order: scheduled routes first, then go before stretch, then score. */
+export const TIER_RANK = { go: 0, stretch: 1 };
+export function rankOrder(a, b) {
+  return (SCHEDULED.has(b.route) - SCHEDULED.has(a.route))
+    || ((TIER_RANK[a.tier] ?? 0) - (TIER_RANK[b.tier] ?? 0))
+    || b.score - a.score;
 }
 
 /**
@@ -242,7 +250,7 @@ async function runModel(candidates, { max, rpm, model, tooManyYears, candidate, 
   const texts = loadPostingTexts(dataRoot, toScore.map((x) => x.url));
   const fetched = [];
   for (const x of toScore) {
-    if (texts.has(x.url) || !(isHellowork(x.url) || isLinkedin(x.url))) continue;
+    if (texts.has(x.url) || !needsTextFetch(x.url)) continue;
     let text = null;
     try { text = await fetchPostingText(x.url); } catch { /* title only */ }
     if (text) { texts.set(x.url, clipText(text)); fetched.push({ url: x.url, text }); }
@@ -378,9 +386,9 @@ async function main() {
   }
 
   const { kept, merges } = mergeSameJobs(routed);
-  const ranked = capPerCompany([...kept].sort((a, b) => (SCHEDULED.has(b.route) - SCHEDULED.has(a.route)) || b.score - a.score));
+  const ranked = capPerCompany([...kept].sort(rankOrder));
   const list = ranked.filter((x) => SCHEDULED.has(x.route)).slice(0, TOP)
-    .map((x) => ({ co: x.co, title: x.title, url: x.url, english: x.english, toulouse: x.toulouse, paris: x.paris, route: x.route, source: x.source, ...(x.fit != null ? { fit: x.fit } : {}) }));
+    .map((x) => ({ co: x.co, title: x.title, url: x.url, english: x.english, toulouse: x.toulouse, paris: x.paris, route: x.route, source: x.source, tier: x.tier, ...(x.fit != null ? { fit: x.fit } : {}) }));
 
   mkdirSync(OUT, { recursive: true });
   writeFileSync(join(OUT, 'pool.json'), JSON.stringify(ranked.map(({ origUrl, ...x }) => x), null, 1));
@@ -396,7 +404,7 @@ async function main() {
   console.log(`  passed the rules: ${routed.length} | merged away as duplicates: ${routed.length - kept.length} (${merges.length} groups, see merges.txt)`);
   console.log(`  kept: ${ranked.length} after the ${4}-per-company cap | by route: ${sorted(count(ranked, (x) => x.route))}`);
   console.log(`  scheduled pool by source: ${sorted(count(ranked.filter((x) => SCHEDULED.has(x.route)), (x) => x.source))}`);
-  console.log(`  tonight's list: ${list.length} jobs | Toulouse ${list.filter((x) => x.toulouse).length} · Paris ${list.filter((x) => x.paris).length} · English ${list.filter((x) => x.english).length} · model-scored ${list.filter((x) => x.fit != null).length} -> ${join('tmp/fm/night', 'list.json')}`);
+  console.log(`  tonight's list: ${list.length} jobs | Toulouse ${list.filter((x) => x.toulouse).length} · Paris ${list.filter((x) => x.paris).length} · English ${list.filter((x) => x.english).length} · model-scored ${list.filter((x) => x.fit != null).length} · stretch ${list.filter((x) => x.tier === 'stretch').length} -> ${join('tmp/fm/night', 'list.json')}`);
 }
 
 if (isMainModule(import.meta.url)) {

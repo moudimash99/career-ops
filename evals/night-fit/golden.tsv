@@ -84,7 +84,7 @@ g082	no-go	claude	Architecte électrique et puissance programme Stratobus F/H	Th
 g083	no-go	claude	Architecte Electronique Radar H/F	Thales	Elancourt	scan-history	radar hardware	
 g084	no-go	claude	Commissioning & Reliability Manager	aligneddc	LBB - 01	scan-history	data-center facilities	
 g085	no-go	claude	Tech Talent Acquisition Lead	Pigment	Paris	scan-history	HR	
-g086	no-go	claude	Growth Hacker - AI Native (French fluent)	paradox	Office Paris · Marseille Remote · Marseille · France · Lyon Remote · Lyon · Bordeaux Remote · Bordeaux	scan-history	marketing	
+g086	stretch	claude	Growth Hacker - AI Native (French fluent)	paradox	Office Paris · Marseille Remote · Marseille · France · Lyon Remote · Lyon · Bordeaux Remote · Bordeaux	scan-history	marketing; digital, under-qualified (user rule)	
 g087	no-go	claude	Partnership Manager (AI)	razer	France	scan-history	business development	
 g088	no-go	claude	Partner AI Strategy & Transformation	artefact	9th arrondissement of Paris, 75009, Paris, France	scan-history	partner-level	
 g089	no-go	claude	AI Benchmark Engineer | Native Language Specialist - French (France) - Remote	lilt-production	France (Remote)	scan-history	native French linguist	
@@ -102,43 +102,43 @@ g100	no-go	claude	Material Handling Equipment Technician Lead	sysco	Sysco San Fr
 g101	no-go	claude	Senior Materials & Process Engineer, Rocket Motor Systems (Polymeric Ablatives)	andurilindustries	Huntsville, Alabama, United States	scan-history	materials	
 g102	no-go	claude	RF Subsystems Electrical Engineer II (Onsite)	globalhr	US-AZ-TUCSON-M02 ~ 1151 E Hermans Rd ~ BLDG M02	scan-history	RF hardware	
 g103	no-go	claude	Transmission Right of Way Agent Associate	aep	New Albany, OH	scan-history	utilities	
-g104	no-go	claude	Architecte Salesforce - F/H	Deloitte	Paris, France	scan-history	Salesforce	
-g105	no-go	claude	Architecte Solution IFS H/F	Business At Work part of Mantu	Colombelles, France	scan-history	ERP	
-g106	no-go	claude	Product Architect Microsoft D365 H/F	airliquidehr	AL Paris HO - Digital & IT - Enterprise Applications	scan-history	ERP	
-g107	no-go	claude	Architecte Ivalua F/H	BLUETHINK	Paris 01 - 75	scan-history	procurement software	
-g108	no-go	claude	Tech Lead Salesforce Apex F/H	BRAIN LOGIC	Paris 20 - 75	scan-history	Salesforce	
-g109	no-go	claude	DBA Oracle / Exadata Expert F/H	cadremploi	La Garenne-Colombes - 92	scan-history	Oracle DBA	
-g110	no-go	claude	Rust Engineer - Trading Systems	keyrock	Brussels · Rome · Italy · Zug · Switzerland · Porto · Portugal · Istanbul · Turkey · Eindhoven · Netherlands · Geneva · Milan · Amsterdam · Manama · Bahrain · Madrid · Spain · London · United Kingdom · Berlin · Germany · Antwerp · Belgium · Copenhagen · Denmark · Vienna · Austria · Prague · Czech Republic · Athens · Greece · Budapest · Hungary · Paris · France · Frankfurt · Dublin · Ireland · Warsaw · Poland · Sofia · Bulgaria · Luxembourg · Remote · Zurich · Lisbon · England · Tallinn · Tallin · Estonia · London OR Brussels · Rotterdam · Krakow · Zagreb · Croatia	scan-history	Rust / trading	
+g104	stretch	claude	Architecte Salesforce - F/H	Deloitte	Paris, France	scan-history	Salesforce; digital, under-qualified (user rule)	
+g105	stretch	claude	Architecte Solution IFS H/F	Business At Work part of Mantu	Colombelles, France	scan-history	ERP; digital, under-qualified (user rule)	
+g106	stretch	claude	Product Architect Microsoft D365 H/F	airliquidehr	AL Paris HO - Digital & IT - Enterprise Applications	scan-history	ERP; digital, under-qualified (user rule)	
+g107	stretch	claude	Architecte Ivalua F/H	BLUETHINK	Paris 01 - 75	scan-history	procurement software; digital, under-qualified (user rule)	
+g108	stretch	claude	Tech Lead Salesforce Apex F/H	BRAIN LOGIC	Paris 20 - 75	scan-history	Salesforce; digital, under-qualified (user rule)	
+g109	stretch	claude	DBA Oracle / Exadata Expert F/H	cadremploi	La Garenne-Colombes - 92	scan-history	Oracle DBA; digital, under-qualified (user rule)	
+g110	no-go	claude	Rust Engineer - Trading Systems	keyrock	Brussels · Rome · Italy · Zug · Switzerland · Porto · Portugal · Istanbul · Turkey · Eindhoven · Netherlands · Geneva · Milan · Amsterdam · Manama · Bahrain · Madrid · Spain · London · United Kingdom · Berlin · Germany · Antwerp · Belgium · Copenhagen · Denmark · Vienna · Austria · Prague · Czech Republic · Athens · Greece · Budapest · Hungary · Paris · France · Frankfurt · Dublin · Ireland · Warsaw · Poland · Sofia · Bulgaria · Luxembourg · Remote · Zurich · Lisbon · England · Tallinn · Tallin · Estonia · London OR Brussels · Rotterdam · Krakow · Zagreb · Croatia	scan-history	Rust / trading; on site in Brussels, outside France	
 g111	no-go	claude	VP DATA	mirakllabs	Bordeaux, France	scan-history	VP	
 g112	no-go	claude	Head of Engineering - GPU Cloud	scaleway	Paris	scan-history	head of	
 g113	no-go	claude	Directeur des Systèmes d'Information F/H	Direct Emploi	Toulouse - 31	scan-history	director	
-g114	go	claude-guess	HPC System & Storage Engineer		Toulouse	toulouse-test	unsure #1	
-g115	no-go	claude-guess	Ingénieur DBA PostgreSQL - Spatial		Toulouse	toulouse-test	unsure #2	
-g116	go	claude-guess	Ingénieur Middleware Kafka		Toulouse	toulouse-test	unsure #3	
-g117	no-go	claude-guess	Ingénieur Computer Vision		Toulouse	toulouse-test	unsure #4	
-g118	no-go	claude-guess	Ingénieur Essais		Toulouse	toulouse-test	unsure #5	
-g119	no-go	claude-guess	Ingénieur Algorithmie GNSS et SBAS - Spatial		Toulouse	toulouse-test	unsure #6	
-g120	no-go	claude-guess	Ingénieur GNC		Toulouse	toulouse-test	unsure #7	
-g121	no-go	claude-guess	Ingénieur Développement Avionique / On-Board Computer Spatial		Toulouse	toulouse-test	unsure #8	
-g122	go	claude-guess	Solutions Architect - France	GitLab	Remote, France	scan-history	unsure #9	
-g123	go	claude-guess	Customer Reliability Engineer H/F	NUMSPOT	Courbevoie, France	scan-history	unsure #10	
-g124	go	claude-guess	Forward Deployed Engineer – Applied AI F/H	Act Digital France	Paris 01 - 75	scan-history	unsure #11	
-g125	go	claude-guess	Observability expert F/H	U - CONSULTING GROUPE	Paris 08 - 75	scan-history	unsure #12	
-g126	go	claude-guess	Architecte technique - F/H	Berger-Levrault	Labège, France	scan-history	unsure #13	
-g127	no-go	claude-guess	Architecte Microsoft 365 - Toulouse F/H	Handicap Job	Toulouse - 31	scan-history	unsure #14	
-g128	go	claude-guess	Ingénieure / Ingénieur réseau & sécurité	La Banque Postale	Toulouse, France	scan-history	unsure #15	
-g129	go	claude-guess	Tech Lead F/H	La Sécurité Sociale	Toulouse, France	scan-history	unsure #16	
-g130	no-go	claude-guess	Tech Lead Servicenow F/H	Hellowork	Toulouse - 31	scan-history	unsure #17	
-g131	go	claude-guess	DataViz & BI Engineer - CDI F/H	Collective	Paris 04 - 75	scan-history	unsure #18	
-g132	no-go	claude-guess	Consultant Teradata - F/H	CO-MARTIN	Paris 01 - 75	scan-history	unsure #19	
-g133	go	claude-guess	Engineering Manager - Observability & Reliability Engineering Obsession (x/f/m)	Doctolib	Paris, France	scan-history	unsure #20	
-g134	go	claude-guess	Architecte Avant-Vente Services Infogérance F/H	Proaxian	Malakoff - 92	scan-history	unsure #21	
-g135	no-go	claude-guess	Ingénieur supervision - H/F	agap2	Bergerac, France	scan-history	unsure #22	
-g136	no-go	claude-guess	Safety & Reliability Engineer	ag	Bristol Area	scan-history	unsure #23	
-g137	go	claude-guess	Tech Lead Agentic F/H	VESTRALA	Paris 16 - 75	scan-history	unsure #24	
-g138	no-go	claude-guess	Ingénieur réseau mobile 4G/5G F/H	SET-WAY	Meudon - 92	scan-history	unsure #25	
-g139	go	claude-guess	Airbus Atlantic - IT Product Manager (All Gender)	Airbus		applications	unsure #26	
-g140	go	claude-guess	Ingénieure / Ingénieur Scrum Master DevOps	Capgemini	Montpellier	applications	unsure #27	
-g141	go	claude-guess	Business Analyst IAM (f/m)	Airbus	Toulouse Area	applications	unsure #28	
-g142	no-go	claude-guess	Workforce Operations Specialist			issue-3	unsure #29	
-g143	no-go	claude-guess	Digital Airframe Compliance Engineer (M/F).	Airbus	Toulouse Area	applications	unsure #30	
+g114	go	user	HPC System & Storage Engineer		Toulouse	toulouse-test	unsure #1: not a hard no	
+g115	stretch	user	Ingénieur DBA PostgreSQL - Spatial		Toulouse	toulouse-test	unsure #2: not a hard no, under-qualified	
+g116	go	user	Ingénieur Middleware Kafka		Toulouse	toulouse-test	unsure #3: not a hard no	
+g117	stretch	user	Ingénieur Computer Vision		Toulouse	toulouse-test	unsure #4: not a hard no, under-qualified	
+g118	no-go	user	Ingénieur Essais		Toulouse	toulouse-test	unsure #5: hard limit	
+g119	stretch	user	Ingénieur Algorithmie GNSS et SBAS - Spatial		Toulouse	toulouse-test	unsure #6: not a hard no, under-qualified	
+g120	stretch	user	Ingénieur GNC		Toulouse	toulouse-test	unsure #7: not a hard no, under-qualified	
+g121	stretch	user	Ingénieur Développement Avionique / On-Board Computer Spatial		Toulouse	toulouse-test	unsure #8: not a hard no, under-qualified	
+g122	go	user	Solutions Architect - France	GitLab	Remote, France	scan-history	unsure #9: not a hard no	
+g123	go	user	Customer Reliability Engineer H/F	NUMSPOT	Courbevoie, France	scan-history	unsure #10: not a hard no	
+g124	go	user	Forward Deployed Engineer – Applied AI F/H	Act Digital France	Paris 01 - 75	scan-history	unsure #11: not a hard no	
+g125	go	user	Observability expert F/H	U - CONSULTING GROUPE	Paris 08 - 75	scan-history	unsure #12: not a hard no	
+g126	go	user	Architecte technique - F/H	Berger-Levrault	Labège, France	scan-history	unsure #13: not a hard no	
+g127	stretch	user	Architecte Microsoft 365 - Toulouse F/H	Handicap Job	Toulouse - 31	scan-history	unsure #14: not a hard no, under-qualified	
+g128	go	user	Ingénieure / Ingénieur réseau & sécurité	La Banque Postale	Toulouse, France	scan-history	unsure #15: not a hard no	
+g129	go	user	Tech Lead F/H	La Sécurité Sociale	Toulouse, France	scan-history	unsure #16: not a hard no	
+g130	stretch	user	Tech Lead Servicenow F/H	Hellowork	Toulouse - 31	scan-history	unsure #17: not a hard no, under-qualified	
+g131	go	user	DataViz & BI Engineer - CDI F/H	Collective	Paris 04 - 75	scan-history	unsure #18: not a hard no	
+g132	stretch	user	Consultant Teradata - F/H	CO-MARTIN	Paris 01 - 75	scan-history	unsure #19: not a hard no, under-qualified	
+g133	go	user	Engineering Manager - Observability & Reliability Engineering Obsession (x/f/m)	Doctolib	Paris, France	scan-history	unsure #20: not a hard no	
+g134	go	user	Architecte Avant-Vente Services Infogérance F/H	Proaxian	Malakoff - 92	scan-history	unsure #21: not a hard no	
+g135	stretch	user	Ingénieur supervision - H/F	agap2	Bergerac, France	scan-history	unsure #22: not a hard no, under-qualified	
+g136	no-go	user	Safety & Reliability Engineer	ag	Bristol Area	scan-history	unsure #23: hard limit	
+g137	go	user	Tech Lead Agentic F/H	VESTRALA	Paris 16 - 75	scan-history	unsure #24: not a hard no	
+g138	no-go	user	Ingénieur réseau mobile 4G/5G F/H	SET-WAY	Meudon - 92	scan-history	unsure #25: hard limit	
+g139	go	user	Airbus Atlantic - IT Product Manager (All Gender)	Airbus		applications	unsure #26: not a hard no	
+g140	go	user	Ingénieure / Ingénieur Scrum Master DevOps	Capgemini	Montpellier	applications	unsure #27: not a hard no	
+g141	go	user	Business Analyst IAM (f/m)	Airbus	Toulouse Area	applications	unsure #28: not a hard no	
+g142	go	user	Workforce Operations Specialist			issue-3	unsure #29: not a hard no	
+g143	no-go	user	Digital Airframe Compliance Engineer (M/F).	Airbus	Toulouse Area	applications	unsure #30: hard limit	
