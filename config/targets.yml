@@ -92,6 +92,10 @@ too_many_years: 8
 # What the night list's model scores each job against. No name, contact
 # details or salary here: this is the only thing about the candidate that
 # goes to the model (freemotion-night/llm-score.mjs).
+# Left out on purpose, filled in at run time from the files the applier
+# already reads (both stay out of git): years_experience from cv.md, and
+# security_clearance / work_authorization from config/profile.yml
+# application_answers. A value written here wins over those.
 candidate:
   trade: Computer scientist; digital work is the main strength.
   target_work:
@@ -105,10 +109,8 @@ candidate:
     - Technical consulting
     - IT product roles
     - Team or project lead on a digital team
-  years_experience: null      # to fill in
   degree: University Master (not a French "ingénieur diplômé"), with a minor in business administration
   certificates: [AWS Certified Solutions Architect – Associate]
   languages: English C2, French B1–B2
   places: Toulouse first, then Paris
   contract: CDI
-  security_clearance: null    # to fill in

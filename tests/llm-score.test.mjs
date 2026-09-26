@@ -7,7 +7,7 @@
 // instructions; 429s back off (the API's own delay first), a daily-quota 429
 // stops the run cleanly; the eval metrics; and the sample set's shape.
 import { pass, fail, ROOT } from './helpers.mjs';
-import { mkdtempSync, readFileSync, rmSync } from 'fs';
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'fs';
 import { tmpdir } from 'os';
 import { join } from 'path';
 import { pathToFileURL } from 'url';
@@ -136,6 +136,35 @@ try {
     else fail(`r6 = ${JSON.stringify({ ...r6, results: undefined })}, asked ${asked}`);
   } finally {
     rmSync(dir, { recursive: true, force: true });
+  }
+
+  // ---- candidate facts from cv.md / profile.yml ----------------------------------
+  const { resolveCandidate } = m;
+  const { computeYearsExperience } = await import(pathToFileURL(join(ROOT, 'lib/freemotion-answers.mjs')).href);
+  const home = mkdtempSync(join(tmpdir(), 'llm-cand-'));
+  try {
+    const cv = '# Me\n\n## Experience\n\n### Cloud Engineer, A\nJan 2023 – present\n\n### Developer, B\nSep 2021 – Dec 2022\n\n## Education\n\n### Master\n2019 – 2021\n';
+    writeFileSync(join(home, 'cv.md'), cv);
+    mkdirSync(join(home, 'config'));
+    writeFileSync(join(home, 'config/profile.yml'), 'application_answers:\n  credentials:\n    security_clearance: "none"\n    highest_degree: "MSc Computer Science"\n  work_authorization:\n    authorized_to_work_in_france: true\n    requires_sponsorship_now: false\n    note: "never sent"\n');
+    const now = new Date('2026-09-26T12:00:00Z');
+    const got = resolveCandidate({ trade: 'Computer scientist' }, { root: home, now });
+    const want = computeYearsExperience(cv, { now });
+    if (got.candidate.years_experience === want && want >= 4 && want <= 5 && got.candidate.security_clearance === 'none'
+        && got.candidate.degree === 'MSc Computer Science'
+        && got.candidate.work_authorization === 'authorized to work in france: yes; requires sponsorship now: no' && got.notes.length === 0) {
+      pass('resolveCandidate() fills years from cv.md (Experience section only), clearance / degree / work authorization from profile.yml');
+    } else fail(`resolveCandidate = ${JSON.stringify(got)} (computeYearsExperience = ${want})`);
+    const kept = resolveCandidate({ years_experience: 7, security_clearance: 'secret', degree: 'Master + business minor' }, { root: home, now });
+    if (kept.candidate.years_experience === 7 && kept.candidate.security_clearance === 'secret' && kept.candidate.degree === 'Master + business minor') {
+      pass('a value written in targets.yml wins over the files');
+    } else fail(`targets values overridden: ${JSON.stringify(kept.candidate)}`);
+    const bare = resolveCandidate({}, { root: join(home, 'nowhere') });
+    if (bare.candidate.years_experience === undefined && bare.notes.length === 2 && /not given/.test(buildInstructions(bare.candidate))) {
+      pass('without cv.md / profile.yml the facts read "not given" and two notes say why');
+    } else fail(`bare = ${JSON.stringify(bare)}`);
+  } finally {
+    rmSync(home, { recursive: true, force: true });
   }
 
   // ---- eval metrics ------------------------------------------------------------

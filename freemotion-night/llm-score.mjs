@@ -36,8 +36,11 @@ import { appendFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } fr
 import { dirname, join, resolve } from 'path';
 import { fileURLToPath } from 'url';
 
+import * as yaml from 'js-yaml';
+
 import { companyKey, titleKey } from './pool-rules.mjs';
 import { loadTargets } from '../targets.mjs';
+import { computeYearsExperience } from '../lib/freemotion-answers.mjs';
 import { isMainModule } from '../lib/is-main-module.mjs';
 import { getCareerOpsRoot } from '../path-resolver.mjs';
 
@@ -124,7 +127,50 @@ export function candidateLines(candidate) {
     line('places', c.places),
     line('contract', c.contract),
     line('security clearance', c.security_clearance),
+    line('work authorization', c.work_authorization),
   ].join('\n');
+}
+
+/**
+ * The candidate block, completed from the files the user already keeps (the
+ * same ones the applier reads), where config/targets.yml leaves a fact out:
+ *   years_experience     cv.md, via computeYearsExperience() (the Experience
+ *                        section's date ranges, overlaps counted once)
+ *   security_clearance   config/profile.yml application_answers.credentials.security_clearance
+ *   degree               ... .credentials.highest_degree
+ *   work_authorization   ... .work_authorization (its yes/no keys)
+ * A value set in targets.yml always wins. Both files stay out of git, so on a
+ * machine without them the fact reads "not given" and a note says so.
+ * @param {object|null} candidate - config/targets.yml `candidate:`
+ * @param {{ root?: string, now?: Date }} [opts]
+ * @returns {{ candidate: object, notes: string[] }}
+ */
+export function resolveCandidate(candidate, { root = getCareerOpsRoot(), now = new Date() } = {}) {
+  const c = { ...(candidate || {}) };
+  const notes = [];
+  if (c.years_experience == null) {
+    const cvPath = join(root, 'cv.md');
+    const years = existsSync(cvPath) ? computeYearsExperience(readFileSync(cvPath, 'utf8'), { now }) : null;
+    if (years != null) c.years_experience = years;
+    else notes.push(existsSync(cvPath) ? 'years_experience: no date ranges found in cv.md' : 'years_experience: no cv.md here');
+  }
+  let answers = null;
+  const profilePath = join(root, 'config/profile.yml');
+  if (existsSync(profilePath)) {
+    try { answers = /** @type {any} */ (yaml.load(readFileSync(profilePath, 'utf8')))?.application_answers ?? null; } catch { /* unreadable: left as not given */ }
+  }
+  const credentials = answers?.credentials && typeof answers.credentials === 'object' ? answers.credentials : {};
+  if (c.security_clearance == null) {
+    if (credentials.security_clearance != null && credentials.security_clearance !== '') c.security_clearance = credentials.security_clearance;
+    else notes.push(existsSync(profilePath) ? 'security_clearance: not in config/profile.yml application_answers.credentials' : 'security_clearance: no config/profile.yml here');
+  }
+  if (c.degree == null && credentials.highest_degree) c.degree = credentials.highest_degree;
+  const wa = answers?.work_authorization;
+  if (c.work_authorization == null && wa && typeof wa === 'object') {
+    const facts = Object.entries(wa).filter(([, v]) => typeof v === 'boolean').map(([k, v]) => `${k.replace(/_/g, ' ')}: ${v ? 'yes' : 'no'}`);
+    if (facts.length) c.work_authorization = facts.join('; ');
+  }
+  return { candidate: c, notes };
 }
 
 /**
@@ -473,9 +519,8 @@ async function main(argv) {
   try { (await import('dotenv')).config({ path: join(CODE_ROOT, '.env'), quiet: true }); } catch { /* optional */ }
   const targets = loadTargets();
   if (!targets?.candidate) { console.error('llm-score: config/targets.yml has no candidate: block to score against'); return 1; }
-  const candidate = targets.candidate;
-  const unset = ['years_experience', 'security_clearance'].filter((k) => candidate[k] == null);
-  if (unset.length) console.warn(`llm-score: candidate ${unset.join(', ')} not filled in yet (config/targets.yml)`);
+  const { candidate, notes } = resolveCandidate(targets.candidate);
+  for (const n of notes) console.warn(`llm-score: ${n}`);
 
   if (argv.includes('--show-instructions')) {
     const text = buildInstructions(candidate);

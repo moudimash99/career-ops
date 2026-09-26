@@ -66,7 +66,7 @@ import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 
 import { MAX_AGE_DAYS, capPerCompany, companyKey, judge, titleKey } from './pool-rules.mjs';
-import { DEFAULT_MODEL, FACTORS, STRETCH_AT, geminiGenerate, jobKey, readScores, scoreJobs, verdictOf } from './llm-score.mjs';
+import { DEFAULT_MODEL, FACTORS, STRETCH_AT, geminiGenerate, jobKey, readScores, resolveCandidate, scoreJobs, verdictOf } from './llm-score.mjs';
 import normalizeUrl from '../url-key.mjs';
 import { readCurrentState } from '../lib/freemotion-submissions.mjs';
 import { checkCompany, countByCompany, matchBlacklist } from '../lib/company-cap.mjs';
@@ -340,7 +340,7 @@ async function main() {
       try {
         textYears = await runModel(candidates, {
           max: LLM_MAX, rpm: Number(flag('--rpm', 12)), model: flag('--model', process.env.GEMINI_MODEL || DEFAULT_MODEL),
-          tooManyYears, candidate: targets.candidate, apiKey,
+          tooManyYears, candidate: resolveCandidate(targets.candidate).candidate, apiKey,
         });
       } catch (err) {
         console.warn(`make-pool: model step failed (${String(err.message || err).split(apiKey).join('[key]')}); stored scores still apply.`);
