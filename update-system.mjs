@@ -475,6 +475,7 @@ const SYSTEM_PATHS = [
   'lib/freemotion-tier1.mjs',
   'lib/required-years.mjs',
   'lib/posting-text.mjs',
+  'lib/posting-fetch.mjs',
   'lib/freemotion-validate.mjs',
   'modes/apply-freemotion.md',
   'modes/auto-apply.md',

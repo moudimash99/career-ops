@@ -10,18 +10,24 @@ Applies to a list of jobs one at a time while you sleep. Each job gets a fresh A
 2. Put your cover-letter facts and wording rules in `config/freemotion-facts-fr.txt` and
    `config/freemotion-rules-fr.txt`.
 3. Email links: `.env` needs `GMAIL_MACHAKA_USER` and `GMAIL_MACHAKA_APP_PASSWORD`.
+   The fit score needs `GEMINI_API_KEY` (a free key from aistudio.google.com); `GEMINI_MODEL` picks the model.
 4. Accounts you made by hand (Free-Work): `node lib/freemotion-credentials.mjs save --domain www.free-work.com --email <you>`.
    It asks for the password and keeps it in `data/freemotion-credentials/`, which git never sees.
 
-Which jobs we look for (search words, title words, what is dropped, points) is `config/targets.yml`,
-the one list the scanner and `make-pool.mjs` both read. `node targets.mjs check` shows what `portals.yml`
-still duplicates.
+Which jobs we look for (search words, title words, what is dropped, points, the years limit and the
+`candidate:` block the model scores against) is `config/targets.yml`, the one list the scanner and
+`make-pool.mjs` both read. `node targets.mjs check` shows what `portals.yml` still duplicates.
+
+Before trusting the model with a night, check it against the go / no-go sample set:
+`node freemotion-night/llm-score.mjs --eval evals/night-fit/golden.tsv` (about 190 calls of the
+~500 a day; the bar is in `evals/night-fit/README.md`).
 
 ## Each night
 
 ```bash
 node scan.mjs                                                     # all sources -> data/scan-history.tsv
-node freemotion-night/make-pool.mjs --top 25                      # rules + merge -> tmp/fm/night/list.json
+node freemotion-night/make-pool.mjs --top 25                      # rules + model + merge -> tmp/fm/night/list.json
+                                                                  #   --llm-max 300 (model calls), --no-llm, --rpm 12
 node freemotion-night/make-jobs.mjs tmp/fm/night/list.json <firstNumber>   # writes tmp/fm/night/job-<N>.md
 bash freemotion-night/run.sh <firstNumber> <secondNumber> ...     # applies, one job at a time
 node freemotion-night/usage.mjs                                   # next morning: results and tokens used
@@ -43,7 +49,8 @@ takes applications (`URL_ONLY` = a partner site, `EMAIL_ONLY` = on APEC itself, 
 | File | Job |
 |------|-----|
 | `make-jobs.mjs` | Writes one instruction sheet per job, plus the list of URLs allowed tonight. Site notes (Welcome to the Jungle, APEC and Free-Work sign-in) go only into sheets for that site. |
-| `make-pool.mjs` | Builds tonight's list from `data/scan-history.tsv`: drops what was already applied to or tried (tracker, run log), blacklisted or capped companies and jobs outside the rules; gives each job its apply route; merges duplicates keeping the easiest place to apply; writes `pool.json`, `list.json` and `merges.txt` to `tmp/fm/night/`. No model tokens. |
+| `make-pool.mjs` | Builds tonight's list from `data/scan-history.tsv`: drops what was already applied to or tried (tracker, run log), blacklisted or capped companies and jobs outside the rules; gives each job its apply route; merges duplicates keeping the easiest place to apply; writes `pool.json`, `list.json` and `merges.txt` to `tmp/fm/night/`. Jobs with no stored fit score are sent to `llm-score.mjs`, best first; HelloWork and LinkedIn text is fetched first and 8+ years asked drops the job. Titles with none of our role words wait for a score and need 3+. |
+| `llm-score.mjs` | The fit score: one plain Gemini API call per job (never an agent). The model rates role, skills, experience, language and blockers 1-5, evidence first; the code averages them (35/25/20/10/10) and caps at 2 on a hard no. Stored once per job in `data/llm-scores.tsv`. `--eval` checks it against `evals/night-fit/golden.tsv`, `--try "<title>"` scores one job. |
 | `pool-rules.mjs` | Same-job keys, Toulouse/Paris places, keep/drop and score. The role words it keeps, drops and scores by are in `config/targets.yml`; the rest (companies handled by hand, defence, seniority and language ranking) is here. |
 | `site-review.mjs` | Weekly: per application site, sent vs failed over the last 7 days, with suggested sites for `data/site-blacklist.md`. |
 | `apec-route.mjs` | For APEC postings: live or gone (APEC search, plain HTTP) and the apply route (read inside one hidden Camoufox page). No model tokens. |

@@ -117,15 +117,18 @@ export function judge(x, targets = targetsOrThrow()) {
   if (DEFENCE.test(`${co} ${t}`)) return { ok: false, why: 'defence/ministry' };
   const role = targets.judgeTitle(t);
   if (role.dropped) return { ok: false, why: role.dropped };
-  if (role.groups.length === 0) return { ok: false, why: 'role not in target list' };
-  if (role.unsure) return { ok: false, why: 'non-fit word, needs the model' }; // "Software Engineer - Sales team": not for agy on its title alone
+  // Kept, but not for agy on the title alone: the model (llm-score.mjs) decides.
+  //   unmatched  none of our role words ("Ingénieur Sysops Linux")
+  //   rescue     a rescue word, no role word ("Presales Engineer")
+  //   unsure     a non-fit word next to a role word ("Software Engineer - Sales team")
+  const needsModel = role.groups.length === 0 || role.unsure;
   const offstack = role.rankLow, senior = SENIOR.test(t), english = !FRENCH_TITLE.test(t);
   const { toulouse, paris } = placeFlags(x.loc || '');
   const age = x.ageDays ?? 7;
   const score = (english ? 5 : 0) + role.points
     + (toulouse ? 2 : 0) + (paris ? 1 : 0) - (senior ? 1.5 : 0) - age / 3 + (age <= 7 ? 2 : 0) - (offstack ? 4 : 0);
-  const kind = offstack ? 'offstack' : role.groups[0];
-  return { ok: true, fields: { score: +score.toFixed(2), kind, senior, english, toulouse, paris, offstack } };
+  const kind = role.unsure ? 'unsure' : role.groups.length === 0 ? (role.rescued ? 'rescue' : 'unmatched') : offstack ? 'offstack' : role.groups[0];
+  return { ok: true, fields: { score: +score.toFixed(2), points: role.points, kind, needsModel, senior, english, toulouse, paris, offstack } };
 }
 
 /** Keep the best PER_COMPANY postings per company (input sorted best-first). */

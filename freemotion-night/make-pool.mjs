@@ -38,8 +38,24 @@
  * apply to: route first, then source (company ATS / WTJ / HelloWork /
  * Free-Work, then France Travail, then APEC, then LinkedIn), then score.
  *
+ * MODEL — freemotion-night/llm-score.mjs, one plain Gemini API call per job
+ * (never an agent). Jobs without a stored answer are scored best first, at most
+ * --llm-max a night (default 300); an answer is stored once, ever, in
+ * data/llm-scores.tsv. HelloWork and LinkedIn send titles only, so their text
+ * is fetched first (lib/posting-fetch.mjs) and a posting asking
+ * too_many_years or more is dropped before any call. The answer then:
+ *   overall < 2                  → dropped
+ *   the model reads 8+ years     → dropped, unless the text states fewer
+ *   otherwise                    the overall replaces the role-word points
+ *                                (overall − 2; −3 below 3)
+ * A title that needs the model (none of our role words, a rescue word, or a
+ * non-fit word next to a role word) goes on the list only with an overall of
+ * 3 or more; with no answer yet it waits. --no-llm, or no GEMINI_API_KEY:
+ * no calls, stored answers still count.
+ *
  * Writes (tmp/fm/night/):
- *   pool.json    every kept job, ranked, with route, source and where else it was seen
+ *   pool.json    every kept job, ranked, with route, source, where else it was
+ *                seen, and the model's fit / factors / summary when scored
  *   list.json    the top --top scheduled jobs, in make-jobs.mjs's input format
  *   merges.txt   every merge made, for spot checks
  */
@@ -50,11 +66,18 @@ import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 
 import { MAX_AGE_DAYS, capPerCompany, companyKey, judge, titleKey } from './pool-rules.mjs';
+import { DEFAULT_MODEL, FACTORS, GO_AT, geminiGenerate, jobKey, readScores, scoreJobs } from './llm-score.mjs';
 import normalizeUrl from '../url-key.mjs';
 import { readCurrentState } from '../lib/freemotion-submissions.mjs';
 import { checkCompany, countByCompany, matchBlacklist } from '../lib/company-cap.mjs';
 import { resolveColumns, parseTrackerRow } from '../tracker-parse.mjs';
 import { isMainModule } from '../lib/is-main-module.mjs';
+import { loadTargets } from '../targets.mjs';
+import { getCareerOpsRoot } from '../path-resolver.mjs';
+import { requiredYears } from '../lib/required-years.mjs';
+import { clipText, loadPostingTexts, savePostingTexts } from '../lib/posting-text.mjs';
+import { fetchPostingText, isHellowork } from '../lib/posting-fetch.mjs';
+import { localToday } from '../lib/local-today.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const OUT = join(ROOT, 'tmp/fm/night');
@@ -163,6 +186,83 @@ export function mergeSameJobs(rows) {
   return { kept: groups.map((g) => g.kept), merges: groups.filter((g) => g.dropped.length) };
 }
 
+/**
+ * Apply the model's stored answers to the judged candidates. Pure; exported
+ * for tests.
+ * @param {object[]} candidates - judge()d rows: title, co, url, score, points, needsModel
+ * @param {Map<string, Record<string, string>>} scores - readScores()
+ * @param {{ tooManyYears: number|null, textYears: Map<string, number> }} opts -
+ *   textYears: years read from the posting text, by URL, where the text is known
+ * @returns {{ kept: object[], dropped: Array<{ row: object, why: string }> }}
+ */
+export function applyScores(candidates, scores, { tooManyYears, textYears }) {
+  const kept = [];
+  const dropped = [];
+  const out = (row, why) => dropped.push({ row, why });
+  for (const x of candidates) {
+    const fromText = textYears.get(x.url) ?? null;
+    if (tooManyYears !== null && fromText !== null && fromText >= tooManyYears) { out(x, `asks ${tooManyYears}+ years`); continue; }
+    const s = scores.get(jobKey(x));
+    if (!s) {
+      if (x.needsModel) out(x, 'waiting for the model');
+      else kept.push(x);
+      continue;
+    }
+    const overall = Number(s.overall);
+    const modelYears = s.years_required === '' || s.years_required == null ? null : Number(s.years_required);
+    if (overall < 2) { out(x, 'model: not a fit'); continue; }
+    if (tooManyYears !== null && modelYears !== null && modelYears >= tooManyYears && fromText === null) { out(x, `asks ${tooManyYears}+ years (model)`); continue; }
+    if (x.needsModel && overall < GO_AT) { out(x, `model: below ${GO_AT}`); continue; }
+    kept.push({
+      ...x,
+      score: +(x.score - (x.points || 0) + (overall >= GO_AT ? overall - 2 : -3)).toFixed(2),
+      fit: overall,
+      factors: Object.fromEntries(FACTORS.map((f) => [f, Number(s[f])])),
+      summary: s.summary,
+    });
+  }
+  return { kept, dropped };
+}
+
+/**
+ * Score the candidates that have no stored answer yet, best first. Fetches
+ * HelloWork / LinkedIn text first and leaves out postings whose text asks
+ * too many years. Returns the years read from every text it saw.
+ */
+async function runModel(candidates, { max, rpm, model, tooManyYears, candidate, apiKey }) {
+  const dataRoot = getCareerOpsRoot();
+  const stored = readScores();
+  const seen = new Set();
+  const toScore = [...candidates].sort((a, b) => b.score - a.score).filter((x) => {
+    const k = jobKey(x);
+    if (stored.has(k) || seen.has(k)) return false;
+    seen.add(k);
+    return true;
+  }).slice(0, max);
+  const texts = loadPostingTexts(dataRoot, toScore.map((x) => x.url));
+  const fetched = [];
+  for (const x of toScore) {
+    if (texts.has(x.url) || !(isHellowork(x.url) || isLinkedin(x.url))) continue;
+    let text = null;
+    try { text = await fetchPostingText(x.url); } catch { /* title only */ }
+    if (text) { texts.set(x.url, clipText(text)); fetched.push({ url: x.url, text }); }
+  }
+  if (fetched.length) savePostingTexts(dataRoot, fetched, localToday());
+  const textYears = new Map();
+  for (const [url, text] of texts) {
+    const y = requiredYears(text);
+    if (y !== null) textYears.set(url, y);
+  }
+  const toAsk = toScore
+    .filter((x) => !(tooManyYears !== null && (textYears.get(x.url) ?? -1) >= tooManyYears))
+    .map((x) => ({ ...x, text: texts.get(x.url) }));
+  const t0 = Date.now();
+  const generate = await geminiGenerate({ apiKey, model });
+  const r = await scoreJobs(toAsk, { generate, candidate, model, max, rpm, log: (m) => console.warn(m) });
+  console.log(`  model: ${r.scored} scored, ${r.failed} failed${r.stoppedByQuota ? ', stopped at the daily quota' : ''} | ${toScore.length - toAsk.length} left out for their years | text fetched for ${fetched.length} | ${Math.round((Date.now() - t0) / 1000)} s`);
+  return textYears;
+}
+
 function readScanHistory(days) {
   const [head, ...lines] = readFileSync(join(ROOT, 'data/scan-history.tsv'), 'utf8').split(/\r?\n/).filter(Boolean);
   const cols = head.split('\t');
@@ -191,6 +291,7 @@ async function main() {
   const TOP = Number(flag('--top', 25));
   const DAYS = Number(flag('--days', MAX_AGE_DAYS));
   const askApec = !argv.includes('--no-apec');
+  const LLM_MAX = Number(flag('--llm-max', 300));
   const drops = {};
   const drop = (why) => (drops[why] = (drops[why] || 0) + 1);
 
@@ -218,6 +319,41 @@ async function main() {
     candidates.push({ ...x, ...v.fields });
   }
 
+  // The model: score what has no stored answer yet, then apply every answer.
+  const targets = loadTargets();
+  const tooManyYears = targets?.tooManyYears ?? null;
+  let textYears = new Map();
+  if (!argv.includes('--no-llm')) {
+    try { (await import('dotenv')).config({ path: join(ROOT, '.env'), quiet: true }); } catch { /* optional */ }
+    const apiKey = (process.env.GEMINI_API_KEY || '').trim();
+    if (!apiKey) console.warn('make-pool: no GEMINI_API_KEY, so no new model scores tonight; titles that need one wait.');
+    else if (!targets?.candidate) console.warn('make-pool: config/targets.yml has no candidate: block; no model scores tonight.');
+    else {
+      try {
+        textYears = await runModel(candidates, {
+          max: LLM_MAX, rpm: Number(flag('--rpm', 12)), model: flag('--model', process.env.GEMINI_MODEL || DEFAULT_MODEL),
+          tooManyYears, candidate: targets.candidate, apiKey,
+        });
+      } catch (err) {
+        console.warn(`make-pool: model step failed (${String(err.message || err).split(apiKey).join('[key]')}); stored scores still apply.`);
+      }
+    }
+  }
+  const scores = readScores();
+  // The text's own number beats the model's reading: load the texts of jobs
+  // the model says ask too many years, so a stated "5 ans" keeps them.
+  if (tooManyYears !== null) {
+    const doubt = candidates.filter((x) => !textYears.has(x.url) && Number(scores.get(jobKey(x))?.years_required) >= tooManyYears).map((x) => x.url);
+    for (const [url, text] of loadPostingTexts(getCareerOpsRoot(), doubt)) {
+      const y = requiredYears(text);
+      if (y !== null) textYears.set(url, y);
+    }
+  }
+  const applied = applyScores(candidates, scores, { tooManyYears, textYears });
+  for (const d of applied.dropped) drop(d.why);
+  candidates.length = 0;
+  candidates.push(...applied.kept);
+
   // APEC: ask about postings not in the route memory yet, best first, at most 30.
   let apecCache = readApecCache();
   const unrouted = candidates.filter((x) => x.source === 'apec' && !apecCache[apecIdOf(x.url)]).sort((a, b) => b.score - a.score);
@@ -244,7 +380,7 @@ async function main() {
   const { kept, merges } = mergeSameJobs(routed);
   const ranked = capPerCompany([...kept].sort((a, b) => (SCHEDULED.has(b.route) - SCHEDULED.has(a.route)) || b.score - a.score));
   const list = ranked.filter((x) => SCHEDULED.has(x.route)).slice(0, TOP)
-    .map((x) => ({ co: x.co, title: x.title, url: x.url, english: x.english, toulouse: x.toulouse, paris: x.paris, route: x.route, source: x.source }));
+    .map((x) => ({ co: x.co, title: x.title, url: x.url, english: x.english, toulouse: x.toulouse, paris: x.paris, route: x.route, source: x.source, ...(x.fit != null ? { fit: x.fit } : {}) }));
 
   mkdirSync(OUT, { recursive: true });
   writeFileSync(join(OUT, 'pool.json'), JSON.stringify(ranked.map(({ origUrl, ...x }) => x), null, 1));
@@ -260,7 +396,7 @@ async function main() {
   console.log(`  passed the rules: ${routed.length} | merged away as duplicates: ${routed.length - kept.length} (${merges.length} groups, see merges.txt)`);
   console.log(`  kept: ${ranked.length} after the ${4}-per-company cap | by route: ${sorted(count(ranked, (x) => x.route))}`);
   console.log(`  scheduled pool by source: ${sorted(count(ranked.filter((x) => SCHEDULED.has(x.route)), (x) => x.source))}`);
-  console.log(`  tonight's list: ${list.length} jobs | Toulouse ${list.filter((x) => x.toulouse).length} · Paris ${list.filter((x) => x.paris).length} · English ${list.filter((x) => x.english).length} -> ${join('tmp/fm/night', 'list.json')}`);
+  console.log(`  tonight's list: ${list.length} jobs | Toulouse ${list.filter((x) => x.toulouse).length} · Paris ${list.filter((x) => x.paris).length} · English ${list.filter((x) => x.english).length} · model-scored ${list.filter((x) => x.fit != null).length} -> ${join('tmp/fm/night', 'list.json')}`);
 }
 
 if (isMainModule(import.meta.url)) {

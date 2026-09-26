@@ -51,8 +51,11 @@ try {
   else fail('age / seniority / internship rules');
   if (J('Lead DevOps').ok && J('DevOps Manager').ok && J('Responsable Data Platform').ok) pass('judge() keeps lead, manager and responsable titles');
   else fail(`lead/manager/responsable = ${JSON.stringify([J('Lead DevOps'), J('DevOps Manager'), J('Responsable Data Platform')])}`);
-  if (J('Technicien Cloud Azure').why === 'non-fit word, needs the model' && J('Comptable').why === 'non_fit') pass('judge() leaves a non-fit word next to a role word to the model');
-  else fail(`non-fit = ${JSON.stringify([J('Technicien Cloud Azure'), J('Comptable')])}`);
+  const kinds = ['Technicien Cloud Azure', 'Ingénieur Sysops Linux', 'Presales Engineer', 'Ingénieur DevOps'].map((t) => J(t).fields);
+  if (kinds[0].kind === 'unsure' && kinds[1].kind === 'unmatched' && kinds[2].kind === 'rescue' && kinds.slice(0, 3).every((f) => f.needsModel)
+      && kinds[3].needsModel === false && kinds[3].points > 0 && J('Comptable').why === 'non_fit') {
+    pass('judge() keeps unmatched / rescue / unsure titles for the model, and still drops a bare non-fit title');
+  } else fail(`kinds = ${JSON.stringify(kinds)}`);
   if (J('Java Developer').ok && J('Java Developer').fields.offstack) pass('judge() keeps Java but marks it off-stack (ranked low)');
   else fail('Java should be kept and ranked low');
   if (capPerCompany(Array.from({ length: 6 }, (_, i) => ({ co: i < 5 ? 'ACME SAS' : 'Other', title: `t${i}` }))).length === 5) pass('capPerCompany() keeps 4 per company key');
