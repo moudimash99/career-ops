@@ -338,6 +338,7 @@ const SYSTEM_PATHS = [
   'profile-language.mjs',
   'title-keywords.mjs',
   'targets.mjs',
+  'scan-history-prune.mjs',
   'gemini-eval.mjs',
   'ollama-eval.mjs',
   'openai-eval.mjs',
