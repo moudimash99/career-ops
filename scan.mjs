@@ -89,6 +89,7 @@ const parseYaml = yaml.load;
 
 // ── Config ──────────────────────────────────────────────────────────
 import { getCareerOpsRoot } from './path-resolver.mjs';
+import { applyTargets, loadTargets } from './targets.mjs';
 const CODE_ROOT = path.dirname(fileURLToPath(import.meta.url));
 const DATA_ROOT = getCareerOpsRoot();
 
@@ -2939,6 +2940,14 @@ async function main() {
     process.exit(1);
   }
   const config = rawConfig && typeof rawConfig === 'object' ? rawConfig : {};
+  // config/targets.yml, when present, owns the title filter and the job boards'
+  // default search words (targets.mjs). Absent: portals.yml exactly as before.
+  try {
+    for (const note of applyTargets(config, loadTargets())) console.log(`targets: ${note}`);
+  } catch (err) {
+    console.error(`Error: ${err.message}`);
+    process.exit(1);
+  }
   const companies = Array.isArray(config.tracked_companies) ? config.tracked_companies : [];
   const boards = Array.isArray(config.job_boards) ? config.job_boards : [];
   const titleFilter = buildTitleFilter(config.title_filter);

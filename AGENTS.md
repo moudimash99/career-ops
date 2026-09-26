@@ -119,6 +119,7 @@ AI-powered, CLI-agnostic job search automation: pipeline tracking, offer evaluat
 | `data/salary-observations.tsv` | Append-only salary observation log (user layer) |
 | `data/assessments.tsv` | Append-only skills-assessment log (user layer, created on first `add`) |
 | `portals.yml` | Query and company config |
+| `config/targets.yml` | **Fork:** the one list of target roles: search words, title match words, drop words, points. `scan.mjs`/`scan-ats-full.mjs` take `title_filter` and the job boards' default search words from it (`targets.mjs`), and `freemotion-night/pool-rules.mjs` keeps/drops/scores by it. Tracked in git (role words, no personal data). `node targets.mjs check` lists what `portals.yml` still duplicates |
 | `templates/cv-template.html` | HTML template for CVs |
 | `templates/cv-template.tex` | LaTeX/Overleaf template for CVs |
 | `article-digest.md` | Compact proof points from portfolio (optional) |

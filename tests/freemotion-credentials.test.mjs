@@ -10,7 +10,8 @@
 //
 // Run: node test-all.mjs --only freemotion-credentials
 
-import { pass, fail, ROOT, rmSync } from './helpers.mjs';
+import { pass, fail, ROOT, NODE, rmSync } from './helpers.mjs';
+import { spawnSync } from 'child_process';
 import { mkdtempSync, writeFileSync, mkdirSync } from 'fs';
 import { tmpdir } from 'os';
 import { dirname, join } from 'path';
@@ -101,6 +102,20 @@ try {
   const firstFour = new Set();
   for (let i = 0; i < 60; i++) firstFour.add(generatePassword().slice(0, 4));
   check('the guaranteed characters are shuffled, not front-loaded', firstFour.size > 50, true);
+
+  // ------------------------------------------------------------ save (CLI)
+  // An account made by hand: the password comes in on stdin, never as an
+  // argument (shell history, `ps`), and is never printed back.
+  const cli = join(ROOT, 'lib/freemotion-credentials.mjs');
+  const saveRoot = join(tmp, 'save');
+  const run = (input, root) => spawnSync(NODE, [cli, 'save', '--domain', 'www.free-work.com', '--email', 'jane@example.com', '--root', root], { input, encoding: 'utf8' });
+  const r = run(' Hand made pw! \n', saveRoot);
+  check('save exits 0 on a piped password', r.status, 0);
+  check('save stores the password exactly (spaces kept, newline dropped)', loadCredentials('www.free-work.com', { root: saveRoot })?.password, ' Hand made pw! ');
+  check('save never prints the password', r.stdout.includes('Hand made pw!') || r.stderr.includes('Hand made pw!'), false);
+  const emptyRoot = join(tmp, 'save-empty');
+  const empty = run('', emptyRoot);
+  check('save with no password stores nothing and fails', [empty.status, loadCredentials('www.free-work.com', { root: emptyRoot })], [1, null]);
 } finally {
   rmSync(tmp, { recursive: true, force: true });
 }

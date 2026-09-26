@@ -2,9 +2,13 @@
  * freemotion-night/pool-rules.mjs — the night-list rules, as plain code.
  *
  * Everything here is deterministic keyword and text matching: no model, no
- * tokens, no guessing. The same input always gives the same answer. The word
- * lists are the ones the user approved on 2026-09-24; change them here, in one
- * place, and nowhere else.
+ * tokens, no guessing. The same input always gives the same answer.
+ *
+ * The ROLE word lists (which titles are wanted, which are dropped, how many
+ * points each group is worth, what ranks low) are in config/targets.yml, the
+ * same file the scanner's title filter comes from (targets.mjs). Change them
+ * there. What stays here is not about roles: same-job keys, places, companies
+ * handled by hand, defence, seniority and language ranking.
  *
  *   titleKey / companyKey  — how two postings are recognised as the same job
  *   placeFlags             — Toulouse / Paris area, from the LOCATION field
@@ -14,6 +18,8 @@
  * is `salary_filter` in portals.yml, applied by scan.mjs to every source that
  * publishes a salary (a posting with no salary passes).
  */
+
+import { TARGETS_PATH, loadTargets } from '../targets.mjs';
 
 export const MAX_AGE_DAYS = 14;
 export const PER_COMPANY = 4;
@@ -81,43 +87,43 @@ export function placeFlags(location) {
   };
 }
 
-// ── Keep / drop and score (the 2026-09-23 rules, frontend out 2026-09-24) ──
+// ── Keep / drop and score ───────────────────────────────────────────────
+// Role rules: config/targets.yml. Company, seniority and language rules: here.
 
 const MANUAL = /\b(airbus|thales|capgemini|sogeti|accenture|ntt|alan)\b/i; // companies the user handles by hand
 const DEFENCE = /minist|défense|defense|armée|armees|naval group|mbda|safran|dassault|\bdga\b|gendarmerie|police/i;
-const NOT_CDI_TITLE = /\b(stage|stagiaire|intern(ship)?|alternan\w*|apprenti\w*|trainee|freelance|int[ée]rim)\b/i;
-const SENIORITY_OUT = /\b(principal|director|directeur|directrice|head of|vp|chief|staff|lead|manager)\b|product owner|chef de projet|tech ?lead|responsable|technicien|commercial|\bsales\b/i;
-const FRONTEND = /front.?end|\breact\b|angular|\bvue(\.?js)?\b/i; // out, 100% (user, 2026-09-24)
-const CLOUD = /cloud|aws|azure|gcp|devops|\bsre\b|site reliability|platform|infrastructure|kubernetes|devsecops|finops|mlops/i;
-const DATA = /data engineer|ing[ée]nieur data|data platform|analytics engineer|big data|dataops/i;
-const PYTHON = /python|backend|back-end|software engineer/i;
-const SYSTEMS = /syst[eè]me|systems? engineer|\bmbse\b|\bivvq?\b|v&v|validation|v[ée]rification|int[ée]gration|integration|embarqu|embedded|segment sol|ground segment|g[ée]omat|geospati|\bsig\b|observation de la terre|earth observation/i;
-const SOFT = /d[ée]veloppeur|developer|logiciel|software|full.?stack|\bml\b|machine learning|\bia\b|ai engineer|data scientist|data analyst|\bdata\b|donn[ée]es/i;
-const OFFSTACK = /salesforce|\bgo\b|golang|\brust\b|\.net|c#|\bjava\b|\bphp\b|\bsap\b/i; // allowed, ranked low
 const SENIOR = /\b(senior|sr\.?|expert|exp[ée]riment[ée]e?|confirm[ée]e?)\b/i;
 const FRENCH_TITLE = /\b(h\/f|f\/h|h\/f\/x|ing[ée]nieur|d[ée]veloppeur|architecte|consultant\.?e?|expert\.e)\b/i;
 
+let defaultTargets;
+/** config/targets.yml, loaded once. A missing file is an error: the night list has no role rules without it. */
+function targetsOrThrow() {
+  if (defaultTargets === undefined) defaultTargets = loadTargets();
+  if (!defaultTargets) throw new Error(`pool-rules: ${TARGETS_PATH} is missing; the night list's role rules live there`);
+  return defaultTargets;
+}
+
 /**
  * Judge one posting: { title, co, loc, ageDays }.
+ * @param {object} x
+ * @param {ReturnType<typeof import('../targets.mjs').compileTargets>} [targets] - default: config/targets.yml
  * @returns {{ ok: true, fields: object } | { ok: false, why: string }}
  */
-export function judge(x) {
+export function judge(x, targets = targetsOrThrow()) {
   const t = x.title || '';
   const co = x.co || '';
   if (x.ageDays != null && x.ageDays > MAX_AGE_DAYS) return { ok: false, why: 'older than 14 days' };
   if (co && MANUAL.test(co)) return { ok: false, why: 'company handled by hand' };
   if (DEFENCE.test(`${co} ${t}`)) return { ok: false, why: 'defence/ministry' };
-  if (NOT_CDI_TITLE.test(t)) return { ok: false, why: 'intern/freelance/interim' };
-  if (SENIORITY_OUT.test(t)) return { ok: false, why: 'lead/manager/technician/sales' };
-  if (FRONTEND.test(t)) return { ok: false, why: 'frontend' };
-  const cloud = CLOUD.test(t), data = DATA.test(t), python = PYTHON.test(t), systems = SYSTEMS.test(t), soft = SOFT.test(t);
-  if (!cloud && !data && !python && !systems && !soft) return { ok: false, why: 'role not in target list' };
-  const offstack = OFFSTACK.test(t), senior = SENIOR.test(t), english = !FRENCH_TITLE.test(t);
+  const role = targets.judgeTitle(t);
+  if (role.dropped) return { ok: false, why: role.dropped };
+  if (role.groups.length === 0) return { ok: false, why: 'role not in target list' };
+  const offstack = role.rankLow, senior = SENIOR.test(t), english = !FRENCH_TITLE.test(t);
   const { toulouse, paris } = placeFlags(x.loc || '');
   const age = x.ageDays ?? 7;
-  const score = (english ? 5 : 0) + (cloud ? 2 : 0) + (data || python || systems ? 1.5 : 0) + (soft ? 0.5 : 0)
+  const score = (english ? 5 : 0) + role.points
     + (toulouse ? 2 : 0) + (paris ? 1 : 0) - (senior ? 1.5 : 0) - age / 3 + (age <= 7 ? 2 : 0) - (offstack ? 4 : 0);
-  const kind = offstack ? 'offstack' : cloud ? 'cloud' : data ? 'data' : systems ? 'systems' : python ? 'python' : 'software';
+  const kind = offstack ? 'offstack' : role.groups[0];
   return { ok: true, fields: { score: +score.toFixed(2), kind, senior, english, toulouse, paris, offstack } };
 }
 

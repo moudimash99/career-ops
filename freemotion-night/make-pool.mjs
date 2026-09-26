@@ -23,7 +23,7 @@
  *                      France Travail recruiter/partner link, Free-Work employer
  *                      link, APEC partner link)                    → scheduled
  *   apec-account       APEC's own form, behind the APEC sign-in    → scheduled
- *   freework-account   Free-Work's own form (needs an account)     → kept apart
+ *   freework-account   Free-Work's own form, behind the Free-Work sign-in → scheduled
  *   francetravail-page France Travail's own page (FT account)      → kept apart
  *   apec-unrouted      APEC posting whose route is not known yet   → kept apart
  *   linkedin-lead      found only on LinkedIn (Phase C)            → kept apart
@@ -64,7 +64,7 @@ const DAY_MS = 86_400_000;
 const SITE_BLACKLIST = join(ROOT, 'data/site-blacklist.md');
 
 export const ROUTE_RANK = { 'apply-here': 0, 'apec-account': 1, 'freework-account': 2, 'francetravail-page': 2, 'apec-unrouted': 2, 'blocked-site': 2, 'linkedin-lead': 3 };
-export const SCHEDULED = new Set(['apply-here', 'apec-account']);
+export const SCHEDULED = new Set(['apply-here', 'apec-account', 'freework-account']);
 const SOURCE_RANK = { francetravail: 1, apec: 2, linkedin: 3 }; // everything else 0
 
 const hostOf = (u) => { try { return new URL(u).hostname.toLowerCase(); } catch { return ''; } };

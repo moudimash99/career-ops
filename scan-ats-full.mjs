@@ -54,6 +54,7 @@ import lever from './providers/lever.mjs';
 import ashby from './providers/ashby.mjs';
 import workday from './providers/workday.mjs';
 import icims from './providers/icims.mjs';
+import { applyTargets, loadTargets } from './targets.mjs';
 import { buildTitleFilter, buildTitleFilterOverrides, buildTitleFilterWithOverrides, buildLocationFilter, buildContentFilter, matchedTitleKeywords, loadSeenUrls, normalizeUrlForDedup, appendToPipeline, appendToScanHistory, loadBlacklist, parseSinceDays, PORTALS_PATH, PIPELINE_PATH } from './scan.mjs';
 import { localToday } from './lib/local-today.mjs';
 import { printScanSummaryHeader } from './lib/scan-summary-marker.mjs';
@@ -733,6 +734,9 @@ async function main() {
     process.exit(1);
   }
   const config = yaml.load(readFileSync(PORTALS_PATH, 'utf-8'));
+  // Same targets as scan.mjs (targets.mjs). title_filter_full, when set, still
+  // wins for this sweep: it is a deliberate stricter list for a different corpus.
+  for (const note of applyTargets(config, loadTargets())) progress(`targets: ${note}\n`);
   const fullTitleFilterConfig = resolveTitleFilterConfig(config);
   // title_filter_overrides is independent of title_filter_full: it broadens
   // the net for specific companies on top of whichever title filter config

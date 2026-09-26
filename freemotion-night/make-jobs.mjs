@@ -104,6 +104,19 @@ const SITE_NOTES = [
     before the next step.
   - A visible captcha challenge you cannot get past: finalize \`captcha\` and stop.`,
   },
+  {
+    host: /(^|\.)free-work\.com$/i,
+    text: `- Free-Work: an account EXISTS (made by hand 2026-09-25; no run has used it yet, so write down in your
+  report every step that surprised you). This posting takes applications on Free-Work's own form, which
+  needs you signed in. If "Postuler" asks you to sign in, get the login with
+  \`node lib/freemotion-credentials.mjs load --domain www.free-work.com\` and sign in with that email and
+  password, then go back to the posting and apply.
+  - If Free-Work sends you to the company's own site instead, write the exact URL you land on in your report,
+    then apply there. Record the result with the Free-Work posting URL given above.
+  - After every click, check that the page really changed (new text, new URL, or the field now filled)
+    before the next step.
+  - A visible captcha challenge you cannot get past: finalize \`captcha\` and stop.`,
+  },
 ];
 
 mkdirSync(OUT, { recursive: true });
