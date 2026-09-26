@@ -47,8 +47,12 @@ try {
   else fail('frontend must be dropped');
   if (J('Full Stack Developer').ok) pass('judge() keeps full-stack');
   else fail('full-stack must stay');
-  if (J('Ingénieur DevOps', { ageDays: 20 }).why === 'older than 14 days' && J('Lead DevOps').ok === false && J('Stage DevOps').ok === false) pass('judge() drops old postings, leads and internships');
+  if (J('Ingénieur DevOps', { ageDays: 20 }).why === 'older than 14 days' && J('Director of DevOps').why === 'seniority' && J('Stage DevOps').ok === false) pass('judge() drops old postings, directors and internships');
   else fail('age / seniority / internship rules');
+  if (J('Lead DevOps').ok && J('DevOps Manager').ok && J('Responsable Data Platform').ok) pass('judge() keeps lead, manager and responsable titles');
+  else fail(`lead/manager/responsable = ${JSON.stringify([J('Lead DevOps'), J('DevOps Manager'), J('Responsable Data Platform')])}`);
+  if (J('Technicien Cloud Azure').why === 'non-fit word, needs the model' && J('Comptable').why === 'non_fit') pass('judge() leaves a non-fit word next to a role word to the model');
+  else fail(`non-fit = ${JSON.stringify([J('Technicien Cloud Azure'), J('Comptable')])}`);
   if (J('Java Developer').ok && J('Java Developer').fields.offstack) pass('judge() keeps Java but marks it off-stack (ranked low)');
   else fail('Java should be kept and ranked low');
   if (capPerCompany(Array.from({ length: 6 }, (_, i) => ({ co: i < 5 ? 'ACME SAS' : 'Other', title: `t${i}` }))).length === 5) pass('capPerCompany() keeps 4 per company key');

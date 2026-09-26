@@ -106,7 +106,37 @@ export function compileTargets(raw, where = 'targets') {
   const rankLowAll = withAccentFree(words(raw.rank_low));
   const rankLowTests = rankLowAll.map((k) => compileKeyword(k.toLowerCase()));
 
+  // A rescue word beats every drop list: "Presales Engineer" carries "sales".
+  const rescueAll = withAccentFree(words(raw.rescue));
+  const rescueTests = rescueAll.map((k) => compileKeyword(k.toLowerCase()));
+  const isRescued = (lower) => rescueTests.some((m) => m(lower));
+  // Other fields: drop a title only when none of our role words is in it.
+  const nonFitAll = withAccentFree(words(raw.non_fit));
+  const nonFitTests = nonFitAll.map((k) => compileKeyword(k.toLowerCase()));
+  const isNonFit = (lower) => nonFitTests.some((m) => m(lower));
+
   const groups = tiers.flatMap((t) => t.groups);
+  const hasGroup = (lower) => groups.some((g) => g.test(lower));
+  /** The drop list's name (or 'non_fit'), or null when the title is kept. */
+  const dropReason = (lower) => {
+    if (isRescued(lower)) return null;
+    const hit = drop.find((d) => d.test(lower));
+    if (hit) return hit.name;
+    return isNonFit(lower) && !hasGroup(lower) ? 'non_fit' : null;
+  };
+
+  let tooManyYears = null;
+  if (raw.too_many_years != null) {
+    if (typeof raw.too_many_years !== 'number' || !(raw.too_many_years > 0)) {
+      throw new Error(`${where}: \`too_many_years:\` must be a positive number`);
+    }
+    tooManyYears = raw.too_many_years;
+  }
+  if (raw.candidate != null && (typeof raw.candidate !== 'object' || Array.isArray(raw.candidate))) {
+    throw new Error(`${where}: \`candidate:\` must be a mapping`);
+  }
+  const candidate = raw.candidate ?? null;
+
   const searchWords = [];
   for (const g of groups) for (const q of g.search) if (!searchWords.includes(q)) searchWords.push(q);
 
@@ -114,21 +144,51 @@ export function compileTargets(raw, where = 'targets') {
     tiers,
     groups,
     drop,
+    rescue: rescueAll,
+    nonFit: nonFitAll,
     searchWords,
-    /** The scanner's title filter: any group's words in, any drop word out. */
+    tooManyYears,
+    candidate,
+    /**
+     * The scanner's title filter as keyword lists: any group's (or rescue)
+     * words in, any drop word out. `non_fit` needs no entry: with a match word
+     * required, a non-fit title is only ever kept when it has a role word too,
+     * which is exactly the non_fit rule. A plain list cannot say "unless a
+     * rescue word is there too", so a reader that can take a function should
+     * use keepTitle() / dropFilter() instead.
+     */
     titleFilter: {
-      positive: groups.flatMap((g) => g.all),
+      positive: [...groups.flatMap((g) => g.all), ...rescueAll],
       negative: drop.flatMap((d) => d.all),
+    },
+    /**
+     * Drop and non-fit words only: true when the title is kept. For job
+     * boards, which already searched with our words.
+     * @param {string} title
+     */
+    dropFilter(title) {
+      return dropReason(String(title ?? '').toLowerCase()) === null;
+    },
+    /**
+     * The full filter: a group's word or a rescue word, and no drop word
+     * (rescue words beat drop words).
+     * @param {string} title
+     */
+    keepTitle(title) {
+      const lower = String(title ?? '').toLowerCase();
+      if (dropReason(lower) !== null) return false;
+      return isRescued(lower) || hasGroup(lower);
     },
     /**
      * One title against the targets.
      * @param {string} title
-     * @returns {{ dropped: string|null, groups: string[], points: number, rankLow: boolean }}
-     *   `dropped` is the drop list's name, or null; `groups` in file order.
+     * @returns {{ dropped: string|null, groups: string[], points: number, rankLow: boolean, rescued: boolean, unsure: boolean }}
+     *   `dropped` is the drop list's name (or 'non_fit'), or null; `groups` in
+     *   file order; `unsure` = a non-fit word next to a role word, for the
+     *   model to decide.
      */
     judgeTitle(title) {
       const lower = String(title ?? '').toLowerCase();
-      const hitDrop = drop.find((d) => d.test(lower));
       const matched = [];
       let points = 0;
       for (const t of tiers) {
@@ -136,7 +196,16 @@ export function compileTargets(raw, where = 'targets') {
         if (hits.length) points += t.points; // once per tier, however many of its groups match
         matched.push(...hits.map((g) => g.name));
       }
-      return { dropped: hitDrop ? hitDrop.name : null, groups: matched, points, rankLow: rankLowTests.some((m) => m(lower)) };
+      const dropped = dropReason(lower);
+      const rescued = isRescued(lower);
+      return {
+        dropped,
+        groups: matched,
+        points,
+        rankLow: rankLowTests.some((m) => m(lower)),
+        rescued,
+        unsure: dropped === null && !rescued && matched.length > 0 && isNonFit(lower),
+      };
     },
   };
 }
@@ -185,7 +254,11 @@ function check() {
     return 0;
   }
   const n = (count, word) => `${count} ${word}${count === 1 ? '' : 's'}`;
-  console.log(`${TARGETS_PATH}: ${n(targets.groups.length, 'group')}, ${n(targets.titleFilter.positive.length, 'match word')}, ${n(targets.titleFilter.negative.length, 'drop word')}, ${n(targets.searchWords.length, 'search word')}`);
+  console.log(`${TARGETS_PATH}: ${n(targets.groups.length, 'group')}, ${n(targets.titleFilter.positive.length, 'match word')}, ${n(targets.titleFilter.negative.length, 'drop word')}, ${n(targets.nonFit.length, 'non-fit word')}, ${n(targets.rescue.length, 'rescue word')}, ${n(targets.searchWords.length, 'search word')}`);
+  console.log(targets.tooManyYears ? `Postings asking ${targets.tooManyYears}+ years are not saved.` : 'No years limit (too_many_years is not set).');
+  const unset = Object.entries(targets.candidate || {}).filter(([, v]) => v == null).map(([k]) => k);
+  if (!targets.candidate) console.log('No candidate: block, so the night list\'s model has nothing to score against.');
+  else if (unset.length) console.log(`candidate: still to fill in: ${unset.join(', ')}`);
 
   let portals = null;
   const portalsPath = process.env.CAREER_OPS_PORTALS || join(getCareerOpsRoot(), 'portals.yml');

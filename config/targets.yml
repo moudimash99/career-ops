@@ -3,10 +3,15 @@
 # Read by (see targets.mjs):
 #   scan.mjs, scan-ats-full.mjs
 #     - `match` words of every group = the title filter: a title must contain one.
-#     - `drop` words = titles always rejected.
+#     - `drop` words = titles always rejected, unless a `rescue` word is also
+#       in the title ("Presales Engineer" has "sales" but is kept).
+#     - `non_fit` words = rejected only when no `match` word is in the title.
+#     - `rescue` words also count as a match, so those titles pass.
 #       While this file exists, title_filter.positive/negative in portals.yml
 #       are ignored. (title_filter_full, the strict list for the full ATS sweep,
 #       still wins there.)
+#     - `too_many_years`: a posting that asks for this many years of
+#       experience or more is not saved.
 #     - `search` words of every group = what is typed into the job boards
 #       (WTJ, APEC, HelloWork, Free-Work, France Travail, LinkedIn) whose
 #       portals.yml block has no `queries:` of its own. A block that keeps its
@@ -61,10 +66,49 @@ tiers:
 drop:
   contract: ["word:stage", "word:stagiaire", "word:intern", "word:internship", "stem:alternan",
              "stem:apprenti", "word:trainee", "word:freelance", "word:intérim"]
-  seniority: ["word:principal", "word:director", "word:directeur", "word:directrice", "word:head of",
-              vp, "word:chief", "word:staff", "word:lead", "word:manager", product owner,
-              chef de projet, tech lead, techlead, responsable, technicien, commercial, "word:sales"]
+  # Only the top of the ladder. Lead, manager, responsable, chef de projet,
+  # product owner, principal, staff and chief are kept: too_many_years decides.
+  seniority: ["word:director", "word:directeur", "word:directrice", vp, "word:head of"]
   frontend: [frontend, front-end, front end, "word:react", angular, vue, "word:vuejs"]
+
+# Other fields. Softer than `drop`: a title with one of these and none of our
+# role words is dropped ("Comptable Fournisseurs"); a title that also has a
+# role word is kept but marked unsure, for the model to decide
+# ("Senior Software Engineer - Sales Customer Care", "Technicien Cloud Azure").
+non_fit: [technicien, commercial, "word:sales", comptable, chantier, conducteur de travaux,
+          business developer, infirmier, avocat, juriste, magasinier, logistique, mécanique,
+          génie civil, bâtiment, vrd, électricien, soudeur, maintenance cvc]
+
+# Never dropped, even with a drop or non-fit word in the title; counted as a match.
+rescue: [pre-sales, presales, pre sales, avant-vente, avant vente, sales engineer,
+         solutions engineer, solution engineer, solutions architect, solution architect,
+         technico-commercial]
 
 # Allowed, but ranked low: off our stack.
 rank_low: [salesforce, go, golang, "word:rust", .net, "c#", "word:java", php, sap]
+
+too_many_years: 8
+
+# What the night list's model scores each job against. No name, contact
+# details or salary here: this is the only thing about the candidate that
+# goes to the model (freemotion-night/llm-score.mjs).
+candidate:
+  trade: Computer scientist; digital work is the main strength.
+  target_work:
+    - Cloud / DevOps / SRE / platform engineering (AWS, Kubernetes, Terraform)
+    - Data engineering (Databricks, Python, SQL)
+    - Backend development in Python
+    - Space systems engineering (IVV, ground segment, MBSE)
+    - AI engineering
+  also_fits:
+    - Pre-sales / solutions engineering
+    - Technical consulting
+    - IT product roles
+    - Team or project lead on a digital team
+  years_experience: null      # to fill in
+  degree: University Master (not a French "ingénieur diplômé"), with a minor in business administration
+  certificates: [AWS Certified Solutions Architect – Associate]
+  languages: English C2, French B1–B2
+  places: Toulouse first, then Paris
+  contract: CDI
+  security_clearance: null    # to fill in

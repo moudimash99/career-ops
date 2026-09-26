@@ -118,6 +118,7 @@ export function judge(x, targets = targetsOrThrow()) {
   const role = targets.judgeTitle(t);
   if (role.dropped) return { ok: false, why: role.dropped };
   if (role.groups.length === 0) return { ok: false, why: 'role not in target list' };
+  if (role.unsure) return { ok: false, why: 'non-fit word, needs the model' }; // "Software Engineer - Sales team": not for agy on its title alone
   const offstack = role.rankLow, senior = SENIOR.test(t), english = !FRENCH_TITLE.test(t);
   const { toulouse, paris } = placeFlags(x.loc || '');
   const age = x.ageDays ?? 7;
