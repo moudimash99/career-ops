@@ -236,15 +236,12 @@ export async function fitWithCuts(payload, steps, render, { now = new Date(), ke
 // Every real render appends one row to data/cv-fit-log.tsv. A CV "hits the
 // floor" when it only fit at the floor step, or overflowed it. Counted per
 // output PDF, not per attempt: an overflow that was trimmed and then fit is
-// still one CV that hit the floor. When more than cv.floor_alert_pct (default
-// 20) of recent CVs hit it, the tailoring prompt is writing too much and
-// modes/pdf.md's content budget needs tightening — not the layout.
+// still one CV that hit the floor. `--stats` reports the share of recent CVs
+// that did; a high share means the payloads are written too long. There is
+// no automatic alert (removed 2026-09-25 at the user's request).
 export const FIT_LOG_RELATIVE_PATH = 'data/cv-fit-log.tsv';
 const FIT_LOG_HEADER = ['timestamp', 'pdf', 'theme', 'step', 'floor', 'outcome'];
-export const DEFAULT_FLOOR_ALERT_PCT = 20;
 export const FIT_STATS_WINDOW = 50;
-// Below this many CVs the rate is noise; no alert.
-export const FIT_STATS_MIN = 10;
 
 export function appendFitLog(root, row) {
   const path = join(root, FIT_LOG_RELATIVE_PATH);
@@ -266,9 +263,9 @@ export function readFitLog(root) {
 
 /**
  * Share of the most recent CVs (distinct PDFs) that hit the floor.
- * @returns {{cvs: number, hits: number, rate: number|null, alert: boolean, threshold: number, window: number}}
+ * @returns {{cvs: number, hits: number, rate: number|null, window: number}}
  */
-export function fitStats(rows, { threshold = DEFAULT_FLOOR_ALERT_PCT, window = FIT_STATS_WINDOW } = {}) {
+export function fitStats(rows, { window = FIT_STATS_WINDOW } = {}) {
   const byPdf = new Map();
   for (const r of rows) {
     const hit = r.outcome === 'overflow' || r.outcome === 'floor';
@@ -279,13 +276,7 @@ export function fitStats(rows, { threshold = DEFAULT_FLOOR_ALERT_PCT, window = F
   const recent = [...byPdf.values()].slice(-window);
   const hits = recent.filter(Boolean).length;
   const rate = recent.length ? Math.round((hits / recent.length) * 1000) / 10 : null;
-  return { cvs: recent.length, hits, rate, alert: recent.length >= FIT_STATS_MIN && rate > threshold, threshold, window };
-}
-
-function floorAlertMessage(stats) {
-  return `${stats.rate}% of the last ${stats.cvs} CVs needed the floor layout or overflowed (limit ${stats.threshold}%). `
-    + 'The tailoring writes too much for one page: tighten the content budget in modes/pdf.md '
-    + '(fewer bullets per role, shorter summary), not the layout.';
+  return { cvs: recent.length, hits, rate, window };
 }
 
 function readProfileCv(root) {
@@ -393,11 +384,9 @@ async function main() {
   }
   const root = getCareerOpsRoot();
   const profileCv = readProfileCv(root);
-  const threshold = Number.isFinite(Number(profileCv.floor_alert_pct)) ? Number(profileCv.floor_alert_pct) : DEFAULT_FLOOR_ALERT_PCT;
 
   if (opts.stats) {
-    const stats = fitStats(readFitLog(root), { threshold });
-    console.log(JSON.stringify({ ...stats, ...(stats.alert ? { message: floorAlertMessage(stats) } : {}) }, null, 2));
+    console.log(JSON.stringify(fitStats(readFitLog(root)), null, 2));
     return;
   }
 
@@ -502,13 +491,10 @@ async function main() {
     copyFileSync(outcome.result.yamlPath, outYaml);
     if (opts.report) updatePDFManifest(opts.report, outPdf, outYaml, base.format);
     logFit(outcome.step.name === floor && outcome.tried.length > 1 ? 'floor' : 'fit');
-    const stats = fitStats(readFitLog(root), { threshold });
-    if (stats.alert) console.error(`⚠️  ${floorAlertMessage(stats)}`);
 
     console.log(JSON.stringify({
       status: 'ok', pdf: outPdf, yaml: outYaml, pages: 1, theme,
       step: outcome.step.name, floor, tried, dropped, factCheck, report: opts.report || null,
-      floorRate: { cvs: stats.cvs, rate: stats.rate, alert: stats.alert },
     }, null, 2));
   } catch (err) {
     console.error(`❌ ${err.message}`);
