@@ -110,9 +110,10 @@ export function parseEnvPayload(text) {
  *               posting allows fulltime remote
  *   - postedAt: `published_at_timestamp` (epoch seconds → ms)
  *   - salary:   {min, max, currency} from salary_yearly_minimum/salary_maximum
+ *   - minYears: `experience_level_minimum`, years asked, when 0–20
  *
  * @param {any} h
- * @returns {{ title: string, url: string, company: string, location: string, postedAt?: number, salary?: {min: number, max: number, currency: string} } | null}
+ * @returns {{ title: string, url: string, company: string, location: string, postedAt?: number, salary?: {min: number, max: number, currency: string}, minYears?: number } | null}
  */
 export function normalizeWttjHit(h) {
   if (!h || typeof h !== 'object') return null;
@@ -136,11 +137,16 @@ export function normalizeWttjHit(h) {
   if (h.remote === 'fulltime') parts.push('Remote');
   const location = parts.join(', ');
 
-  /** @type {{ title: string, url: string, company: string, location: string, postedAt?: number, salary?: {min: number, max: number, currency: string} }} */
+  /** @type {{ title: string, url: string, company: string, location: string, postedAt?: number, salary?: {min: number, max: number, currency: string}, minYears?: number }} */
   const job = { title, url, company, location };
 
   const ts = h.published_at_timestamp;
   if (Number.isFinite(ts) && ts > 0) job.postedAt = ts * 1000;
+
+  // Minimum years of experience the posting asks for (scan.mjs's years filter).
+  // Read as years; a value outside 0–20 is ignored rather than trusted.
+  const exp = typeof h.experience_level_minimum === 'string' ? Number(h.experience_level_minimum) : h.experience_level_minimum;
+  if (Number.isFinite(exp) && exp >= 0 && exp <= 20) job.minYears = exp;
 
   const min = Number.isFinite(h.salary_yearly_minimum) && h.salary_yearly_minimum > 0 ? h.salary_yearly_minimum : 0;
   // salary_maximum is per salary_period; only trust it as an annual bound when
@@ -214,7 +220,7 @@ export default {
         query,
         hitsPerPage: String(maxHits),
         attributesToRetrieve:
-          'name,slug,organization,offices,remote,published_at_timestamp,salary_yearly_minimum,salary_maximum,salary_period,salary_currency',
+          'name,slug,organization,offices,remote,published_at_timestamp,salary_yearly_minimum,salary_maximum,salary_period,salary_currency,experience_level_minimum',
       });
       // Algolia parses `filters` as a filter expression against the index's
       // faceted attributes; it never reaches a URL or host, so the assertHost

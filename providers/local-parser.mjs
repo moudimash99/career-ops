@@ -147,12 +147,16 @@ function normalizeParserJob(job, entry) {
   );
   if (!title || !url) return null;
 
-  return {
+  const out = {
     title,
     url,
     company: String(job.company || entry.name || '').trim(),
     location: normalizeLocation(job.location || job.locations),
   };
+  // Posting text, when the parser has it: read by scan.mjs's content, visa
+  // and years filters, and cached for the night list's model.
+  if (typeof job.description === 'string' && job.description.trim()) out.description = job.description.trim();
+  return out;
 }
 
 async function runLocalParser(entry) {

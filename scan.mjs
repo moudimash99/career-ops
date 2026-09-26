@@ -89,7 +89,9 @@ const parseYaml = yaml.load;
 
 // ── Config ──────────────────────────────────────────────────────────
 import { getCareerOpsRoot } from './path-resolver.mjs';
-import { applyTargets, loadTargets } from './targets.mjs';
+import { applyTargets, loadTargets, QUERY_PROVIDERS } from './targets.mjs';
+import { requiredYears } from './lib/required-years.mjs';
+import { savePostingTexts } from './lib/posting-text.mjs';
 const CODE_ROOT = path.dirname(fileURLToPath(import.meta.url));
 const DATA_ROOT = getCareerOpsRoot();
 
@@ -200,6 +202,18 @@ export { compileKeyword, compilePositiveKeyword, compileContentKeyword, buildTit
 //
 // v1 keeps matching simple and explicit: a literal (case-insensitive) slug
 // list, no fuzzy company-type inference, no domain heuristics.
+/**
+ * The title filter for one provider's results: the job boards that searched
+ * with our words (QUERY_PROVIDERS) get the drop-words-only filter, everything
+ * else the full one.
+ * @param {string} providerId
+ * @param {(title: string) => boolean} fullFilter
+ * @param {(title: string) => boolean} boardFilter
+ */
+export function titleFilterFor(providerId, fullFilter, boardFilter) {
+  return QUERY_PROVIDERS.includes(providerId) ? boardFilter : fullFilter;
+}
+
 export function buildTitleFilterOverrides(overrides) {
   const map = new Map();
   if (!Array.isArray(overrides)) return map;
@@ -2942,15 +2956,24 @@ async function main() {
   const config = rawConfig && typeof rawConfig === 'object' ? rawConfig : {};
   // config/targets.yml, when present, owns the title filter and the job boards'
   // default search words (targets.mjs). Absent: portals.yml exactly as before.
+  let roleTargets = null;
   try {
-    for (const note of applyTargets(config, loadTargets())) console.log(`targets: ${note}`);
+    roleTargets = loadTargets();
+    for (const note of applyTargets(config, roleTargets)) console.log(`targets: ${note}`);
   } catch (err) {
     console.error(`Error: ${err.message}`);
     process.exit(1);
   }
   const companies = Array.isArray(config.tracked_companies) ? config.tracked_companies : [];
   const boards = Array.isArray(config.job_boards) ? config.job_boards : [];
-  const titleFilter = buildTitleFilter(config.title_filter);
+  // With targets: company boards need one of our role words (a rescue word
+  // counts, and beats a drop word); the job boards already searched with our
+  // words, so only drop / non-fit words remove a title there. Unusual titles
+  // for our kind of work survive and go to the night list's model.
+  const titleFilter = roleTargets ? roleTargets.keepTitle : buildTitleFilter(config.title_filter);
+  const boardTitleFilter = roleTargets ? roleTargets.dropFilter : titleFilter;
+  // Postings asking this many years or more are not saved (null: no limit).
+  const tooManyYears = roleTargets?.tooManyYears ?? null;
 
   // Seniority tier classifier integration
   let classifyTier = null;
@@ -3071,6 +3094,10 @@ async function main() {
   let totalFilteredBlacklist = 0;
   let annotatedBlacklisted = 0;
   let totalFilteredVisa = 0;
+  let totalFilteredYears = 0;
+  /** Per source: postings checked, how many stated their years, how many asked too many. */
+  const yearsBySource = {};
+  const yearsSamples = [];
   let totalDupes = 0;
   const newOffers = [];
   const errors = [...resolveErrors];
@@ -3088,7 +3115,7 @@ async function main() {
       boards: targets.filter(t => t._isBoard).length,
       found: totalFound, filteredTitle: totalFilteredTitle, filteredTier: totalFilteredTier,
       filteredLocation: totalFilteredLocation, filteredPostingAge: totalFilteredPostingAge,
-      filteredSalary: totalFilteredSalary, filteredContent: totalFilteredContent,
+      filteredSalary: totalFilteredSalary, filteredContent: totalFilteredContent + totalFilteredYears,
       filteredCooldown: totalFilteredCooldown, dupes: totalDupes, newAdded: 0,
       errors: errors.length, filteredBlacklist: totalFilteredBlacklist,
       filteredVisa: totalFilteredVisa, filteredPostedDate: totalFilteredPostedDate,
@@ -3176,7 +3203,7 @@ async function main() {
           }
         }
 
-        if (!titleFilter(job.title)) {
+        if (!titleFilterFor(provider.id, titleFilter, boardTitleFilter)(job.title)) {
           totalFilteredTitle++;
           continue;
         }
@@ -3213,6 +3240,20 @@ async function main() {
         if (!visaFilter(job.description)) {
           totalFilteredVisa++;
           continue;
+        }
+        // Years asked: the board's own field when it has one, else the text.
+        // Unknown (no field, no text, nothing stated) keeps the posting.
+        if (tooManyYears !== null) {
+          const years = Number.isFinite(job.minYears) ? job.minYears : requiredYears(job.description);
+          const tally = (yearsBySource[provider.id] ||= { checked: 0, stated: 0, dropped: 0 });
+          tally.checked++;
+          if (years !== null) tally.stated++;
+          if (years !== null && years >= tooManyYears) {
+            tally.dropped++;
+            totalFilteredYears++;
+            if (yearsSamples.length < 10) yearsSamples.push(`${years}y  ${provider.id}  ${job.company || company.name} | ${job.title}`);
+            continue;
+          }
         }
         const dedupUrl = normalizeUrlForDedup(job.url);
         if (seenUrls.has(dedupUrl)) {
@@ -3342,6 +3383,12 @@ async function main() {
   if (!dryRun && verifiedOffers.length > 0) {
     await appendToPipeline(verifiedOffers);
     await appendToScanHistory(verifiedOffers, date);
+    // The start of each new posting's text, for the night list's model.
+    try {
+      savePostingTexts(DATA_ROOT, verifiedOffers, date);
+    } catch (err) {
+      console.warn(`posting-text cache not written: ${err.message}`);
+    }
   }
   if (!dryRun && cooldownOffers.length > 0) {
     const cooldownGroups = {};
@@ -3420,6 +3467,13 @@ async function main() {
   }
   if (visaEnabled) {
     console.log(`Filtered by visa:      ${totalFilteredVisa} removed`);
+  }
+  if (tooManyYears !== null) {
+    console.log(`Filtered by years:     ${totalFilteredYears} removed (asked ${tooManyYears}+ years)`);
+    for (const [source, t] of Object.entries(yearsBySource).sort((a, b) => b[1].checked - a[1].checked)) {
+      console.log(`  ${source.padEnd(16)} ${t.stated}/${t.checked} stated their years, ${t.dropped} asked ${tooManyYears}+`);
+    }
+    for (const s of yearsSamples) console.log(`  dropped: ${s}`);
   }
   if (Object.keys(windows).length > 0 || totalFilteredCooldown > 0) {
     console.log(`Filtered by cooldown:  ${totalFilteredCooldown} removed`);
@@ -3583,7 +3637,9 @@ async function main() {
       filteredTitle: totalFilteredTitle, filteredTier: totalFilteredTier,
       filteredLocation: totalFilteredLocation, filteredPostingAge: totalFilteredPostingAge,
       filteredSalary: totalFilteredSalary,
-      filteredContent: totalFilteredContent, filteredCooldown: totalFilteredCooldown,
+      // The years filter reads the posting text, so it is counted as content
+      // here: scan-runs.tsv keeps its columns.
+      filteredContent: totalFilteredContent + totalFilteredYears, filteredCooldown: totalFilteredCooldown,
       dupes: totalDupes, newAdded: verifiedOffers.length, errors: errors.length,
       filteredBlacklist: totalFilteredBlacklist,
       filteredVisa: totalFilteredVisa,
@@ -3601,7 +3657,7 @@ async function main() {
     const filtered = totalFilteredTitle + totalFilteredTier + totalFilteredLocation
       + totalFilteredPostingAge + totalFilteredPostedDate + totalFilteredSalary
       + totalFilteredContent + totalFilteredCountryEligibility + totalFilteredBlacklist
-      + totalFilteredVisa + totalFilteredCooldown;
+      + totalFilteredVisa + totalFilteredCooldown + totalFilteredYears;
     emitJsonReceipt({
       version: 'careerops.scan.receipt@1',
       date,

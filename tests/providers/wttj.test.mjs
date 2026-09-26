@@ -357,6 +357,16 @@ try {
   } else {
     fail(`wttj.fetch() malformed-response error = ${JSON.stringify(badShapeErr) || 'did not throw'}`);
   }
+
+  // ---- minYears from experience_level_minimum (scan.mjs years filter) ----
+  const base = { name: 'Cloud Engineer', slug: 'cloud-engineer', organization: { slug: 'acme', name: 'Acme' } };
+  const y10 = normalizeWttjHit({ ...base, experience_level_minimum: 10 });
+  const y3s = normalizeWttjHit({ ...base, experience_level_minimum: '3' });
+  const yBad = normalizeWttjHit({ ...base, experience_level_minimum: 45 });
+  const yNone = normalizeWttjHit(base);
+  if (y10.minYears === 10 && y3s.minYears === 3 && !('minYears' in yBad) && !('minYears' in yNone)) {
+    pass('normalizeWttjHit() reads experience_level_minimum as minYears (0-20 only)');
+  } else fail(`minYears = ${JSON.stringify([y10.minYears, y3s.minYears, yBad.minYears, yNone.minYears])}`);
 } catch (e) {
   fail(`wttj provider tests crashed: ${e.message}`);
 }

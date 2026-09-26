@@ -38,6 +38,7 @@
 //     enabled: true
 
 import { sleep } from './_http.mjs';
+import { requiredYearsFromLabel } from '../lib/required-years.mjs';
 
 const TOKEN_URL =
   'https://entreprise.francetravail.fr/connexion/oauth2/access_token?realm=%2Fpartenaire';
@@ -135,6 +136,7 @@ export function normalizeDepartments(raw) {
  *   - postedAt: `dateCreation` (ISO 8601) → epoch ms.
  *   - description: `description`, already in the list payload.
  *   - salary:   `salaire.libelle`, yearly form only (see parseFranceTravailSalary).
+ *   - minYears: `experienceExige` "D" → 0, else `experienceLibelle` ("5 An(s)").
  *
  * @param {any} o
  * @param {string} [fallbackCompany]
@@ -196,6 +198,15 @@ export function normalizeFranceTravailOffer(o, fallbackCompany) {
 
   const salary = parseFranceTravailSalary(o.salaire && o.salaire.libelle);
   if (salary) job.salary = salary;
+
+  // Years asked (scan.mjs's years filter): `experienceExige` "D" is
+  // "débutant accepté"; otherwise `experienceLibelle`, e.g. "5 An(s)" or
+  // "Expérience exigée de 36 Mois".
+  if (o.experienceExige === 'D') job.minYears = 0;
+  else {
+    const years = requiredYearsFromLabel(typeof o.experienceLibelle === 'string' ? o.experienceLibelle : '');
+    if (years !== null) job.minYears = years;
+  }
 
   return job;
 }

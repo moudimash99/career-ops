@@ -285,6 +285,16 @@ try {
   } else {
     fail('a malformed search payload must throw rather than return []');
   }
+
+  // ---- minYears from experienceExige / experienceLibelle (years filter) ----
+  const ftOffer = { intitule: 'Ingénieur DevOps', id: '123ABC' };
+  const y5 = normalizeFranceTravailOffer({ ...ftOffer, experienceExige: 'E', experienceLibelle: '5 An(s)' });
+  const y3 = normalizeFranceTravailOffer({ ...ftOffer, experienceExige: 'E', experienceLibelle: 'Expérience exigée de 36 Mois' });
+  const yD = normalizeFranceTravailOffer({ ...ftOffer, experienceExige: 'D', experienceLibelle: 'Débutant accepté' });
+  const yNone = normalizeFranceTravailOffer(ftOffer);
+  if (y5.minYears === 5 && y3.minYears === 3 && yD.minYears === 0 && !('minYears' in yNone)) {
+    pass('normalizeFranceTravailOffer() reads the years asked from experienceLibelle / experienceExige');
+  } else fail(`minYears = ${JSON.stringify([y5.minYears, y3.minYears, yD.minYears, yNone.minYears])}`);
 } catch (err) {
   fail(`francetravail provider suite crashed: ${err.message}`);
 }

@@ -473,6 +473,8 @@ const SYSTEM_PATHS = [
   'lib/freemotion-snapshot.mjs',
   'lib/freemotion-submissions.mjs',
   'lib/freemotion-tier1.mjs',
+  'lib/required-years.mjs',
+  'lib/posting-text.mjs',
   'lib/freemotion-validate.mjs',
   'modes/apply-freemotion.md',
   'modes/auto-apply.md',
