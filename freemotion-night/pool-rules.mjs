@@ -91,7 +91,12 @@ export function placeFlags(location) {
 // Role rules: config/targets.yml. Company, seniority and language rules: here.
 
 const MANUAL = /\b(airbus|thales|capgemini|sogeti|accenture|ntt|alan)\b/i; // companies the user handles by hand
-const DEFENCE = /minist|défense|defense|armée|armees|naval group|mbda|safran|dassault|\bdga\b|gendarmerie|police/i;
+// Defence employers usually need French nationality or a clearance. Matched on
+// company + title. Whole words where a bare stem hit other jobs (2026-09-27):
+// "minist" matched adMINISTrateur (107 sysadmin/DevOps jobs dropped), "dassault"
+// matched Dassault Systèmes (software, not defence), and "La Défense" is a Paris
+// business district, not a sector.
+const DEFENCE = /\bminist[eè]res?\b|\bministry\b|(?<!la )d[ée]fense\b|\barm[ée]es?\b|naval group|\bmbda\b|\bsafran\b|dassault aviation|\bdga\b|gendarmerie|\bpolice\b/i;
 const SENIOR = /\b(senior|sr\.?|expert|exp[ée]riment[ée]e?|confirm[ée]e?)\b/i;
 // Posting language. The English flag gives the +5 below AND tells the applier
 // which language to write the cover letter in (make-jobs.mjs), so a French

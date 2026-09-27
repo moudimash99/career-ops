@@ -99,6 +99,16 @@ try {
   } else fail(`live = ${first.live.map((x) => x.url)} dropped = ${first.dropped.length} calls = ${calls.length} recheck = ${again.checked}`);
   rmSync(dir, { recursive: true, force: true });
 
+  // ---- defence rule: whole words, no sysadmin or Dassault Systèmes or La Défense -----
+  const { judge } = await load('freemotion-night/pool-rules.mjs');
+  const drop = (co, title) => judge({ url: 'u', co, title, loc: 'Paris', ageDays: 1 }).why === 'defence/ministry';
+  if (!drop('PMEJOB', 'Administrateur Systèmes Linux') && !drop('Dassault Systèmes', 'Ingénieur Cloud SRE')
+      && !drop('X', 'Ingénieur DevOps - Paris La Défense')
+      && drop('Civils de la Défense - Ministère des Armées', 'Data Engineer') && drop('MBDA France', 'Ingénieur Cloud')
+      && drop('Dassault Aviation', 'Ingénieur Système') && drop('Handicap Job', 'DevSecOps - Defense & Securite')) {
+    pass('the defence rule drops defence employers only (not "Administrateur", Dassault Systèmes or La Défense)');
+  } else fail('the defence rule drops the wrong jobs');
+
   // ---- posting language: the text decides, the title only without one ----------------
   const frText = 'Nous recherchons un ingénieur pour rejoindre notre équipe. Vous serez en charge de la plateforme et des pipelines avec les équipes produit, pour les clients du groupe. '.repeat(3);
   if (!isEnglishPosting('Admin système Linux et Cloud') && !isEnglishPosting('Chef de Projet Cybersécurité') && isEnglishPosting('Backend Engineer')
