@@ -6,6 +6,8 @@
 # hit (then agy is tried again), or for the rest of the night after a weekly-limit hit.
 # Skips jobs that already have a final result in this run. Retries network failures.
 # Prints one line per job: "job N (driver): outcome".
+# AGY_ONLY=1 bash freemotion-night/run.sh ...: never hand a job to Sonnet (it spends the
+# Claude plan); when agy runs out, the job in hand is left for a retry and the run stops.
 cd "$(dirname "$0")/.."
 ROOT=$(pwd -W 2>/dev/null || pwd)   # Windows-style path when available, for the agent prompt
 RUN=$(cat tmp/fm/night/run-id 2>/dev/null) || { echo "no tmp/fm/night/run-id: run freemotion-night/make-jobs.mjs first"; exit 1; }
@@ -17,6 +19,7 @@ url_of() { grep -m1 -oE '^   https?://\S+' "tmp/fm/night/job-$1.md" | tr -d ' ';
 result_of() { awk -F'\t' -v u="$1" -v r="$RUN" '$2==u && $8==r {o=$6} END {print o}' data/freemotion-submissions.tsv; }
 close_open() { node lib/freemotion-submissions.mjs finalize --url "$1" --outcome errored --run-id $RUN --notes "$2" > /dev/null 2>&1; }
 driver() {
+  if [ -n "$AGY_ONLY" ]; then echo agy; return; fi
   if [ -f "$FLAG" ]; then
     read kind at < "$FLAG"
     if [ "$kind" = "5h" ] && [ $(( $(date +%s) - at )) -ge 18000 ]; then rm -f "$FLAG"; echo agy; return; fi
@@ -47,6 +50,11 @@ for n in "$@"; do
           rs=$(grep -oE 'Resets in ([0-9]+h)?([0-9]+m)?' "tmp/fm/usage/agy-$n.json" | head -1)
           h=$(echo "$rs" | grep -oE '[0-9]+h' | tr -d h); m=$(echo "$rs" | grep -oE '[0-9]+m' | tr -d m)
           secs=$(( ${h:-5} * 3600 + ${m:-0} * 60 + 120 )); echo "5h $(( $(date +%s) + secs - 18000 ))" > "$FLAG"
+        fi
+        if [ -n "$AGY_ONLY" ]; then
+          echo "note: agy out of quota ($(cut -d' ' -f1 $FLAG)) at job $n; AGY_ONLY set, stopping (no Sonnet)"
+          [ "$(result_of "$u")" = in-progress ] && close_open "$u" "agy out of quota mid-job; AGY_ONLY run stopped, retry next run"
+          break 2
         fi
         echo "note: agy out of quota ($(cut -d' ' -f1 $FLAG)) at job $n, switching to sonnet"
         [ "$(result_of "$u")" = in-progress ] && close_open "$u" "agy ran out of quota mid-job; handing to sonnet"
