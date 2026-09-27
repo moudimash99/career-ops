@@ -93,7 +93,54 @@ export function placeFlags(location) {
 const MANUAL = /\b(airbus|thales|capgemini|sogeti|accenture|ntt|alan)\b/i; // companies the user handles by hand
 const DEFENCE = /minist|défense|defense|armée|armees|naval group|mbda|safran|dassault|\bdga\b|gendarmerie|police/i;
 const SENIOR = /\b(senior|sr\.?|expert|exp[ée]riment[ée]e?|confirm[ée]e?)\b/i;
-const FRENCH_TITLE = /\b(h\/f|f\/h|h\/f\/x|ing[ée]nieur|d[ée]veloppeur|architecte|consultant\.?e?|expert\.e)\b/i;
+// Posting language. The English flag gives the +5 below AND tells the applier
+// which language to write the cover letter in (make-jobs.mjs), so a French
+// posting read as English gets an English letter. Until 2026-09-26 it was
+// "the title has no H/F marker": every French title without one ("Chef de
+// Projet Cybersécurité", "Admin système Linux et Cloud") counted as English,
+// Free-Work (few H/F markers) filled the list and HelloWork (always H/F) vanished.
+// Now: the posting text decides when there is enough of it; the title only
+// when there is none. Both compared without accents.
+const FRENCH_TITLE = /\b(h\/f|f\/h|h\/f\/x|f\/h\/x|ingenieure?|developpeur|developpeuse|architecte|consultante?|expert\.e|chef|projet|responsable|administrateur|administratrice|analyste|gestionnaire|technicien|technicienne|coordinateur|coordinatrice|formateur|formatrice|integrateur|referent|referente|donnees|systemes?|reseaux?|securite|confirme|confirmee|experimente|experimentee|exploitation|recette|plateforme|ingenierie|charge|chargee|de|des|du|et|en|pour|sur)\b/;
+const FR_WORDS = new Set(['le', 'la', 'les', 'des', 'du', 'une', 'et', 'pour', 'vous', 'nous', 'avec', 'dans', 'sur', 'est', 'sont', 'votre', 'notre', 'au', 'aux', 'qui', 'que', 'nos', 'vos', 'ou', 'par', 'plus']);
+const EN_WORDS = new Set(['the', 'and', 'for', 'you', 'we', 'with', 'our', 'your', 'are', 'is', 'to', 'of', 'will', 'this', 'that', 'in', 'on', 'as', 'be', 'an', 'or', 'who', 'what', 'about']);
+const MIN_TEXT_WORDS = 40;
+
+// ── Night-list rank (user, 2026-09-26) ──────────────────────────────────
+// A model-scored job ranks by its fit (the model's 1-5 overall) plus small
+// nudges for the user's preferences, sized to break near-ties and never to
+// override the fit: a 4.8 Toulouse job beats a 4.6 Paris English one, a 5.0
+// Paris English one beats both. Before this, the fit only replaced the role
+// points inside the rule score below, where English +5 and Toulouse +2
+// outweighed it: of the 154 jobs the model rated 4.5+, 10 reached a 75-job
+// list. The rule score still orders jobs for scoring and for jobs the model
+// has not seen; a scored job ranks by rankScore() only (make-pool rankOrder).
+// offstack keeps targets.yml `rank_low` meaning "ranked low" at this scale.
+export const RANK_NUDGES = { toulouse: 0.3, paris: 0.1, english: 0.2, offstack: -0.5 };
+
+/** @param {{ fit: number, toulouse?: boolean, paris?: boolean, english?: boolean, offstack?: boolean }} x */
+export function rankScore(x) {
+  const place = x.toulouse ? RANK_NUDGES.toulouse : x.paris ? RANK_NUDGES.paris : 0;
+  const r = Number(x.fit) + place + (x.english ? RANK_NUDGES.english : 0) + (x.offstack ? RANK_NUDGES.offstack : 0);
+  return Math.round(r * 100) / 100;
+}
+
+/**
+ * Is this posting written in English? The text decides when it has at least
+ * MIN_TEXT_WORDS words (common French vs English words, counted); otherwise
+ * the title (no French marker or French job word = English).
+ * @param {string} title
+ * @param {string} [text]
+ */
+export function isEnglishPosting(title, text) {
+  const words = deaccent(text).split(/[^a-z]+/).filter(Boolean);
+  if (words.length >= MIN_TEXT_WORDS) {
+    let fr = 0, en = 0;
+    for (const w of words) { if (FR_WORDS.has(w)) fr++; else if (EN_WORDS.has(w)) en++; }
+    return en > fr;
+  }
+  return !FRENCH_TITLE.test(deaccent(title));
+}
 
 let defaultTargets;
 /** config/targets.yml, loaded once. A missing file is an error: the night list has no role rules without it. */
@@ -122,7 +169,7 @@ export function judge(x, targets = targetsOrThrow()) {
   //   rescue     a rescue word, no role word ("Presales Engineer")
   //   unsure     a non-fit word next to a role word ("Software Engineer - Sales team")
   const needsModel = role.groups.length === 0 || role.unsure;
-  const offstack = role.rankLow, senior = SENIOR.test(t), english = !FRENCH_TITLE.test(t);
+  const offstack = role.rankLow, senior = SENIOR.test(t), english = isEnglishPosting(t, x.text);
   const { toulouse, paris } = placeFlags(x.loc || '');
   const age = x.ageDays ?? 7;
   const score = (english ? 5 : 0) + role.points

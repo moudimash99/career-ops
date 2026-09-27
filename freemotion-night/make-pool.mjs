@@ -52,7 +52,7 @@
  *   the model reads 8+ years     → dropped, unless the text states fewer
  *   2–2.9 (stretch)              kept, ranked after every go job: applied to
  *                                only when the list has room left
- *   3+ (go)                      the overall replaces the role-word points
+ *   3+ (go)                      ranked by the fit, not the rule score (below)
  * A title that needs the model (none of our role words, a rescue word, or a
  * non-fit word next to a role word) waits until it has an answer. --no-llm, or no GEMINI_API_KEY:
  * no calls, stored answers still count.
@@ -69,7 +69,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 
-import { MAX_AGE_DAYS, capPerCompany, companyKey, judge, titleKey } from './pool-rules.mjs';
+import { MAX_AGE_DAYS, capPerCompany, companyKey, judge, rankScore, titleKey } from './pool-rules.mjs';
 import { DEFAULT_MODEL, FACTORS, STRETCH_AT, geminiGenerate, jobKey, readScores, resolveCandidate, scoreJobs, verdictOf } from './llm-score.mjs';
 import normalizeUrl from '../url-key.mjs';
 import { readCurrentState } from '../lib/freemotion-submissions.mjs';
@@ -221,6 +221,7 @@ export function applyScores(candidates, scores, { tooManyYears, textYears }) {
       tier: verdictOf(overall), // go, or stretch: applied to only when no go job is left
       score: +(x.score - (x.points || 0) + (overall - 2)).toFixed(2),
       fit: overall,
+      rank: rankScore({ ...x, fit: overall }),
       factors: Object.fromEntries(FACTORS.map((f) => [f, Number(s[f])])),
       summary: s.summary,
     });
@@ -228,12 +229,19 @@ export function applyScores(candidates, scores, { tooManyYears, textYears }) {
   return { kept, dropped };
 }
 
-/** Night-list order: scheduled routes first, then go before stretch, then score. */
+/**
+ * Night-list order: scheduled routes first, then go before stretch, then
+ * model-scored jobs by rank (fit + small Toulouse / Paris / English nudges,
+ * pool-rules.mjs rankScore) ahead of jobs the model has not seen yet, which
+ * keep the rule score; newest first on a tie.
+ */
 export const TIER_RANK = { go: 0, stretch: 1 };
 export function rankOrder(a, b) {
   return (SCHEDULED.has(b.route) - SCHEDULED.has(a.route))
     || ((TIER_RANK[a.tier] ?? 0) - (TIER_RANK[b.tier] ?? 0))
-    || b.score - a.score;
+    || ((b.rank != null) - (a.rank != null))
+    || (a.rank != null ? b.rank - a.rank : b.score - a.score)
+    || ((a.ageDays ?? 99) - (b.ageDays ?? 99));
 }
 
 /**
@@ -324,6 +332,10 @@ async function main() {
   const runLog = readCurrentState();
 
   const rows = readScanHistory(DAYS);
+  // Posting texts already cached (scan, earlier fetches): judge() reads the
+  // posting's language from them. Passed in, not kept on the row, so pool.json
+  // stays small.
+  const cachedTexts = loadPostingTexts(getCareerOpsRoot(), rows.map((r) => r.url));
   const candidates = [];
   for (const x of rows) {
     const logged = runLog.get(normalizeUrl(x.url));
@@ -332,7 +344,7 @@ async function main() {
     if (x.co && matchBlacklist(blacklist, x.co)) { drop('blacklisted company'); continue; }
     if (!inFrance(x.loc || '', x.url, x.title)) { drop('outside France (location filter)'); continue; }
     if (x.co && !checkCompany(x.co, capCounts).allowed) { drop('company cap reached'); continue; }
-    const v = judge(x);
+    const v = judge({ ...x, text: cachedTexts.get(x.url) });
     if (!v.ok) { drop(v.why); continue; }
     candidates.push({ ...x, ...v.fields });
   }

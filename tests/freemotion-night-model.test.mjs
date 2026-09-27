@@ -62,6 +62,32 @@ try {
     pass('the night list ranks scheduled first, then every go job before any stretch job, then score');
   } else fail(`order = ${order.join(' | ')}`);
 
+  // ---- rank by the model's fit (user, 2026-09-26) ------------------------------------
+  // The rule scores below are set BACKWARDS on purpose: English +5 and place
+  // points once outweighed the fit, and 10 of the 154 jobs rated 4.5+ made a
+  // 75-job list. If the rule score drives the order again, this fails.
+  const { rankScore, isEnglishPosting } = await load('freemotion-night/pool-rules.mjs');
+  if (k[3].rank === 3.4 && k[1].rank === undefined) pass('applyScores() gives each scored job a rank from its fit; unscored jobs have none');
+  else fail(`ranks = ${JSON.stringify(kept.map((x) => [x.title, x.rank]))}`);
+  const ranked = [
+    { title: '3.2 Paris English', fit: 3.2, paris: true, english: true, score: 20 },
+    { title: 'not scored yet', score: 99 },
+    { title: '4.6 Paris English', fit: 4.6, paris: true, english: true, score: 15 },
+    { title: '4.8 Toulouse French', fit: 4.8, toulouse: true, english: false, score: 3 },
+    { title: '5.0 Paris English', fit: 5.0, paris: true, english: true, score: 1 },
+  ].map((x) => ({ route: 'apply-here', tier: 'go', ...x, ...(x.fit != null ? { rank: rankScore(x) } : {}) }))
+    .sort(rankOrder).map((x) => x.title);
+  if (ranked.join() === '5.0 Paris English,4.8 Toulouse French,4.6 Paris English,3.2 Paris English,not scored yet') {
+    pass('scored jobs rank by fit; Toulouse / Paris / English only break near-ties; unscored jobs come after');
+  } else fail(`order = ${ranked.join(' | ')}`);
+
+  // ---- posting language: the text decides, the title only without one ----------------
+  const frText = 'Nous recherchons un ingénieur pour rejoindre notre équipe. Vous serez en charge de la plateforme et des pipelines avec les équipes produit, pour les clients du groupe. '.repeat(3);
+  if (!isEnglishPosting('Admin système Linux et Cloud') && !isEnglishPosting('Chef de Projet Cybersécurité') && isEnglishPosting('Backend Engineer')
+      && !isEnglishPosting('Data Engineer', frText)) {
+    pass('isEnglishPosting(): a French title without H/F is French, and a French text beats an English title');
+  } else fail('isEnglishPosting() misreads French postings as English');
+
   // ---- posting text fetch ----------------------------------------------------------
   const { jobPostingText, linkedinPostingText, fetchPostingText } = await load('lib/posting-fetch.mjs');
   const hwPage = `<html><head><script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Organization","name":"X"},
