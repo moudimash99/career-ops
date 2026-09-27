@@ -57,6 +57,14 @@
  * non-fit word next to a role word) waits until it has an answer. --no-llm, or no GEMINI_API_KEY:
  * no calls, stored answers still count.
  *
+ * LIVE CHECK — before the list is written, the scheduled jobs are checked in
+ * rank order (liveness-api.mjs, then one headless page at a time,
+ * liveness-browser.mjs) and only live ones are kept: a dead or unclear link is
+ * skipped and the next job takes its place until the list is full. HelloWork
+ * leaves an expired posting's page up without its apply button: that reads
+ * "uncertain" and is skipped too. Results are kept in data/posting-liveness.json
+ * (dead 14 days, live or unclear 1 day). --no-live-check skips the step.
+ *
  * Writes (tmp/fm/night/):
  *   pool.json    every kept job, ranked, with route, source, where else it was
  *                seen, and the model's fit / factors / summary when scored
@@ -82,6 +90,8 @@ import { requiredYears } from '../lib/required-years.mjs';
 import { clipText, loadPostingTexts, savePostingTexts } from '../lib/posting-text.mjs';
 import { fetchPostingText, needsTextFetch } from '../lib/posting-fetch.mjs';
 import { localToday } from '../lib/local-today.mjs';
+import { checkLivenessViaApi } from '../liveness-api.mjs';
+import { checkUrlLivenessWithFallback, jitteredDelayMs, newLivenessPage, sleep } from '../liveness-browser.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const OUT = join(ROOT, 'tmp/fm/night');
@@ -227,6 +237,66 @@ export function applyScores(candidates, scores, { tooManyYears, textYears }) {
     });
   }
   return { kept, dropped };
+}
+
+/** How long a liveness result is reused (data/posting-liveness.json). */
+export const LIVE_KEEP_MS = { active: DAY_MS, uncertain: DAY_MS, expired: 14 * DAY_MS };
+
+/** One posting: the free ATS API first, else one headless page (opened once, reused). */
+function browserChecker({ throttleMs = 2000 } = {}) {
+  let browser = null, page = null;
+  return {
+    async check(url) {
+      const api = await checkLivenessViaApi(url);
+      if (api) return api;
+      if (!browser) {
+        const { chromium } = await import('playwright');
+        browser = await chromium.launch({ headless: true });
+        page = await newLivenessPage(browser);
+      }
+      const r = await checkUrlLivenessWithFallback(page, url, {});
+      await sleep(jitteredDelayMs(throttleMs));
+      return r;
+    },
+    async close() { if (browser) await browser.close(); },
+  };
+}
+
+/**
+ * The first `top` candidates (already in rank order) whose posting is live.
+ * Sequential: never Playwright in parallel. Cached results are reused while fresh.
+ * @param {Array<{ url: string }>} candidates
+ * @param {number} top
+ * @param {{ check?: (url: string) => Promise<{ result: string, reason?: string }>, cachePath?: string, now?: number }} [opts]
+ */
+export async function takeLive(candidates, top, { check, cachePath = join(ROOT, 'data/posting-liveness.json'), now = Date.now() } = {}) {
+  const cache = existsSync(cachePath) ? JSON.parse(readFileSync(cachePath, 'utf8')) : {};
+  const fresh = (c) => c && now - c.at < (LIVE_KEEP_MS[c.result] ?? DAY_MS);
+  const own = check ? null : browserChecker();
+  const checkOne = check || own.check;
+  const live = [];
+  const dropped = [];
+  let checked = 0;
+  try {
+    for (const x of candidates) {
+      if (live.length >= top) break;
+      let c = cache[x.url];
+      if (!fresh(c)) {
+        let r;
+        try { r = await checkOne(x.url); } catch (err) { r = { result: 'uncertain', reason: `check failed: ${err.message}` }; }
+        c = cache[x.url] = { result: r.result, reason: r.reason || '', at: now };
+        checked++;
+      }
+      if (c.result === 'active') live.push(x);
+      else dropped.push({ ...x, live: c.result, liveReason: c.reason });
+    }
+  } finally {
+    if (own) await own.close();
+  }
+  for (const [u, c] of Object.entries(cache)) if (now - c.at > LIVE_KEEP_MS.expired) delete cache[u];
+  mkdirSync(dirname(cachePath), { recursive: true });
+  writeFileSync(cachePath, JSON.stringify(cache));
+  return { live, dropped, checked };
 }
 
 /**
@@ -409,12 +479,15 @@ async function main() {
 
   const { kept, merges } = mergeSameJobs(routed);
   const ranked = capPerCompany([...kept].sort(rankOrder));
-  const list = ranked.filter((x) => SCHEDULED.has(x.route)).slice(0, TOP)
+  const scheduled = ranked.filter((x) => SCHEDULED.has(x.route));
+  const liveCheck = argv.includes('--no-live-check') ? null : await takeLive(scheduled, TOP);
+  const list = (liveCheck ? liveCheck.live : scheduled.slice(0, TOP))
     .map((x) => ({ co: x.co, title: x.title, url: x.url, english: x.english, toulouse: x.toulouse, paris: x.paris, route: x.route, source: x.source, tier: x.tier, ...(x.fit != null ? { fit: x.fit } : {}) }));
 
   mkdirSync(OUT, { recursive: true });
   writeFileSync(join(OUT, 'pool.json'), JSON.stringify(ranked.map(({ origUrl, ...x }) => x), null, 1));
   writeFileSync(join(OUT, 'list.json'), JSON.stringify(list, null, 1));
+  if (liveCheck) writeFileSync(join(OUT, 'dead.txt'), liveCheck.dropped.map((x) => `${x.live.padEnd(9)} ${x.co} | ${x.title} | ${x.url}${x.liveReason ? `  (${x.liveReason})` : ''}`).join('\n') + '\n');
   const line = (x) => `${x.source.padEnd(13)} ${x.route.padEnd(18)} ${x.co} | ${x.title} | ${x.url}`;
   writeFileSync(join(OUT, 'merges.txt'), merges.map((g) =>
     [`KEPT    ${line(g.kept)}`, ...g.dropped.map((d, i) => `  merged ${line(d)}   (${g.by[i]})`)].join('\n')).join('\n\n') + '\n');
@@ -426,6 +499,7 @@ async function main() {
   console.log(`  passed the rules: ${routed.length} | merged away as duplicates: ${routed.length - kept.length} (${merges.length} groups, see merges.txt)`);
   console.log(`  kept: ${ranked.length} after the ${4}-per-company cap | by route: ${sorted(count(ranked, (x) => x.route))}`);
   console.log(`  scheduled pool by source: ${sorted(count(ranked.filter((x) => SCHEDULED.has(x.route)), (x) => x.source))}`);
+  if (liveCheck) console.log(`  live check: ${liveCheck.checked} checked (the rest cached), ${liveCheck.dropped.length} skipped as dead or unclear (see dead.txt)`);
   console.log(`  tonight's list: ${list.length} jobs | Toulouse ${list.filter((x) => x.toulouse).length} · Paris ${list.filter((x) => x.paris).length} · English ${list.filter((x) => x.english).length} · model-scored ${list.filter((x) => x.fit != null).length} · stretch ${list.filter((x) => x.tier === 'stretch').length} -> ${join('tmp/fm/night', 'list.json')}`);
 }
 

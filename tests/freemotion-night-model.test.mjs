@@ -81,6 +81,24 @@ try {
     pass('scored jobs rank by fit; Toulouse / Paris / English only break near-ties; unscored jobs come after');
   } else fail(`order = ${ranked.join(' | ')}`);
 
+  // ---- live check: dead or unclear links are skipped and the next job fills in --------
+  const { takeLive } = await load('freemotion-night/make-pool.mjs');
+  const { mkdtempSync, rmSync } = await import('fs');
+  const { tmpdir } = await import('os');
+  const dir = mkdtempSync(join(tmpdir(), 'live-'));
+  const cachePath = join(dir, 'liveness.json');
+  const status = { a: 'active', b: 'expired', c: 'uncertain', d: 'active', e: 'active' };
+  const calls = [];
+  const check = async (url) => { calls.push(url); return { result: status[url.slice(-1)], reason: 'test' }; };
+  const cands = ['a', 'b', 'c', 'd', 'e'].map((id) => ({ url: `https://x/${id}` }));
+  const first = await takeLive(cands, 3, { check, cachePath, now: 1_000_000 });
+  const again = await takeLive(cands, 3, { check, cachePath, now: 1_000_000 + 3_600_000 });
+  if (first.live.map((x) => x.url.slice(-1)).join() === 'a,d,e' && first.dropped.length === 2 && calls.length === 5
+      && again.live.length === 3 && again.checked === 0 && calls.length === 5) {
+    pass('takeLive() skips dead and unclear links, fills from the next jobs, and reuses fresh results');
+  } else fail(`live = ${first.live.map((x) => x.url)} dropped = ${first.dropped.length} calls = ${calls.length} recheck = ${again.checked}`);
+  rmSync(dir, { recursive: true, force: true });
+
   // ---- posting language: the text decides, the title only without one ----------------
   const frText = 'Nous recherchons un ingénieur pour rejoindre notre équipe. Vous serez en charge de la plateforme et des pipelines avec les équipes produit, pour les clients du groupe. '.repeat(3);
   if (!isEnglishPosting('Admin système Linux et Cloud') && !isEnglishPosting('Chef de Projet Cybersécurité') && isEnglishPosting('Backend Engineer')
