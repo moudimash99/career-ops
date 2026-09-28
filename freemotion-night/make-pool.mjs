@@ -78,7 +78,7 @@ import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 
 import { MAX_AGE_DAYS, capPerCompany, companyKey, judge, rankScore, titleKey } from './pool-rules.mjs';
-import { DEFAULT_MODEL, FACTORS, STRETCH_AT, geminiGenerate, jobKey, readScores, resolveCandidate, scoreJobs, verdictOf } from './llm-score.mjs';
+import { DEFAULT_MODEL, FACTORS, STRETCH_AT, gateJobs, geminiGateGenerate, geminiGenerate, jobKey, readGate, readScores, resolveCandidate, scoreJobs, verdictOf } from './llm-score.mjs';
 import normalizeUrl from '../url-key.mjs';
 import { readCurrentState } from '../lib/freemotion-submissions.mjs';
 import { checkCompany, countByCompany, matchBlacklist } from '../lib/company-cap.mjs';
@@ -209,6 +209,29 @@ export function mergeSameJobs(rows) {
  *   textYears: years read from the posting text, by URL, where the text is known
  * @returns {{ kept: object[], dropped: Array<{ row: object, why: string }> }}
  */
+/**
+ * Titles clearly in our fields skip the quick gate (issue #10): a role group
+ * worth 1.5+ points, not unmatched / unsure / rescued, not off-stack.
+ */
+export const strongTitle = (x) => (x.points || 0) >= 1.5 && !x.needsModel && !x.offstack;
+
+/**
+ * The quick gate's verdicts on the rule-kept jobs. Strong titles and jobs that
+ * already have a full score pass; a stored no-go is dropped; a job the gate has
+ * not answered yet (no key, quota) passes and is left to the full score.
+ */
+export function applyGate(candidates, gate, scored) {
+  const passed = [];
+  const dropped = [];
+  for (const x of candidates) {
+    const k = jobKey(x);
+    const g = strongTitle(x) || scored.has(k) ? null : gate.get(k);
+    if (g && !g.go) dropped.push({ ...x, gateReason: g.reason });
+    else passed.push(x);
+  }
+  return { passed, dropped };
+}
+
 export function applyScores(candidates, scores, { tooManyYears, textYears }) {
   const kept = [];
   const dropped = [];
@@ -381,9 +404,12 @@ async function main() {
   const TOP = Number(flag('--top', 25));
   const DAYS = Number(flag('--days', MAX_AGE_DAYS));
   const askApec = !argv.includes('--no-apec');
-  const LLM_MAX = Number(flag('--llm-max', 300));
+  // Every job that passed the gate is scored (issue #10); the free daily quota
+  // stops the run cleanly and the rest continues the next night.
+  const LLM_MAX = Number(flag('--llm-max', 5000));
   const drops = {};
   const drop = (why) => (drops[why] = (drops[why] || 0) + 1);
+  let gateLine = '';
 
   // "Never twice" inputs — the same ones the run-time claim uses.
   const { loadBlacklist, buildLocationFilter, PORTALS_PATH } = await import('../scan.mjs');
@@ -419,24 +445,42 @@ async function main() {
     candidates.push({ ...x, ...v.fields });
   }
 
-  // The model: score what has no stored answer yet, then apply every answer.
+  // The model (issue #10): a quick batched go / no-go on the titles that are
+  // not clearly ours, then the full score for every job that passed.
   const targets = loadTargets();
   const tooManyYears = targets?.tooManyYears ?? null;
   let textYears = new Map();
+  let apiKey = '';
+  let who = null;
   if (!argv.includes('--no-llm')) {
     try { (await import('dotenv')).config({ path: join(ROOT, '.env'), quiet: true }); } catch { /* optional */ }
-    const apiKey = (process.env.GEMINI_API_KEY || '').trim();
-    if (!apiKey) console.warn('make-pool: no GEMINI_API_KEY, so no new model scores tonight; titles that need one wait.');
-    else if (!targets?.candidate) console.warn('make-pool: config/targets.yml has no candidate: block; no model scores tonight.');
-    else {
-      try {
-        textYears = await runModel(candidates, {
-          max: LLM_MAX, rpm: Number(flag('--rpm', 12)), model: flag('--model', process.env.GEMINI_MODEL || DEFAULT_MODEL),
-          tooManyYears, candidate: resolveCandidate(targets.candidate).candidate, apiKey,
-        });
-      } catch (err) {
-        console.warn(`make-pool: model step failed (${String(err.message || err).split(apiKey).join('[key]')}); stored scores still apply.`);
-      }
+    apiKey = (process.env.GEMINI_API_KEY || '').trim();
+    if (!apiKey) console.warn('make-pool: no GEMINI_API_KEY, so no new model answers tonight; titles that need one wait.');
+    else if (!targets?.candidate) console.warn('make-pool: config/targets.yml has no candidate: block; no model answers tonight.');
+    else who = resolveCandidate(targets.candidate).candidate;
+  }
+  const model = flag('--model', process.env.GEMINI_MODEL || DEFAULT_MODEL);
+  const hideKey = (err) => (apiKey ? String(err.message || err).split(apiKey).join('[key]') : String(err.message || err));
+  const scoredBefore = readScores();
+  if (who) {
+    try {
+      const g = await gateJobs(candidates.filter((x) => !strongTitle(x) && !scoredBefore.has(jobKey(x))), {
+        generate: await geminiGateGenerate({ apiKey, model }), candidate: who, model, log: (m) => console.warn(m),
+      });
+      gateLine = `  gate: ${g.asked} titles asked (${g.go} go, ${g.noGo} no-go${g.failed ? `, ${g.failed} failed` : ''})`;
+    } catch (err) {
+      console.warn(`make-pool: gate step failed (${hideKey(err)}); stored answers still apply.`);
+    }
+  }
+  const gated = applyGate(candidates, readGate(), scoredBefore);
+  for (const d of gated.dropped) drop('gate: no-go');
+  candidates.length = 0;
+  candidates.push(...gated.passed);
+  if (who) {
+    try {
+      textYears = await runModel(candidates, { max: LLM_MAX, rpm: Number(flag('--rpm', 12)), model, tooManyYears, candidate: who, apiKey });
+    } catch (err) {
+      console.warn(`make-pool: model step failed (${hideKey(err)}); stored scores still apply.`);
     }
   }
   const scores = readScores();
@@ -496,6 +540,7 @@ async function main() {
   const sorted = (o) => JSON.stringify(Object.fromEntries(Object.entries(o).sort((a, b) => b[1] - a[1])));
   console.log(`make-pool: ${rows.length} scanned jobs from the last ${DAYS} days`);
   console.log(`  dropped: ${sorted(drops)}`);
+  if (gateLine) console.log(gateLine);
   console.log(`  passed the rules: ${routed.length} | merged away as duplicates: ${routed.length - kept.length} (${merges.length} groups, see merges.txt)`);
   console.log(`  kept: ${ranked.length} after the ${4}-per-company cap | by route: ${sorted(count(ranked, (x) => x.route))}`);
   console.log(`  scheduled pool by source: ${sorted(count(ranked.filter((x) => SCHEDULED.has(x.route)), (x) => x.source))}`);

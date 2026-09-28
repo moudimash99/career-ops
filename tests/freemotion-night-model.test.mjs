@@ -99,6 +99,36 @@ try {
   } else fail(`live = ${first.live.map((x) => x.url)} dropped = ${first.dropped.length} calls = ${calls.length} recheck = ${again.checked}`);
   rmSync(dir, { recursive: true, force: true });
 
+  // ---- quick gate (issue #10): batched go / no-go, stored, strong titles skip it ------
+  const { gateJobs, readGate } = await load('freemotion-night/llm-score.mjs');
+  const { applyGate, strongTitle } = await load('freemotion-night/make-pool.mjs');
+  const gdir = mkdtempSync(join(tmpdir(), 'gate-'));
+  const gpath = join(gdir, 'gate.tsv');
+  const prompts = [];
+  // Batch 1 answers both; batch 2 leaves its only job out (it must stay unanswered).
+  const gen = async (_ins, prompt) => {
+    prompts.push(prompt);
+    return JSON.stringify({ results: prompts.length === 1 ? [{ id: 1, go: true, reason: 'devops' }, { id: 2, go: false, reason: 'sales' }] : [] });
+  };
+  const gjobs = [{ title: 'Ingénieur Sysops', co: 'A' }, { title: 'Commercial terrain', co: 'B' }, { title: 'Chef de projet IT', co: 'C' }];
+  const g1 = await gateJobs(gjobs, { generate: gen, candidate: {}, batch: 2, path: gpath });
+  const g2 = await gateJobs(gjobs, { generate: gen, candidate: {}, batch: 2, path: gpath });
+  const stored = readGate(gpath);
+  if (g1.asked === 3 && g1.go === 1 && g1.noGo === 1 && prompts.length === 3 && g2.asked === 1
+      && stored.get(jobKey(gjobs[1]))?.go === false && !stored.has(jobKey(gjobs[2]))) {
+    pass('gateJobs() asks in batches, stores go / no-go, never re-asks an answered job, retries an unanswered one');
+  } else fail(`gate = ${JSON.stringify({ g1, g2, calls: prompts.length })}`);
+  rmSync(gdir, { recursive: true, force: true });
+  const strong = { title: 'Ingénieur DevOps', co: 'S', points: 2, needsModel: false, offstack: false };
+  const weakNo = { title: 'Commercial terrain', co: 'B', points: 0, needsModel: true };
+  const weakGo = { title: 'Ingénieur Sysops', co: 'A', points: 0, needsModel: true };
+  const weakUnasked = { title: 'Chef de projet IT', co: 'C', points: 0.5, needsModel: false };
+  const gateMap = new Map([[jobKey(strong), { go: false }], [jobKey(weakNo), { go: false }], [jobKey(weakGo), { go: true }]]);
+  const ag = applyGate([strong, weakNo, weakGo, weakUnasked], gateMap, new Map());
+  if (strongTitle(strong) && !strongTitle(weakUnasked) && ag.passed.map((x) => x.co).join() === 'S,A,C' && ag.dropped.map((x) => x.co).join() === 'B') {
+    pass('applyGate(): strong titles pass without the gate, a no-go is dropped, go and not-yet-asked pass to full scoring');
+  } else fail(`applyGate passed ${ag.passed.map((x) => x.co)} dropped ${ag.dropped.map((x) => x.co)}`);
+
   // ---- defence rule: whole words, no sysadmin or Dassault Systèmes or La Défense -----
   const { judge } = await load('freemotion-night/pool-rules.mjs');
   const drop = (co, title) => judge({ url: 'u', co, title, loc: 'Paris', ageDays: 1 }).why === 'defence/ministry';
