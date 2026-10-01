@@ -125,7 +125,8 @@ export function loadContextInputs({ jd, root = getCareerOpsRoot() }) {
   const readData = (p) => readFileSync(join(root, p), 'utf8');
   const jdPath = resolve(jd);
   if (!existsSync(jdPath)) throw new Error(`posting not found: ${jd}`);
-  const pdfPath = existsSync(join(root, 'modes/pdf.md')) ? join(root, 'modes/pdf.md') : join(CODE_ROOT, 'modes/pdf.md');
+  // System Layer: always the codebase copy, never the data root (#3500).
+  const pdfPath = join(CODE_ROOT, 'modes/pdf.md');
   return {
     customMd: readData('modes/_custom.md'),
     pdfMd: readFileSync(pdfPath, 'utf8'),

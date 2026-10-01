@@ -38,7 +38,6 @@ const KNOWN_FLAGS = [
   '--count', '--since', '--report', '--company', '--full', '--open', '--list', '--json',
   '--help', '-h',
 ];
-const VALUE_FLAGS = ['--count', '--since', '--report', '--company'];
 
 const WTTJ_API = 'https://api.welcometothejungle.com/api/v1/organizations';
 const PREVIEW_CHARS = 1200;
@@ -171,7 +170,10 @@ async function main(argv) {
     console.log(readFileSync(new URL(import.meta.url), 'utf8').split('*/')[0].replace(/^[\s\S]*?\/\*\*/, ''));
     return 0;
   }
-  validateFlags(argv, KNOWN_FLAGS, VALUE_FLAGS, 'reread-jd.mjs');
+  validateFlags(argv, KNOWN_FLAGS, 'Usage: node reread-jd.mjs [--report N | --company X | --since YYYY-MM-DD] [--count N] (see --help)', {
+    valueFlags: ['--count', '--since', '--report', '--company'],
+    requireOperand: true,
+  });
 
   const trackerPath = resolveTrackerPath(getCareerOpsRoot());
   if (!existsSync(trackerPath)) {

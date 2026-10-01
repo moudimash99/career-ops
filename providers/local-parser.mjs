@@ -137,6 +137,51 @@ function normalizeLocation(value) {
   return String(value).trim();
 }
 
+// The ECMA-262 Date range: ±100,000,000 days from the epoch, in ms. A raw
+// number outside this range is finite but produces an Invalid Date, which
+// throws RangeError downstream (scan.mjs's postedAtIsoDate calls toISOString()).
+const MAX_VALID_EPOCH_MS = 8_640_000_000_000_000;
+
+// NaN-safe coercion for an optional parser-supplied posting date. Accepts an
+// epoch-milliseconds number or a Date.parse-able string; an unparseable
+// string, a non-finite or out-of-range number, a non-string/non-number
+// value, or an absent field yields undefined, so the row is kept without a
+// date rather than carrying a wrong one. The `typeof value !== 'string'`
+// guard is load-bearing, not redundant with the truthiness check below it: a
+// truthy object (e.g. one JSON.parse produces from `{"toString":null}`)
+// reaching Date.parse() throws TypeError (ToPrimitive can't call a
+// non-callable toString and Object.prototype.valueOf isn't primitive), which
+// is not caught anywhere between here and the parser's fetch() call.
+// A result at or before the Unix epoch is rejected, not preserved: no real
+// job posting predates 1970, so `0` (or negative) is a sentinel/placeholder
+// from the source, not a date, regardless of which alias or format it came
+// in as.
+function toEpochMs(value) {
+  let ms;
+  if (typeof value === 'number') {
+    if (!Number.isFinite(value)) return undefined;
+    ms = value;
+  } else if (typeof value === 'string' && value) {
+    ms = Date.parse(value);
+    if (Number.isNaN(ms)) return undefined;
+  } else {
+    return undefined;
+  }
+  return ms > 0 && ms <= MAX_VALID_EPOCH_MS ? ms : undefined;
+}
+
+// Tries each alias in order and keeps the first one that parses, so a garbage
+// value in an earlier-checked field (e.g. postedAt) doesn't hide a good date
+// in a later one (e.g. posted_at) — unlike a `??` chain, which stops at the
+// first non-nullish value regardless of whether it actually parses.
+function firstPostedAt(...candidates) {
+  for (const candidate of candidates) {
+    const parsed = toEpochMs(candidate);
+    if (parsed !== undefined) return parsed;
+  }
+  return undefined;
+}
+
 function normalizeParserJob(job, entry) {
   if (!job || typeof job !== 'object') return null;
 
@@ -156,6 +201,13 @@ function normalizeParserJob(job, entry) {
   // Posting text, when the parser has it: read by scan.mjs's content, visa
   // and years filters, and cached for the night list's model.
   if (typeof job.description === 'string' && job.description.trim()) out.description = job.description.trim();
+
+  const postedAt = firstPostedAt(
+    job.postedAt, job.posted_at, job.publishedAt, job.published_at,
+    job.published_date, job.datePosted, job.date_posted,
+  );
+  if (postedAt !== undefined) out.postedAt = postedAt;
+
   return out;
 }
 
