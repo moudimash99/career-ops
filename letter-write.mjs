@@ -10,8 +10,8 @@
 //     hand-tuned "someone typing into a form" register)
 //   - cv.md verbatim, and the posting
 //
-// A draft that fails the checks gets ONE retry with the problems listed. If
-// the retry fails too, nothing is written as the letter (exit 2) and the
+// A draft that fails the checks gets up to TWO revisions, each with the
+// problems listed. If the last one fails too, nothing is written (exit 2) and the
 // caller falls back (short letter, or no letter): a bad letter is worse than
 // none.
 //
@@ -87,7 +87,7 @@ export function buildLetterContext({ parts, cvMd, jdText, version = 'full', form
     ? `=== TONE EXAMPLES (approved answers in the right register: match how they SOUND; take no facts from them, their content may be outdated) ===\n${parts.examples.map((e, i) => `--- example ${i + 1} ---\n${e}`).join('\n\n')}\n\n`
     : '';
   const retryBlock = retry
-    ? `=== YOUR FIRST DRAFT FAILED THESE CHECKS — WRITE A NEW ONE THAT PASSES ===\n${retry.problems.map((x) => `- ${x}`).join('\n')}\n\nFirst draft (do not reuse its sentences):\n${retry.text}\n\n`
+    ? `=== YOUR LAST DRAFT FAILED THESE CHECKS — WRITE A NEW ONE THAT PASSES ===\n${retry.problems.map((x) => `- ${x}`).join('\n')}\n\nLast draft (do not reuse its sentences):\n${retry.text}\n\n`
     : '';
   return `Write one ${version} cover letter for this job application, as JSON.
 Everything you need is in this file. Do not open or read any other file.
@@ -147,9 +147,12 @@ export function rolloutPick(root, currentParts, rng = Math.random) {
 }
 
 /**
- * Write a letter with agy, check it, retry once on failure.
+ * Write a letter with agy, check it, revise up to MAX_REVISIONS times on failure.
  * @returns {Promise<{ok: boolean, letter?: object, text?: string, check: object, attempts: number, promptVersion: string, usage: object[]}>}
  */
+/** Revisions after the first draft (decided 2026-09-30; was 1). */
+export const MAX_REVISIONS = 2;
+
 export async function writeLetter({ inputs, version, format, lang, root, write = writeWithAgy, rollout = true, rng = Math.random }) {
   const postingLanguage = lang || detectLanguage(inputs.jdText);
   const recent = recentLetters(root);
@@ -158,7 +161,7 @@ export async function writeLetter({ inputs, version, format, lang, root, write =
   const usage = [];
   let retry;
   let last;
-  for (let attempt = 1; attempt <= 2; attempt++) {
+  for (let attempt = 1; attempt <= 1 + MAX_REVISIONS; attempt++) {
     const context = buildLetterContext({ parts: pick.parts, cvMd: inputs.cvMd, jdText: inputs.jdText, version, format, lang: postingLanguage, retry });
     const res = await write(context);
     usage.push(res.usage || {});
@@ -175,7 +178,7 @@ export async function writeLetter({ inputs, version, format, lang, root, write =
     }
     retry = { problems: check.problems, text };
   }
-  return { ok: false, ...last, attempts: 2, promptVersion: pick.id, rollout: pick.state, usage };
+  return { ok: false, ...last, attempts: 1 + MAX_REVISIONS, promptVersion: pick.id, rollout: pick.state, usage };
 }
 
 // ── PDF ────────────────────────────────────────────────────────────────

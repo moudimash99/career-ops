@@ -66,18 +66,21 @@ for (let i = 0; i < ro.STAGE_SIZE; i++) held = ro.recordWritten(held, 'b', { a: 
 check('holds when the old version got a callback and the new one none', [held.stage, Boolean(held.held)], [0, true]);
 check('letters written by the stable version do not count', ro.recordWritten(held, 'a', {}), held);
 
-// ── writeLetter: retry once, then refuse ──────────────────────────────
+// ── writeLetter: two revisions, then refuse ──────────────────────────────
 {
   const root = tmpRoot();
   const inputs = { parts, cvMd: 'cv', jdText: 'Bonjour, poste à Blagnac pour une équipe de développement web et la production.' };
   let calls = 0;
   const bad = { greeting: 'Bonjour,', paragraphs: ['Fort de mon expérience, je veux ce poste.'], sign_off: 'Cordialement,' };
   const r1 = await lw.writeLetter({ inputs, version: 'short', format: 'form', root, rollout: false, write: async () => { calls++; return { payload: bad, usage: {} }; } });
-  check('a failing draft is retried once, then refused', [r1.ok, r1.attempts, calls], [false, 2, 2]);
+  check('a failing draft is revised twice, then refused', [r1.ok, r1.attempts, calls], [false, 3, 3]);
   let n = 0;
   const good = { greeting: 'Bonjour,', paragraphs: FR.split('\n\n').slice(1, 3), sign_off: 'Cordialement,' };
   const r2 = await lw.writeLetter({ inputs, version: 'short', format: 'form', root, rollout: false, write: async (ctxText) => { n++; return { payload: n === 1 ? bad : good, usage: {} }; } });
-  check('the retry can pass', [r2.ok, r2.attempts], [true, 2]);
+  check('the first revision can pass', [r2.ok, r2.attempts], [true, 2]);
+  let m = 0;
+  const r3 = await lw.writeLetter({ inputs, version: 'short', format: 'form', root, rollout: false, write: async () => { m++; return { payload: m < 3 ? bad : good, usage: {} }; } });
+  check('the second revision can pass', [r3.ok, r3.attempts, m], [true, 3, 3]);
 }
 
 // ── letter experiment: its own ledger, its own arms ───────────────────
