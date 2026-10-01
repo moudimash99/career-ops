@@ -174,7 +174,16 @@ function buildHeader(candidate = {}) {
   if (text(candidate.email)) cv.email = text(candidate.email);
   if (text(candidate.phone)) cv.phone = text(candidate.phone).replace(/[\s.()-]/g, '');
   const portfolio = candidate.portfolio?.url || candidate.website;
-  if (text(portfolio)) cv.website = /^https?:\/\//i.test(text(portfolio)) ? text(portfolio) : `https://${text(portfolio)}`;
+  if (text(portfolio)) {
+    const url = /^https?:\/\//i.test(text(portfolio)) ? text(portfolio) : `https://${text(portfolio)}`;
+    // RenderCV prints a website as its own URL. When the link is not what the
+    // page should show (a tracked machaka.net/r/<code>, see lib/site-links.mjs),
+    // a custom connection keeps the same link icon and shows the display text.
+    const display = text(candidate.portfolio?.display);
+    const shown = url.replace(/^https?:\/\//i, '').replace(/\/+$/, '');
+    if (display && display.replace(/\/+$/, '') !== shown) cv.custom_connections = [{ fontawesome_icon: 'link', placeholder: display, url }];
+    else cv.website = url;
+  }
   const social = [];
   for (const [key, network] of [['linkedin', 'LinkedIn'], ['github', 'GitHub']]) {
     const username = usernameFromUrl(candidate[key]?.url, network);

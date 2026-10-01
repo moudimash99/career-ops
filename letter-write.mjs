@@ -36,6 +36,7 @@ import * as yaml from 'js-yaml';
 import { getCareerOpsRoot } from './path-resolver.mjs';
 import { isMainModule } from './lib/is-main-module.mjs';
 import { markdownSections, writeWithAgy } from './cv-write.mjs';
+import { codeOf, displayOf, markUsed, replaceSiteMentions } from './lib/site-links.mjs';
 import {
   LETTER_LOG_RELATIVE_PATH, appendLetterLog, checkLetter, detectLanguage, openingOf, parseVoiceDna, recentLetters,
 } from './lib/letter-check.mjs';
@@ -182,7 +183,7 @@ export async function writeLetter({ inputs, version, format, lang, root, write =
 const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
 /** A plain one-page letter: contact header, place/date, the letter. No title, no bullets. */
-export function letterHtml(letter, { contact = '', company = '', city = '', date = new Date() } = {}) {
+export function letterHtml(letter, { contact = '', company = '', city = '', date = new Date(), siteLink = '' } = {}) {
   const lang = letter.language === 'en' ? 'en' : 'fr';
   const when = date.toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
   const place = lang === 'fr' ? `Toulouse, le ${when}` : `Toulouse, ${when}`;
@@ -192,12 +193,13 @@ export function letterHtml(letter, { contact = '', company = '', city = '', date
 body { font-family: Georgia, 'Times New Roman', serif; font-size: 11pt; line-height: 1.45; color: #111; }
 .name { font-size: 15pt; font-weight: bold; margin: 0; }
 .contact { color: #333; margin: 2px 0 18px; font-size: 10pt; }
+.contact a { color: inherit; text-decoration: none; }
 .meta { margin: 0 0 18px; }
 p { margin: 0 0 10px; }
 .sign { margin-top: 16px; }
 </style></head><body>
 <p class="name">${esc(letter.name || 'Mohammad Machaka')}</p>
-<p class="contact">${esc(contact)}</p>
+<p class="contact">${[contact ? esc(contact) : '', siteLink ? `<a href="${esc(siteLink)}">${esc(displayOf(siteLink))}</a>` : ''].filter(Boolean).join(' | ')}</p>
 <p class="meta">${company ? `${esc(company)}${city ? `, ${esc(city)}` : ''}<br>` : ''}${esc(place)}</p>
 <p>${esc(letter.greeting)}</p>
 ${paras}
@@ -235,7 +237,7 @@ export function sampleLetters(root, { n = 3, since, rng = Math.random } = {}) {
 
 function parseArgs(argv) {
   const o = {};
-  const names = ['--jd', '--version', '--format', '--out', '--text', '--pdf', '--lang', '--company', '--role', '--city', '--arm', '--context-only', '--sample', '--since', '--contact', '--check', '--prompt-version'];
+  const names = ['--jd', '--version', '--format', '--out', '--text', '--pdf', '--lang', '--company', '--role', '--city', '--arm', '--context-only', '--sample', '--since', '--contact', '--check', '--prompt-version', '--site-link'];
   for (let i = 0; i < argv.length; i++) {
     if (names.includes(argv[i])) o[argv[i].slice(2)] = argv[++i];
     else if (argv[i] === '--no-rollout') o.noRollout = true;
@@ -262,7 +264,7 @@ async function main() {
     return;
   }
 
-  const usage = 'Usage: node letter-write.mjs --jd <posting.md> --version short|full --format form|pdf (--out <letter.json> [--text x.txt] [--pdf x.pdf] | --context-only <context.md>) [--lang fr|en] [--company C --role R --city T] [--arm A]\n       node letter-write.mjs --sample 3 [--since <ISO time>]';
+  const usage = 'Usage: node letter-write.mjs --jd <posting.md> --version short|full --format form|pdf (--out <letter.json> [--text x.txt] [--pdf x.pdf] | --context-only <context.md>) [--lang fr|en] [--company C --role R --city T] [--arm A] [--site-link <url>]\n       node letter-write.mjs --sample 3 [--since <ISO time>]';
   if (o.help || !o.jd || (!o.out && !o['context-only'] && !o.check)) { console.error(usage); process.exitCode = o.help ? 0 : 1; return; }
   const version = o.version || 'full';
   const format = o.format || 'form';
@@ -280,15 +282,18 @@ async function main() {
         return;
       }
       const textPath = resolve(o.text || jsonPath.replace(/\.json$/i, '') + '.txt');
-      writeFileSync(textPath, text);
+      const siteLink = o['site-link'] || '';
+      const finalText = siteLink ? replaceSiteMentions(text, siteLink) : text;
+      writeFileSync(textPath, finalText);
       const pv = o['prompt-version'] || promptVersion(inputs.parts);
       let state = loadState(root);
       if (state) { state = recordWritten(state, pv, rampCallbacks(root, state)); saveState(root, state); }
       let pdf = null;
       if (o.pdf) {
         pdf = resolve(o.pdf);
-        await renderLetterPdf(letter, pdf, { contact: o.contact || '', company: o.company || '', city: o.city || '' });
+        await renderLetterPdf(letter, pdf, { contact: o.contact || '', company: o.company || '', city: o.city || '', siteLink });
       }
+      if (codeOf(siteLink) && (pdf || finalText !== text)) await markUsed(siteLink, 'letter', { root }).catch(() => {});
       appendLetterLog(root, { company: o.company, role: o.role, version, promptVersion: pv, language: res.language, arm: o.arm, textPath, opening: openingOf(text) });
       console.log(JSON.stringify({ status: 'ok', text: textPath, pdf, words: res.words, language: res.language, warnings: res.warnings, promptVersion: pv }, null, 2));
       return;
@@ -314,12 +319,15 @@ async function main() {
       return;
     }
     writeFileSync(out, JSON.stringify(r.letter, null, 2));
-    writeFileSync(textPath, r.text);
+    const siteLink = o['site-link'] || '';
+    const finalText = siteLink ? replaceSiteMentions(r.text, siteLink) : r.text;
+    writeFileSync(textPath, finalText);
     let pdf = null;
     if (o.pdf) {
       pdf = resolve(o.pdf);
-      await renderLetterPdf(r.letter, pdf, { contact: o.contact || '', company: o.company || '', city: o.city || '' });
+      await renderLetterPdf(r.letter, pdf, { contact: o.contact || '', company: o.company || '', city: o.city || '', siteLink });
     }
+    if (codeOf(siteLink) && (pdf || finalText !== r.text)) await markUsed(siteLink, 'letter', { root }).catch(() => {});
     appendLetterLog(root, { company: o.company, role: o.role, version, promptVersion: r.promptVersion, language: r.check.language, arm: o.arm, textPath, opening: openingOf(r.text) });
     console.log(JSON.stringify({ status: 'ok', json: out, text: textPath, pdf, words: r.check.words, language: r.check.language, attempts: r.attempts, warnings: r.check.warnings, promptVersion: r.promptVersion, rollout, tokens }, null, 2));
   } catch (e) {

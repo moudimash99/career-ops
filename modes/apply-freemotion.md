@@ -142,8 +142,9 @@ policy, or what gets submitted.
         the payload to `output/tailored-cv/freemotion/cv-{company-slug}-{arm}.json`,
      then render it:
      `node generate-cv-typst.mjs <payload.json> output/tailored-cv/freemotion/cv-{company-slug}-{arm}.pdf`
-     (`--report=<reportNum>` when there is one; add `--skip-fact-check` for
-     `loose` only). Use the printed `pdf` as `workOrder.pdfPath` from here on.
+     (`--report=<reportNum>` when there is one; `--site-link=<workOrder.siteLink>`
+     when it is set; add `--skip-fact-check` for `loose` only). Use the
+     printed `pdf` as `workOrder.pdfPath` from here on.
      - Write the payload once, ranked (see `modes/pdf.md` Step 21 and the
        length budget in `modes/_custom.md`): the script cuts it to one page
        itself. Exit 2 means the priority-1 bullets alone do not fit: rank
@@ -159,8 +160,13 @@ policy, or what gets submitted.
 
    ```
    node lib/freemotion-fillplan.mjs --inventory <inventory.json> --resolve \
-        --resume <workOrder.pdfPath> --summary
+        --resume <workOrder.pdfPath> --site-link <workOrder.siteLink> --summary
    ```
+
+   (Drop `--site-link` when `workOrder.siteLink` is null. It puts this
+   application's own link to the candidate's site into any website /
+   portfolio field. Type that link exactly as given; never shorten it back to
+   the bare site address.)
 
    This is the preferred path and it replaces writing a filler for the site in
    front of you. It resolves every pending question through
@@ -272,7 +278,8 @@ policy, or what gets submitted.
           `output/letters/freemotion/<company-slug>-<role-slug>.json`.
        3. `node letter-write.mjs --jd <same jd> --version <same> --check
           <that json> --prompt-version <promptVersion> --company <c> --role
-          <r> --arm <letterArm>` (add `--pdf <path>.pdf --contact "Toulouse,
+          <r> --arm <letterArm> --site-link <workOrder.siteLink>` (drop
+          `--site-link` when null; add `--pdf <path>.pdf --contact "Toulouse,
           France | <email> | <phone>"` for an upload). `status: ok` → type
           the printed text file's content (or upload the PDF). `status:
           rejected` → rewrite once, fixing exactly the listed problems, and

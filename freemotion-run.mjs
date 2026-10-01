@@ -48,6 +48,7 @@ import { readEngineConfig } from './lib/freemotion-engine-config.mjs';
 import { claimSubmission } from './lib/freemotion-submissions.mjs';
 import { assignArm } from './lib/cv-experiment.mjs';
 import { assignLetterArm } from './lib/letter-experiment.mjs';
+import { getSiteLink } from './lib/site-links.mjs';
 import * as yaml from 'js-yaml';
 import { getCareerOpsRoot, resolveTrackerPath } from './path-resolver.mjs';
 import { parseTrackerRow, resolveColumns } from './tracker-parse.mjs';
@@ -241,6 +242,7 @@ function readDraftAnswers(reportPath) {
  * @returns {Promise<
  *   { ok: true, workOrder: { runId: string, url: string, company: string, role: string,
  *       reportNum: number|null, reportPath: string|null, cvArm: 'generic'|'loose'|'strict',
+ *       siteLink: string|null,
  *       genericCvPath: string|null, pdfPath: string|null,
  *       draftAnswers: object|null, engineConfig: object } }
  *   | { ok: false, reason: 'blacklisted'|'already-submitted'|'in-progress'|'unkeyable'
@@ -299,6 +301,13 @@ export async function resolveWorkOrder(args = {}) {
         root,
       }));
     } catch { /* keep 'short' */ }
+    // This application's tracked link to the personal site (lib/site-links.mjs),
+    // used in the CV header, the letter and any website field. The plain site
+    // URL when tracking is off or the site is not reachable; never blocks.
+    let siteLink = null;
+    try {
+      siteLink = (await getSiteLink({ url: candidate.url, report: candidate.reportNum, company: candidate.company, role: candidate.role, root }))?.url || null;
+    } catch { /* plain link */ }
     return {
       ok: true,
       workOrder: {
@@ -311,6 +320,7 @@ export async function resolveWorkOrder(args = {}) {
         cvArm,
         ...(cvArmError ? { cvArmError } : {}),
         letterArm,
+        siteLink,
         genericCvPath,
         pdfPath: cvArm === 'generic' ? genericCvPath : null,
         draftAnswers: readDraftAnswers(candidate.reportPath),
