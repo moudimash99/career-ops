@@ -22,6 +22,8 @@ function runCadence(...args) {
     cwd: ROOT,
     encoding: 'utf-8',
     timeout: 30_000,
+    // It reads the real tracker, whose JSON passes spawnSync's 1 MB default (ENOBUFS).
+    maxBuffer: 64 * 1024 * 1024,
   });
   assert.equal(result.error, undefined, `followup-cadence.mjs failed to spawn: ${result.error?.message}`);
   assert.equal(result.signal, null, `followup-cadence.mjs was killed by ${result.signal} (timeout?)`);
