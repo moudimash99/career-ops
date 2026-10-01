@@ -482,6 +482,9 @@ const SYSTEM_PATHS = [
   'lib/posting-text.mjs',
   'lib/posting-fetch.mjs',
   'lib/freemotion-validate.mjs',
+  'lib/freemotion-browser/',
+  'freemotion-night/',
+  'config/freemotion-candidate.example.md',
   'modes/apply-freemotion.md',
   'modes/auto-apply.md',
 ];

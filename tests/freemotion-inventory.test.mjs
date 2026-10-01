@@ -276,6 +276,85 @@ check('a class-only validation message is still found', errorOut.errors.length >
 check('the message is resolved to the field it belongs to', errorOut.errors[0].field, 'zip');
 check('the message text is preserved', errorOut.errors[0].text, 'is a required property');
 
+// A field container whose class merely looks like an error (Teamtailor's
+// consent box sits in "field-with-errors" from page load) is not a message:
+// its text is just the label. A container that says more is still an error.
+const errClassWrapperDom = makeDom((el) => [
+  el('div', { class: 'field-with-errors' }, [
+    el('input', { type: 'checkbox', id: 'consent', required: '' }, []),
+    el('label', { for: 'consent', _text: 'Required. By submitting this application, I agree.*' }, []),
+  ]),
+  el('div', { class: 'field-with-errors' }, [
+    el('label', { for: 'city', _text: 'City' }, []),
+    el('input', { type: 'text', id: 'city', required: '' }, []),
+    el('span', { _text: 'City is required' }, []),
+  ]),
+]);
+const errClassWrapperOut = runScript(errClassWrapperDom);
+check('a field container with an error-like class and only its label is not an error',
+  errClassWrapperOut.errors.some((e) => /By submitting/.test(e.text)), false);
+check('a container that says more than its label is still an error',
+  errClassWrapperOut.errors.some((e) => /City is required/.test(e.text)), true);
+
+// An uploader that took the file, emptied its input and shows the file's name
+// counts as filled; one that only lists accepted formats does not.
+const shownUploadOut = runScript(makeDom((el) => [
+  el('div', {}, [
+    el('label', { for: 'cv1', _text: 'CV *' }, []),
+    el('input', { type: 'file', id: 'cv1', required: '' }, []),
+    el('span', { class: 'file-name', _text: 'cv-mohammad-machaka.pdf' }, []),
+  ]),
+]));
+const formatsOnlyOut = runScript(makeDom((el) => [
+  el('div', {}, [
+    el('label', { for: 'cv2', _text: 'CV *' }, []),
+    el('input', { type: 'file', id: 'cv2', required: '' }, []),
+    el('span', { _text: 'Formats acceptés : .pdf, .doc, .docx' }, []),
+  ]),
+]));
+check('an uploader showing the chosen file name counts as filled',
+  [shownUploadOut.uploads[0].filled, shownUploadOut.uploads[0].shownFile, shownUploadOut.counts.requiredEmpty], [true, 'cv-mohammad-machaka.pdf', 0]);
+check('an uploader listing only accepted formats is still empty',
+  [formatsOnlyOut.uploads[0].filled, formatsOnlyOut.counts.requiredEmpty], [false, 1]);
+
+// A tag picker: the text box stays empty, the choice shows as a chip in the
+// field's own wrapper. That answers it; an empty box with no chip does not.
+const chipOut = runScript(makeDom((el) => [
+  el('div', {}, [
+    el('label', { for: 'mob', _text: 'Mobilité *' }, []),
+    el('span', { class: 'chip chip-selected', _text: 'All France' }, []),
+    el('input', { type: 'text', id: 'mob', required: '' }, []),
+  ]),
+]));
+const noChipOut = runScript(makeDom((el) => [
+  el('div', {}, [
+    el('label', { for: 'mob2', _text: 'Mobilité *' }, []),
+    el('input', { type: 'text', id: 'mob2', required: '' }, []),
+  ]),
+]));
+check('a tag picker with a chosen chip counts as answered',
+  [chipOut.fields[0].chips, chipOut.counts.requiredEmpty], [['All France'], 0]);
+check('an empty required box with no chip is still empty', noChipOut.counts.requiredEmpty, 1);
+
+// A multi-select whose chip is named the widget's way ("__selected") and which keeps
+// a hidden checkbox per option inside its own box: the chip still answers the search box.
+const multiOut = runScript(makeDom((el) => [
+  el('div', {}, [
+    el('label', { for: 'mobi', _text: '*' }, []),
+    el('div', { class: 'v-select' }, [
+      el('div', { class: 'vs__selected-options' }, [
+        el('span', { class: 'vs__selected', _text: 'Toute la France' }, []),
+        el('input', { type: 'search', id: 'mobi', required: '' }, []),
+      ]),
+      el('input', { type: 'checkbox', id: 'opt1', _hidden: true }, []),
+      el('input', { type: 'checkbox', id: 'opt2', _hidden: true }, []),
+    ]),
+  ]),
+]));
+const mobi = multiOut.fields.find((f) => f.id === 'mobi');
+check('a multi-select chip named "__selected", with hidden option boxes beside it, answers the field',
+  [mobi && mobi.chips, multiOut.counts.requiredEmpty], [['Toute la France'], 0]);
+
 // ------------------------------------------------------------------ selects
 
 const selectDom = makeDom((el) => [

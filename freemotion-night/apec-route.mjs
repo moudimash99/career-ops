@@ -28,6 +28,13 @@
  * the cheaper choice, since every offer costs one detail request), else the
  * APEC rows of data/scan-history.tsv from the last --days days (default 14).
  *
+ * Text: the same detail answer carries the full posting (`texteHtml` mission,
+ * `texteHtmlProfil`, `texteHtmlEntreprise`); the search service only gives a
+ * 282-character excerpt. It is saved to the posting-text cache
+ * (lib/posting-text.mjs) for the night list's model. Before 2026-09-28 it was
+ * thrown away, so routed postings saved without it (no `text` in memory) are
+ * asked once more.
+ *
  * Memory: a posting's apply route never changes, so every answer (and every
  * posting found gone) is kept in data/apec-routes.json and never asked again.
  * Each run asks APEC only about NEW postings — at most --max (default 30),
@@ -47,6 +54,9 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { dirname, join, resolve } from 'path';
 import { fileURLToPath } from 'url';
+import { htmlToText } from '../providers/_html-to-text.mjs';
+import { savePostingTexts } from '../lib/posting-text.mjs';
+import { localToday } from '../lib/local-today.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const SEARCH_URL = 'https://www.apec.fr/cms/webservices/rechercheOffre';
@@ -118,7 +128,10 @@ for (const r of rows) {
   const c = cache[r.apecId];
   if (!c) toAsk.push(r);
   else if (c.gone) cachedGone++;
-  else out.push(toRow(r, c));
+  else {
+    out.push(toRow(r, c));
+    if (!c.text) toAsk.push({ ...r, textOnly: true }); // routed before texts were kept
+  }
 }
 const asking = toAsk.slice(0, MAX);
 const later = toAsk.length - asking.length;
@@ -144,6 +157,7 @@ for (const r of asking) {
 // 2. Route of the new live ones, read inside one hidden Camoufox page on apec.fr.
 let blocked = '';
 let routed = 0;
+const texts = [];
 if (live.length) {
   const { Camoufox } = await import('camoufox-js');
   const browser = await Camoufox({ headless: true, geoip: true });
@@ -163,13 +177,18 @@ if (live.length) {
         console.error(`apec-route: stopped at ${r.apecId}: ${blocked}. Not working around it.`);
         break;
       }
+      // Mission first, then the profile: the years asked and the stack are there.
+      const text = htmlToText(['texteHtml', 'texteHtmlProfil', 'texteHtmlEntreprise']
+        .map((k) => (typeof d[k] === 'string' ? d[k] : '')).filter(Boolean).join('<br/><br/>'));
+      if (text) texts.push({ url: `${OFFER_BASE}/${r.apecId}`, text });
       const route = {
         applyType: d.typeCandidature || 'UNKNOWN',
         applyUrl: typeof d.adresseUrlCandidature === 'string' ? d.adresseUrlCandidature : '',
         checkedAt: new Date().toISOString(),
+        ...(text ? { text: true } : {}),
       };
       cache[r.apecId] = route;
-      out.push(toRow(r, route));
+      if (!r.textOnly) out.push(toRow(r, route));
       routed++;
       await sleep(GAP * 1000);
     }
@@ -178,13 +197,16 @@ if (live.length) {
   }
 }
 
+if (texts.length) savePostingTexts(ROOT, texts, localToday());
+// A routed posting asked again for its text and found gone leaves the output.
+for (let i = out.length - 1; i >= 0; i--) if (cache[out[i].apecId]?.gone) out.splice(i, 1);
 mkdirSync(dirname(CACHE), { recursive: true });
 writeFileSync(CACHE, JSON.stringify(cache, null, 1));
 mkdirSync(dirname(OUT), { recursive: true });
 writeFileSync(OUT, JSON.stringify(out, null, 1));
 const byType = out.reduce((m, x) => ((m[x.applyType] = (m[x.applyType] || 0) + 1), m), {});
 console.log(`apec-route: ${rows.length} postings | from memory: ${rows.length - toAsk.length - cachedGone} routed, ${cachedGone} gone`
-  + ` | asked now: ${asking.length} (${live.length} live, ${gone} gone, ${routed} routed)`
+  + ` | asked now: ${asking.length} (${live.length} live, ${gone} gone, ${routed} routed, ${texts.length} texts saved)`
   + (later ? ` | ${later} left for the next run` : '')
   + ` | written: ${out.length} ${JSON.stringify(byType)}`
   + (blocked ? ` | STOPPED: ${blocked}` : '') + ` -> ${OUT.replace(ROOT, '.').replace(/\\/g, '/')}`);

@@ -45,9 +45,14 @@
  * MODEL — freemotion-night/llm-score.mjs, one plain Gemini API call per job
  * (never an agent). Jobs without a stored answer are scored best first, at most
  * --llm-max a night (default 300); an answer is stored once, ever, in
- * data/llm-scores.tsv. HelloWork, WTJ and LinkedIn send no description, so their
- * text is fetched first (lib/posting-fetch.mjs) and a posting asking
- * too_many_years or more is dropped before any call. The answer then:
+ * data/llm-scores.tsv. Every job that passed the gate first gets its posting
+ * text (fetch-texts.mjs: HelloWork, WTJ, Free-Work, LinkedIn, France Travail,
+ * company ATS APIs; fetched once and kept, a failure retried after 3 days, a
+ * site that stops answering or a leftover backlog raised in
+ * data/agent-inbox.md; --text-minutes caps it, default 120, --no-texts skips
+ * it, --texts-only stops after it; APEC's text comes from apec-route.mjs,
+ * at most --apec-max (30) a night), and a posting asking too_many_years or
+ * more is dropped before any call. The answer then:
  *   overall < 2 (no-go)          → dropped
  *   the model reads 8+ years     → dropped, unless the text states fewer
  *   2–2.9 (stretch)              kept, ranked after every go job: applied to
@@ -78,7 +83,7 @@ import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 
 import { MAX_AGE_DAYS, capPerCompany, companyKey, judge, rankScore, titleKey } from './pool-rules.mjs';
-import { DEFAULT_MODEL, FACTORS, STRETCH_AT, gateJobs, geminiGateGenerate, geminiGenerate, jobKey, readGate, readScores, resolveCandidate, scoreJobs, verdictOf } from './llm-score.mjs';
+import { AGY_SCORE_MODEL, CLAUDE_SCORE_MODEL, DEFAULT_MODEL, FACTORS, GATE_SCHEMA, STRETCH_AT, agyGenerate, claudeGenerate, gateJobs, geminiGateGenerate, geminiGenerate, scoreJobsAgy, jobKey, readGate, readScores, resolveCandidate, scoreJobs, verdictOf } from './llm-score.mjs';
 import normalizeUrl from '../url-key.mjs';
 import { readCurrentState } from '../lib/freemotion-submissions.mjs';
 import { checkCompany, countByCompany, matchBlacklist } from '../lib/company-cap.mjs';
@@ -87,8 +92,8 @@ import { isMainModule } from '../lib/is-main-module.mjs';
 import { loadTargets } from '../targets.mjs';
 import { getCareerOpsRoot } from '../path-resolver.mjs';
 import { requiredYears } from '../lib/required-years.mjs';
-import { clipText, loadPostingTexts, savePostingTexts } from '../lib/posting-text.mjs';
-import { fetchPostingText, needsTextFetch } from '../lib/posting-fetch.mjs';
+import { loadPostingTexts } from '../lib/posting-text.mjs';
+import { fetchMissingTexts, raiseInInbox, textLine, textProblems } from './fetch-texts.mjs';
 import { localToday } from '../lib/local-today.mjs';
 import { checkLivenessViaApi } from '../liveness-api.mjs';
 import { checkUrlLivenessWithFallback, jitteredDelayMs, newLivenessPage, sleep } from '../liveness-browser.mjs';
@@ -342,25 +347,19 @@ export function rankOrder(a, b) {
  * HelloWork / LinkedIn text first and leaves out postings whose text asks
  * too many years. Returns the years read from every text it saw.
  */
-async function runModel(candidates, { max, rpm, model, tooManyYears, candidate, apiKey }) {
+async function runModel(candidates, { max, rpm, model, tooManyYears, candidate, apiKey, cli, parallel, batch, since }) {
   const dataRoot = getCareerOpsRoot();
   const stored = readScores();
   const seen = new Set();
   const toScore = [...candidates].sort((a, b) => b.score - a.score).filter((x) => {
     const k = jobKey(x);
     if (stored.has(k) || seen.has(k)) return false;
+    if (since && !(x.seen >= since)) return false;
     seen.add(k);
     return true;
   }).slice(0, max);
+  // The texts were fetched right after the gate (fetch-texts.mjs).
   const texts = loadPostingTexts(dataRoot, toScore.map((x) => x.url));
-  const fetched = [];
-  for (const x of toScore) {
-    if (texts.has(x.url) || !needsTextFetch(x.url)) continue;
-    let text = null;
-    try { text = await fetchPostingText(x.url); } catch { /* title only */ }
-    if (text) { texts.set(x.url, clipText(text)); fetched.push({ url: x.url, text }); }
-  }
-  if (fetched.length) savePostingTexts(dataRoot, fetched, localToday());
   const textYears = new Map();
   for (const [url, text] of texts) {
     const y = requiredYears(text);
@@ -370,9 +369,10 @@ async function runModel(candidates, { max, rpm, model, tooManyYears, candidate, 
     .filter((x) => !(tooManyYears !== null && (textYears.get(x.url) ?? -1) >= tooManyYears))
     .map((x) => ({ ...x, text: texts.get(x.url) }));
   const t0 = Date.now();
-  const generate = await geminiGenerate({ apiKey, model });
-  const r = await scoreJobs(toAsk, { generate, candidate, model, max, rpm, log: (m) => console.warn(m) });
-  console.log(`  model: ${r.scored} scored, ${r.failed} failed${r.stoppedByQuota ? ', stopped at the daily quota' : ''} | ${toScore.length - toAsk.length} left out for their years | text fetched for ${fetched.length} | ${Math.round((Date.now() - t0) / 1000)} s`);
+  const r = cli
+    ? await scoreJobsAgy(toAsk, { candidate, driver: cli, model, parallel, max, ...(batch && { batch }), log: (m) => console.warn(m) })
+    : await scoreJobs(toAsk, { generate: await geminiGenerate({ apiKey, model }), candidate, model, max, rpm, log: (m) => console.warn(m) });
+  console.log(`  model: ${r.scored} scored, ${r.failed} failed${r.stoppedByQuota ? ', stopped at the daily quota' : ''} | ${toScore.length - toAsk.length} left out for their years | ${toAsk.filter((x) => x.text).length} of ${toAsk.length} with text | ${Math.round((Date.now() - t0) / 1000)} s`);
   return textYears;
 }
 
@@ -389,7 +389,7 @@ function readScanHistory(days) {
     const posted = Date.parse(r.posted_at || r.first_seen);
     const ageDays = Number.isFinite(posted) ? Math.floor((now - posted) / DAY_MS) : null;
     if (ageDays != null && ageDays > days) continue;
-    rows.push({ url: r.url, title: r.title || '', co: r.company || '', loc: r.location || '', ageDays, source: (r.portal || '').replace(/-(api|full)$/, '') });
+    rows.push({ url: r.url, title: r.title || '', co: r.company || '', loc: r.location || '', ageDays, seen: (r.first_seen || '').slice(0, 10), source: (r.portal || '').replace(/-(api|full)$/, '') });
   }
   return rows;
 }
@@ -398,19 +398,15 @@ function readApecCache() {
   return existsSync(APEC_CACHE) ? JSON.parse(readFileSync(APEC_CACHE, 'utf8')) : {};
 }
 
-async function main() {
-  const argv = process.argv.slice(2);
-  const flag = (name, fallback) => { const i = argv.indexOf(name); return i >= 0 ? argv[i + 1] : fallback; };
-  const TOP = Number(flag('--top', 25));
-  const DAYS = Number(flag('--days', MAX_AGE_DAYS));
-  const askApec = !argv.includes('--no-apec');
-  // Every job that passed the gate is scored (issue #10); the free daily quota
-  // stops the run cleanly and the rest continues the next night.
-  const LLM_MAX = Number(flag('--llm-max', 5000));
-  const drops = {};
-  const drop = (why) => (drops[why] = (drops[why] || 0) + 1);
-  let gateLine = '';
-
+/**
+ * The jobs the night list may take, before the model: from the scan history of
+ * the last `days` days, minus what was tried or applied to, blacklisted,
+ * outside France, over the company cap or outside the rules (pool-rules.mjs).
+ * Shared by make-pool and score-loop.mjs, so both pick from the same jobs.
+ * @param {{ days?: number, drop?: (why: string) => void }} [opts]
+ * @returns {Promise<{ rows: object[], candidates: object[] }>}
+ */
+export async function selectCandidates({ days = MAX_AGE_DAYS, drop = () => {} } = {}) {
   // "Never twice" inputs — the same ones the run-time claim uses.
   const { loadBlacklist, buildLocationFilter, PORTALS_PATH } = await import('../scan.mjs');
   const blacklist = loadBlacklist();
@@ -427,7 +423,7 @@ async function main() {
   const capCounts = countByCompany(trackerText);
   const runLog = readCurrentState();
 
-  const rows = readScanHistory(DAYS);
+  const rows = readScanHistory(days);
   // Posting texts already cached (scan, earlier fetches): judge() reads the
   // posting's language from them. Passed in, not kept on the row, so pool.json
   // stays small.
@@ -445,6 +441,24 @@ async function main() {
     candidates.push({ ...x, ...v.fields });
   }
 
+  return { rows, candidates };
+}
+
+async function main() {
+  const argv = process.argv.slice(2);
+  const flag = (name, fallback) => { const i = argv.indexOf(name); return i >= 0 ? argv[i + 1] : fallback; };
+  const TOP = Number(flag('--top', 25));
+  const DAYS = Number(flag('--days', MAX_AGE_DAYS));
+  const askApec = !argv.includes('--no-apec');
+  // Every job that passed the gate is scored (issue #10); the free daily quota
+  // stops the run cleanly and the rest continues the next night.
+  const LLM_MAX = Number(flag('--llm-max', 5000));
+  const drops = {};
+  const drop = (why) => (drops[why] = (drops[why] || 0) + 1);
+  let gateLine = '';
+
+  const { rows, candidates } = await selectCandidates({ days: DAYS, drop });
+
   // The model (issue #10): a quick batched go / no-go on the titles that are
   // not clearly ours, then the full score for every job that passed.
   const targets = loadTargets();
@@ -452,20 +466,33 @@ async function main() {
   let textYears = new Map();
   let apiKey = '';
   let who = null;
-  if (!argv.includes('--no-llm')) {
+  // --scorer agy | claude (user, 2026-09-30): the quick check and the fit score
+  // go through agy's Claude allowance, or tool-free Haiku on the Claude plan
+  // (20 jobs a call, --batch), instead of the Gemini API.
+  const scorer = flag('--scorer', 'gemini');
+  const cli = scorer === 'agy' || scorer === 'claude' ? scorer : null;
+  const useAgy = !!cli;
+  // --score-since <YYYY-MM-DD|today> (user, 2026-09-30): only jobs the scan first
+  // found from that day on get a new fit score; older stored scores still count.
+  const sinceArg = flag('--score-since', '');
+  const scoreSince = sinceArg === 'today' ? localToday() : sinceArg;
+  if (useAgy && !argv.includes('--no-llm')) {
+    if (!targets?.candidate) console.warn('make-pool: config/targets.yml has no candidate: block; no model answers tonight.');
+    else who = resolveCandidate(targets.candidate).candidate;
+  } else if (!argv.includes('--no-llm')) {
     try { (await import('dotenv')).config({ path: join(ROOT, '.env'), quiet: true }); } catch { /* optional */ }
     apiKey = (process.env.GEMINI_API_KEY || '').trim();
     if (!apiKey) console.warn('make-pool: no GEMINI_API_KEY, so no new model answers tonight; titles that need one wait.');
     else if (!targets?.candidate) console.warn('make-pool: config/targets.yml has no candidate: block; no model answers tonight.');
     else who = resolveCandidate(targets.candidate).candidate;
   }
-  const model = flag('--model', process.env.GEMINI_MODEL || DEFAULT_MODEL);
+  const model = flag('--model', cli === 'claude' ? CLAUDE_SCORE_MODEL : cli === 'agy' ? AGY_SCORE_MODEL : process.env.GEMINI_MODEL || DEFAULT_MODEL);
   const hideKey = (err) => (apiKey ? String(err.message || err).split(apiKey).join('[key]') : String(err.message || err));
   const scoredBefore = readScores();
   if (who) {
     try {
       const g = await gateJobs(candidates.filter((x) => !strongTitle(x) && !scoredBefore.has(jobKey(x))), {
-        generate: await geminiGateGenerate({ apiKey, model }), candidate: who, model, log: (m) => console.warn(m),
+        generate: cli ? (cli === 'claude' ? claudeGenerate : agyGenerate)({ model, schema: GATE_SCHEMA }) : await geminiGateGenerate({ apiKey, model }), candidate: who, model: cli ? `${cli}/${model}` : model, log: (m) => console.warn(m),
       });
       gateLine = `  gate: ${g.asked} titles asked (${g.go} go, ${g.noGo} no-go${g.failed ? `, ${g.failed} failed` : ''})`;
     } catch (err) {
@@ -476,9 +503,57 @@ async function main() {
   for (const d of gated.dropped) drop('gate: no-go');
   candidates.length = 0;
   candidates.push(...gated.passed);
+
+  // Posting text for every job that passed, before the full score: fetched
+  // once, kept, a failure retried after 3 days (fetch-texts.mjs). No model.
+  // A fetched text can change the posting's language, so those are judged again.
+  let textRun = null;
+  if (!argv.includes('--no-texts')) {
+    const order = [...candidates].sort((a, b) => b.score - a.score);
+    textRun = await fetchMissingTexts(order, {
+      root: getCareerOpsRoot(), today: localToday(), maxMinutes: Number(flag('--text-minutes', 120)), log: (m) => console.warn(m),
+    });
+    for (const x of candidates) {
+      const text = textRun.got.get(x.url);
+      if (!text) continue;
+      const v = judge({ ...x, text });
+      if (v.ok) Object.assign(x, v.fields);
+    }
+    const raised = raiseInInbox(ROOT, textProblems(textRun));
+    if (raised.length) console.warn(`make-pool: raised in data/agent-inbox.md: ${raised.join('; ')}`);
+  }
+  // APEC: ask about postings not in the route memory yet, or routed before
+  // their text was kept, best first, at most --apec-max (30). Before the
+  // model, so it reads APEC's full text, not the search excerpt.
+  let apecCache = readApecCache();
+  const apecTodo = (x) => { const c = apecCache[apecIdOf(x.url)]; return !c || (!c.gone && !c.text); };
+  const unrouted = candidates.filter((x) => x.source === 'apec' && apecTodo(x)).sort((a, b) => b.score - a.score);
+  if (askApec && unrouted.length) {
+    mkdirSync(OUT, { recursive: true });
+    const inFile = join(OUT, 'apec-ask.json');
+    writeFileSync(inFile, JSON.stringify(unrouted.map((x) => ({ url: x.url, co: x.co, title: x.title, loc: x.loc, ageDays: x.ageDays }))));
+    const r = spawnSync(process.execPath, [join(ROOT, 'freemotion-night/apec-route.mjs'), '--in', inFile, '--max', String(flag('--apec-max', 30)), '--out', join(OUT, 'apec-routed.json')], { cwd: ROOT, encoding: 'utf8' });
+    process.stdout.write(r.stdout || '');
+    if (r.status === 2) console.warn('make-pool: APEC showed a CAPTCHA; unrouted APEC postings stay kept apart this run.');
+    else if (r.status !== 0) console.warn(`make-pool: apec-route failed (exit ${r.status}): ${(r.stderr || '').trim().slice(0, 300)}`);
+    apecCache = readApecCache();
+    // Their full text can change the posting's language: judge them again.
+    const apecTexts = loadPostingTexts(getCareerOpsRoot(), unrouted.map((x) => x.url));
+    for (const x of unrouted) {
+      const text = apecTexts.get(x.url);
+      const v = text ? judge({ ...x, text }) : null;
+      if (v?.ok) Object.assign(x, v.fields);
+    }
+  }
+
+  if (argv.includes('--texts-only')) {
+    console.log(`make-pool --texts-only: ${rows.length} scanned jobs, ${candidates.length} passed the rules and the gate`);
+    if (textRun) console.log(textLine(textRun));
+    return;
+  }
   if (who) {
     try {
-      textYears = await runModel(candidates, { max: LLM_MAX, rpm: Number(flag('--rpm', 12)), model, tooManyYears, candidate: who, apiKey });
+      textYears = await runModel(candidates, { max: LLM_MAX, rpm: Number(flag('--rpm', 12)), model, tooManyYears, candidate: who, apiKey, cli, parallel: Number(flag('--parallel', 3)), batch: Number(flag('--batch', 0)) || null, since: scoreSince });
     } catch (err) {
       console.warn(`make-pool: model step failed (${hideKey(err)}); stored scores still apply.`);
     }
@@ -498,19 +573,6 @@ async function main() {
   candidates.length = 0;
   candidates.push(...applied.kept);
 
-  // APEC: ask about postings not in the route memory yet, best first, at most 30.
-  let apecCache = readApecCache();
-  const unrouted = candidates.filter((x) => x.source === 'apec' && !apecCache[apecIdOf(x.url)]).sort((a, b) => b.score - a.score);
-  if (askApec && unrouted.length) {
-    mkdirSync(OUT, { recursive: true });
-    const inFile = join(OUT, 'apec-ask.json');
-    writeFileSync(inFile, JSON.stringify(unrouted.map((x) => ({ url: x.url, co: x.co, title: x.title, loc: x.loc, ageDays: x.ageDays }))));
-    const r = spawnSync(process.execPath, [join(ROOT, 'freemotion-night/apec-route.mjs'), '--in', inFile, '--max', '30', '--out', join(OUT, 'apec-routed.json')], { cwd: ROOT, encoding: 'utf8' });
-    process.stdout.write(r.stdout || '');
-    if (r.status === 2) console.warn('make-pool: APEC showed a CAPTCHA; unrouted APEC postings stay kept apart this run.');
-    else if (r.status !== 0) console.warn(`make-pool: apec-route failed (exit ${r.status}): ${(r.stderr || '').trim().slice(0, 300)}`);
-    apecCache = readApecCache();
-  }
 
   const blockedSites = existsSync(SITE_BLACKLIST) ? parseSiteBlacklist(readFileSync(SITE_BLACKLIST, 'utf8')) : [];
   const routed = [];
@@ -541,6 +603,7 @@ async function main() {
   console.log(`make-pool: ${rows.length} scanned jobs from the last ${DAYS} days`);
   console.log(`  dropped: ${sorted(drops)}`);
   if (gateLine) console.log(gateLine);
+  if (textRun) console.log(textLine(textRun));
   console.log(`  passed the rules: ${routed.length} | merged away as duplicates: ${routed.length - kept.length} (${merges.length} groups, see merges.txt)`);
   console.log(`  kept: ${ranked.length} after the ${4}-per-company cap | by route: ${sorted(count(ranked, (x) => x.route))}`);
   console.log(`  scheduled pool by source: ${sorted(count(ranked.filter((x) => SCHEDULED.has(x.route)), (x) => x.source))}`);

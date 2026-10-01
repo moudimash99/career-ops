@@ -153,6 +153,10 @@ try {
   if (jobPostingText(hwPage) === "Vous avez 5 ans d'expérience sur Linux." && jobPostingText('<html>no ld</html>') === null) {
     pass('jobPostingText() reads the JobPosting description from JSON-LD, nothing else on the page');
   } else fail(`jobPostingText = ${JSON.stringify(jobPostingText(hwPage))}`);
+  const hwEscaped = hwPage.replace('application/ld+json', 'application/ld&#x2B;json');
+  if (jobPostingText(hwEscaped) === "Vous avez 5 ans d'expérience sur Linux.") {
+    pass('jobPostingText() also reads HelloWork\'s escaped type (ld&#x2B;json, 2026-09-30)');
+  } else fail(`jobPostingText (escaped type) = ${JSON.stringify(jobPostingText(hwEscaped))}`);
   const li = readFileSync(join(ROOT, 'tests/fixtures/linkedin-guest-live-onsite.html'), 'utf8');
   if (/Own reporting end to end/.test(linkedinPostingText(li) || '') && linkedinPostingText('<html></html>') === null) {
     pass('linkedinPostingText() reads the guest page\'s description block');
@@ -170,6 +174,131 @@ try {
       && asked.length === 3 && asked[1] === 'https://www.linkedin.com/jobs-guest/jobs/api/jobPosting/4012345678') {
     pass('fetchPostingText() reads HelloWork, WTJ (JSON-LD) and LinkedIn (guest endpoint) only, over https');
   } else fail(`fetch = ${JSON.stringify({ a, b, w, c, d, asked })}`);
+
+  // More sites, a browser User-Agent (WTJ answered 403 to the old one), and why a fetch failed.
+  const { textSiteOf, francetravailPostingText, tryFetchPostingText } = await load('lib/posting-fetch.mjs');
+  const { BROWSER_LIKE_USER_AGENT } = await load('user-agent.mjs');
+  const sites = [
+    'https://www.free-work.com/fr/tech-it/data-engineer/job-mission/data-engineer-gcp-197',
+    'https://www.jobposting.pro/fr/offre/123',
+    'https://candidat.francetravail.fr/offres/recherche/detail/201ABCD',
+    'https://job-boards.greenhouse.io/acme/jobs/4012345678',
+    'https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179410350W',
+  ].map(textSiteOf);
+  const ftText = francetravailPostingText('<div itemprop="description" class="description"><p>Vous avez <b>3 ans</b> sur AWS.</p></div><div>menu</div>');
+  let ua = '';
+  const r403 = await tryFetchPostingText('https://www.hellowork.com/fr-fr/emplois/403.html', {
+    throttle, fetchImpl: async (u, o) => { ua = o.headers['user-agent']; return { ok: false, status: 403, text: async () => '' }; },
+  });
+  const ats = await tryFetchPostingText('https://job-boards.greenhouse.io/acme/jobs/4012345678', { throttle, atsFetch: async () => ({ text: 'Greenhouse text' }) });
+  if (JSON.stringify(sites) === JSON.stringify(['free-work', 'jobposting.pro', 'francetravail', 'greenhouse', null])
+      && ftText === 'Vous avez 3 ans sur AWS.' && ua === BROWSER_LIKE_USER_AGENT && r403.why === 'http 403' && r403.text === null
+      && ats.text === 'Greenhouse text') {
+    pass('posting fetch: Free-Work, jobposting.pro, France Travail and ATS APIs read; APEC not; browser User-Agent; a 403 says why');
+  } else fail(`posting fetch = ${JSON.stringify({ sites, ftText, ua, r403, ats })}`);
+
+  // score-loop: English first then newest; too many years and 3 failures left out; pace; quota reset.
+  const { fitQueue, msUntilReset, makePace } = await load('freemotion-night/score-loop.mjs');
+  const qj = (n, extra) => ({ title: `Job ${n}`, co: `Co${n}`, url: `https://q/${n}`, score: 5, ...extra });
+  const qJobs = [
+    qj(1, { english: false, seen: '2026-09-29', ageDays: 0 }), qj(2, { english: true, seen: '2026-09-28', ageDays: 1 }), qj(3, { english: true, seen: '2026-09-29', ageDays: 6 }),
+    qj(4, { english: false, seen: '2026-09-27', ageDays: null }), qj(5, { english: true, seen: '2026-09-29', ageDays: 0 }), qj(6, { english: true, seen: '2026-09-29', ageDays: 0 }), qj(7, { english: false, seen: '2026-09-29', ageDays: 2 }),
+  ];
+  const q = fitQueue(qJobs, {
+    scores: new Map([[jobKey(qJobs[4]), {}]]),            // Job 5 already has a fit score
+    texts: new Map([['https://q/6', 'Vous avez 9 ans d\'expérience minimum.']]), tooManyYears: 8, // Job 6 asks 9 years
+    failed: new Map([[jobKey(qJobs[6]), 3]]),             // Job 7 failed 3 times
+  }).map((x) => x.title);
+  const pace = makePace({ start: 16, max: 18, upEvery: 2 });
+  pace.hit429(); const r1 = pace.rpm; pace.hit429(); pace.hit429(); pace.hit429(); const r2 = pace.rpm;
+  pace.ok(); pace.ok(); const r3 = pace.rpm;
+  const reset = msUntilReset(new Date('2026-09-29T06:00:00Z')); // 23:00 Pacific → 1 h 5 min
+  if (JSON.stringify(q) === JSON.stringify(['Job 3', 'Job 2', 'Job 1', 'Job 4']) && r1 === 8 && r2 === 2 && r3 === 3 && reset === 65 * 60_000) {
+    pass('score-loop: English first, then the day we found the job (newest first), skips scored / too many years / 3 failures; 429 halves the pace; waits for midnight Pacific');
+  } else fail(`score-loop = ${JSON.stringify({ q, r1, r2, r3, reset })}`);
+
+  // score-loop: model rotation — a used-up model comes back after the reset, an unusable one never.
+  const { makeRotation, MODEL_ROTATION } = await load('freemotion-night/score-loop.mjs');
+  const rot = makeRotation(['a', 'b', 'c']);
+  const seq = [rot.model, rot.usedUp(), rot.model, rot.unusable(), rot.model, rot.left, rot.usedUp(), rot.left, rot.reset(), rot.model, rot.usedUp(), rot.model];
+  if (JSON.stringify(seq) === JSON.stringify(['a', true, 'b', true, 'c', 1, false, 0, true, 'a', true, 'c'])
+      && MODEL_ROTATION[0] === 'gemini-3.5-flash-lite' && new Set(MODEL_ROTATION).size === MODEL_ROTATION.length) {
+    pass('score-loop: a model whose daily quota is gone hands over to the next, comes back after the reset; an unusable model never does');
+  } else fail(`rotation = ${JSON.stringify(seq)}`);
+
+  // WTJ: a bot challenge (AWS WAF, HTTP 202) switches the rest of the run to WTJ's search index.
+  const { resetWttj } = await load('lib/posting-fetch.mjs');
+  const { wttjHitText } = await load('providers/wttj.mjs');
+  resetWttj();
+  const wAsked = [];
+  const wFetch = async (u, o) => {
+    wAsked.push(u.includes('algolia') ? `index:${JSON.parse(o.body).params}` : u.includes('/api/env') ? 'env' : 'page');
+    if (u.includes('/api/env')) return { ok: true, status: 200, text: async () => 'window.env = {"PUBLIC_ALGOLIA_APPLICATION_ID":"ABC123","PUBLIC_ALGOLIA_API_KEY_CLIENT":"0123456789abcdef0123"};' };
+    if (u.includes('algolia')) return { ok: true, status: 200, text: async () => JSON.stringify({ hits: [
+      { slug: 'other_paris', organization: { slug: 'alma' }, summary: 'wrong job' },
+      { slug: 'analytics-engineer_paris', organization: { slug: 'alma' }, summary: 'Join Alma.', key_missions: ['Build dbt models'], profile: '<p>3 ans en <b>SQL</b></p>' },
+    ] }) };
+    return { ok: true, status: 202, headers: { get: () => 'challenge' }, text: async () => '' };
+  };
+  const w1 = await tryFetchPostingText('https://www.welcometothejungle.com/en/companies/alma/jobs/analytics-engineer_paris', { fetchImpl: wFetch, throttle });
+  const w2 = await tryFetchPostingText('https://www.welcometothejungle.com/en/companies/alma/jobs/gone_paris', { fetchImpl: wFetch, throttle });
+  resetWttj();
+  if (w1.text === 'Join Alma.\n\n- Build dbt models\n\n3 ans en SQL' && w2.why === 'not in the WTJ index (closed?)'
+      && JSON.stringify(wAsked.map((a) => a.split('&')[0])) === JSON.stringify(['page', 'env', 'index:query=analytics+engineer', 'index:query=gone'])
+      && /filters=organization.slug%3A%22alma%22/.test(wAsked[2]) && wttjHitText({}) === '') {
+    pass('WTJ: a bot challenge stops page fetches for the run; the text then comes from the search index, matched on company + slug');
+  } else fail(`wttj fallback = ${JSON.stringify({ w1, w2, wAsked })}`);
+
+  // The night step: every passed job without text is fetched once, a miss waits 3 days, problems are named.
+  const { fetchMissingTexts, textAlarms, textProblems, textLine } = await load('freemotion-night/fetch-texts.mjs');
+  const { loadPostingTexts, loadMisses } = await load('lib/posting-text.mjs');
+  const { mkdtempSync: mk, rmSync: rm } = await import('fs');
+  const { tmpdir: td } = await import('os');
+  const troot = mk(join(td(), 'texts-'));
+  try {
+    const wj = (n) => ({ url: `https://www.welcometothejungle.com/en/companies/c${n}/jobs/j${n}_paris` });
+    const jobsT = [...Array.from({ length: 10 }, (_, i) => wj(i)), { url: 'https://www.hellowork.com/fr-fr/emplois/1.html' }, { url: 'https://www.apec.fr/x/detail-offre/1W' }];
+    let calls = 0;
+    const fetchOne = async (u) => { calls++; return u.includes('hellowork') ? { site: 'hellowork', text: 'Texte du poste' } : { site: 'wttj', text: null, why: 'http 403' }; };
+    let t = 0;
+    const now = () => Date.parse('2026-09-28T10:00:00Z') + t;
+    const first = await fetchMissingTexts(jobsT, { root: troot, today: '2026-09-28', now, fetchOne });
+    const again = await fetchMissingTexts(jobsT, { root: troot, today: '2026-09-28', now, fetchOne });
+    t = 4 * 86_400_000;
+    const later = await fetchMissingTexts(jobsT, { root: troot, today: '2026-10-02', now, fetchOne });
+    const stored = loadPostingTexts(troot, ['https://www.hellowork.com/fr-fr/emplois/1.html']);
+    const alarms = textAlarms(first.bySite);
+    const backlog = textProblems({ bySite: {}, left: 7 });
+    if (calls === 11 + 10 && first.got.size === 1 && first.unreadable['apec.fr'] === 1
+        && again.recentMiss === 10 && again.had === 1 && Object.keys(again.bySite).length === 0
+        && later.bySite.wttj?.tried === 10 && stored.get('https://www.hellowork.com/fr-fr/emplois/1.html') === 'Texte du poste'
+        && loadMisses(troot, { now: now() }).size === 10
+        && alarms.length === 1 && /^wttj: text for 0 of 10 \(http 403 x10\)/.test(alarms[0])
+        && backlog.length === 1 && /^backlog: 7 passed jobs/.test(backlog[0])) {
+      pass('fetchMissingTexts(): stores texts, skips a miss for 3 days then retries, names a site that gives nothing and a backlog');
+    } else fail(`fetchMissingTexts = ${JSON.stringify({ calls, first: first.got.size, unreadable: first.unreadable, recentMiss: again.recentMiss, had: again.had, later: later.bySite, alarms, backlog })}`);
+    // Offline: network errors are not misses, and 10 in a row stop the run.
+    const oroot = mk(join(td(), 'texts-off-'));
+    try {
+      const many = Array.from({ length: 30 }, (_, i) => ({ url: `https://www.hellowork.com/fr-fr/emplois/${i}.html` }));
+      let n = 0;
+      const down = await fetchMissingTexts(many, { root: oroot, today: '2026-09-28', fetchOne: async () => { n++; throw new Error('fetch failed'); } });
+      const busy = await fetchMissingTexts(many.slice(0, 2), { root: oroot, today: '2026-09-28', fetchOne: async () => ({ site: 'hellowork', text: null, why: 'http 429' }) });
+      if (n === 10 && down.offline && down.left === 20 && loadMisses(oroot).size === 0 && busy.bySite.hellowork.tried === 2 && loadMisses(oroot).size === 0
+          && /network down/.test(textProblems(down)[0] ? textLine(down) : '')) {
+        pass('fetchMissingTexts(): a network error or a 429 is not a miss; 10 network errors in a row stop the run as offline');
+      } else fail(`offline = ${JSON.stringify({ n, offline: down.offline, left: down.left, misses: loadMisses(oroot).size })}`);
+    } finally { rm(oroot, { recursive: true, force: true }); }
+
+    // APEC: the scanner saves a 282-character excerpt, apec-route the full text later the same day.
+    const { savePostingTexts } = await load('lib/posting-text.mjs');
+    const apecUrl = 'https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/1W';
+    savePostingTexts(troot, [{ url: apecUrl, text: 'excerpt' }], '2026-10-02');
+    savePostingTexts(troot, [{ url: apecUrl, text: 'full text' }], '2026-10-02');
+    const apecText = loadPostingTexts(troot, [apecUrl]).get(apecUrl);
+    if (apecText === 'full text') pass('loadPostingTexts(): a later save the same day wins (APEC full text over the excerpt)');
+    else fail(`loadPostingTexts same-day = ${apecText}`);
+  } finally { rm(troot, { recursive: true, force: true }); }
 } catch (err) {
   fail(`night-list model suite crashed: ${err.message}`);
 }

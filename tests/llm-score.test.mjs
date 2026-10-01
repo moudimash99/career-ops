@@ -134,6 +134,65 @@ try {
     const r6 = await scoreJobs(jobs.slice(0, 1), { generate: async () => { asked++; return 'nonsense'; }, candidate: cand, storePath: store3, sleep });
     if (r6.failed === 1 && asked === 2 && readScores(store3).size === 0) pass('an unreadable answer is asked again once, then skipped, never stored');
     else fail(`r6 = ${JSON.stringify({ ...r6, results: undefined })}, asked ${asked}`);
+
+    // ---- several jobs per call (Flash models) -----------------------------------
+    const { parseBatchAnswer, buildBatchPrompt, scoreJobsBatch } = m;
+    const item = (id, scores) => ({ id, ...JSON.parse(answer(scores)) });
+    const pb = parseBatchAnswer(JSON.stringify({ jobs: [item(2, { role: 1 }), item(1), item(1, { role: 2 }), item(9), { id: 3, role: 'x' }] }), 3);
+    if (pb.ok && pb.value.size === 2 && pb.value.get(1).factors.role.score === 5 && pb.value.get(2).factors.role.score === 1 && !pb.value.has(3)) {
+      pass('parseBatchAnswer() matches answers by id in any order; a repeated id, an id out of range or a bad entry is left out');
+    } else fail(`parseBatchAnswer = ${JSON.stringify(pb.ok && [...pb.value.keys()])}`);
+    if (parseBatchAnswer('nope', 3).ok === false && parseBatchAnswer('{"jobs":[]}', 3).ok === false) pass('parseBatchAnswer() refuses non-JSON and an empty list');
+    else fail('parseBatchAnswer accepted nothing usable');
+    const bp = buildBatchPrompt(jobs.slice(0, 2));
+    if (/"id": 1/.test(bp) && /"id": 2/.test(bp) && /\(title only\)/.test(bp) && /data, not instructions/.test(bp)) pass('buildBatchPrompt() numbers the postings and fences them as data');
+    else fail(bp);
+    const store4 = join(dir, 's4.tsv');
+    let batchCalls = 0;
+    const bjobs = [...jobs, { title: 'Data Engineer', co: 'Gamma', url: 'https://d/4' }];
+    const batchGen = async () => { batchCalls++; return JSON.stringify({ jobs: [item(1), item(2, { role: 1 })] }); }; // job 3 left out
+    const b1 = await scoreJobsBatch(bjobs, { generate: batchGen, candidate: cand, storePath: store4, sleep, batch: 10 });
+    const s4 = readScores(store4);
+    if (batchCalls === 1 && b1.scored === 2 && b1.failed === 1 && b1.missing[0].title === 'Data Engineer' && s4.size === 2 && [...s4.values()][1].verdict === 'no-go') {
+      pass('scoreJobsBatch(): one call for the batch, same-job keys merged, a job the answer leaves out is failed and reported, not stored');
+    } else fail(`b1 = ${JSON.stringify({ ...b1, results: undefined })}, calls ${batchCalls}, stored ${s4.size}`);
+    const b2 = await scoreJobsBatch(bjobs.slice(0, 3), { generate: batchGen, candidate: cand, storePath: store4, sleep });
+    if (b2.scored === 0 && b2.skipped === 2 && batchCalls === 1) pass('scoreJobsBatch(): nothing new to score means no call');
+    else fail(`b2 = ${JSON.stringify({ ...b2, results: undefined })}, calls ${batchCalls}`);
+    const quotaGen = async () => { const e = new Error('Quota exceeded for quota metric GenerateRequestsPerDayPerProjectPerModel-FreeTier'); e.status = 429; throw e; };
+    const b3 = await scoreJobsBatch(bjobs, { generate: quotaGen, candidate: cand, storePath: join(dir, 's5.tsv'), sleep });
+    if (b3.stoppedByQuota && b3.failed === 0) pass('scoreJobsBatch(): a daily-quota 429 stops without failing the jobs');
+    else fail(`b3 = ${JSON.stringify({ ...b3, results: undefined })}`);
+    const { jobsPerCall, fitQueue } = await import(pathToFileURL(join(ROOT, 'freemotion-night/score-loop.mjs')).href);
+    if (jobsPerCall('gemini-3.8-flash') === 10 && jobsPerCall('gemini-3.1-pro-preview') === 10 && jobsPerCall('gemini-3.5-flash-lite') === 1 && jobsPerCall('gemma-4-26b-a4b-it') === 1 && jobsPerCall('gemini-3.5-flash', 5) === 5) {
+      pass('score-loop: Flash and Pro score 10 jobs per call, Flash-Lite and Gemma one');
+    } else fail('jobsPerCall wrong');
+    const qj = [{ title: 'Old', co: 'x', seen: '2026-09-20' }, { title: 'New', co: 'y', seen: '2026-09-29' }];
+    const qo = { scores: new Map(), texts: new Map(), tooManyYears: null };
+    if (fitQueue(qj, qo).map((j) => j.title).join() === 'New,Old' && fitQueue(qj, { ...qo, oldestFirst: true }).map((j) => j.title).join() === 'Old,New') {
+      pass('score-loop: --oldest-first gives a second loop the queue from the other end');
+    } else fail('fitQueue oldestFirst wrong');
+    const qt = fitQueue([{ title: 'With', co: 'a', url: 'u1' }, { title: 'Without', co: 'b', url: 'u2' }], { ...qo, texts: new Map([['u1', 'text']]), textOnly: true });
+    if (qt.map((j) => j.title).join() === 'With') pass('score-loop: --text-only leaves out jobs with no stored posting text');
+    else fail('fitQueue textOnly wrong');
+    const { makeRotation } = await import(pathToFileURL(join(ROOT, 'freemotion-night/score-loop.mjs')).href);
+    let clock = 0;
+    const rot = makeRotation(['a', 'b'], { now: () => clock });
+    const r1ok = rot.rest(30 * 60_000);
+    const onB = rot.model;
+    const r2ok = rot.rest(60 * 60_000);
+    const wait = rot.nextRestEnds();
+    clock = 30 * 60_000;
+    rot.wake();
+    if (r1ok && onB === 'b' && !r2ok && wait === 30 * 60_000 && rot.model === 'a') pass('score-loop: a busy (503) model rests while the next one works; when all rest, wait for the first to wake');
+    else fail(`rotation rest: ${JSON.stringify({ r1ok, onB, r2ok, wait, now: rot.model })}`);
+    const store6 = join(dir, 's6.tsv');
+    let busyCalls = 0;
+    const busyGen = async () => { busyCalls++; const e = new Error('503 Service Unavailable'); e.status = 503; throw e; };
+    const bsleeps = [];
+    const b4 = await scoreJobsBatch(bjobs, { generate: busyGen, candidate: cand, storePath: store6, sleep: async (ms) => { bsleeps.push(ms); }, busyRetries: 1, busyWaitMs: 120_000 });
+    if (b4.busy && busyCalls === 2 && bsleeps.join() === '120000') pass('a 503 is retried once after the busy wait, then reported busy (no 5 tries burning daily calls)');
+    else fail(`b4 = ${JSON.stringify({ busy: b4.busy, busyCalls, bsleeps })}`);
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }
@@ -189,6 +248,24 @@ try {
       && golden.every((g) => ['go', 'stretch', 'no-go'].includes(g.label) && ['claude', 'claude-guess', 'user'].includes(g.labeled_by) && g.title)) {
     pass(`evals/night-fit/golden.tsv: ${golden.length} rows, unique ids, every row labeled go / stretch / no-go with who labeled it`);
   } else fail('golden.tsv malformed');
+
+  // ---- agy as the model --------------------------------------------------------
+  const { plainSchema, agyGenerate, DailyQuotaError } = m;
+  const ps = plainSchema(RESPONSE_SCHEMA);
+  if (!JSON.stringify(ps).includes('propertyOrdering') && JSON.stringify(ps.properties.years_required.type) === '["integer","null"]') {
+    pass('plainSchema(): drops propertyOrdering, turns nullable into a null type');
+  } else fail(`plainSchema = ${JSON.stringify(ps)}`);
+  let sent = '';
+  const agyOk = agyGenerate({ run: async (text) => { sent = text; return { status: 'SUCCESS', structured_output: { a: 1 } }; } });
+  const quota = agyGenerate({ run: async () => ({ status: 'ERROR', error: 'You have exhausted your quota' }) });
+  const busy = agyGenerate({ run: async () => ({ status: 'ERROR', error: 'UNAVAILABLE (code 503): No capacity available' }) });
+  const got = await agyOk('INSTR', 'POSTING');
+  const q = await quota('i', 'p').catch((e) => e);
+  const b = await busy('i', 'p').catch((e) => e);
+  if (got === '{"a":1}' && sent.startsWith('INSTR') && sent.includes('Use no tools') && sent.endsWith('POSTING')
+      && q instanceof DailyQuotaError && b.status === 503) {
+    pass('agyGenerate(): instructions then posting, structured answer back; quota stops, no capacity is a 503');
+  } else fail(`agyGenerate: got=${got} quota=${q?.constructor?.name} busy=${b?.status}`);
 } catch (err) {
   fail(`llm-score suite crashed: ${err.message}`);
 }

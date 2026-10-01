@@ -75,6 +75,21 @@ const allowed = [];
 // that site, so every other sheet stays shorter.
 const SITE_NOTES = [
   {
+    // 2026-09-30: four HelloWork applications died on this step. A number set by a script
+    // (fill) shows in the box but the page never registers it ("N'oubliez pas cette
+    // information" = still empty), and "+" is refused ("Certains caractères ne sont pas
+    // acceptés"). Typed digits plus Tab went through.
+    host: /(^|\.)hellowork\.com$/i,
+    text: `- HelloWork phone step: after "Continuer ma candidature" HelloWork may ask "... a besoin d'une
+  information complémentaire : Téléphone". Click the phone box, clear it, then TYPE 0753377823
+  key by key (browser_type with slowly: true, or real key presses; never a script that sets the value),
+  press Tab to leave the box, and check no error shows under it. Only then click "Postuler", once. Never
+  "+33" there: "+" is refused. "N'oubliez pas cette information" means the page did not register the
+  number: type it again the same way. After "Postuler", wait for "Félicitations" / "candidature ...
+  transmise"; if the phone form is still on screen with no message, it was NOT sent: finalize \`errored\`
+  with the note "HelloWork phone step not accepted".`,
+  },
+  {
     host: /(^|\.)welcometothejungle\.com$/i,
     text: `- Welcome to the Jungle: an account EXISTS and works (tested 2026-09-21, no captcha challenge). If
   "Apply / Postuler" asks you to sign in, get the login with
@@ -167,6 +182,10 @@ ${submitLines}
   outcome = errored (closed posting, broken page, stuck) · blocked-waf (bot-protection block) · captcha ·
   already-applied (site says you applied recently) · validation-failed (form refuses and you cannot fix it).
 - Accounts: \`node lib/freemotion-credentials.mjs load --domain <host>\` (then \`generate\` if none exists).
+  A site that needs an account is never a reason to stop: if no login is saved, CREATE the account
+  (save the generated password first, then register with the candidate's email) and confirm it through
+  the email check below. If the site says the email already has an account but no password is saved,
+  use its "forgot password" link, read the reset email, set a new \`generate\`d password, then sign in.
   Never write a password into the report, a note, or any file: write "signed in" instead.
 - Email check: \`PYTHONIOENCODING=utf-8 python freemotion-night/imap-link.py "<sender>" "<expected domain>"\`
   (Gmail OAuth is broken; this IMAP access replaces it). Only open a link on the site's own domain.

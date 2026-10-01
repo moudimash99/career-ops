@@ -1,6 +1,8 @@
 // @ts-check
 /** @typedef {import('./_types.js').Provider} Provider */
 
+import { htmlToText } from './_html-to-text.mjs';
+
 // Welcome to the Jungle provider — queries WTTJ's public Algolia search index
 // (the same one the welcometothejungle.com jobs UI calls). The Algolia app id
 // and client search key are public but rotate, so they are fetched fresh from
@@ -40,9 +42,9 @@
 // present) is attached as `salary: {min, max, currency}` so scan.mjs's
 // salary_filter can gate on it.
 
-const ENV_URL = 'https://www.welcometothejungle.com/api/env';
+export const ENV_URL = 'https://www.welcometothejungle.com/api/env';
 const SITE_ORIGIN = 'https://www.welcometothejungle.com';
-const INDEX = 'wttj_jobs_production_en';
+export const INDEX = 'wttj_jobs_production_en';
 const DEFAULT_MAX_HITS = 100;
 const MAX_HITS_CAP = 200;
 // An unfiltered keyword query matches a large slice of a global board — "product
@@ -100,6 +102,21 @@ export function parseEnvPayload(text) {
 }
 
 /**
+ * The posting text the index carries: WTJ's own summary, the key missions and
+ * the profile asked (HTML). Shorter than the posting page, but never behind the
+ * page's bot challenge (lib/posting-fetch.mjs falls back to it).
+ * @param {any} h
+ * @returns {string}
+ */
+export function wttjHitText(h) {
+  const parts = [];
+  if (typeof h?.summary === 'string' && h.summary.trim()) parts.push(h.summary.trim());
+  if (Array.isArray(h?.key_missions)) parts.push(h.key_missions.filter((m) => typeof m === 'string' && m.trim()).map((m) => `- ${m.trim()}`).join('\n'));
+  if (typeof h?.profile === 'string' && h.profile.trim()) parts.push(htmlToText(h.profile));
+  return parts.filter(Boolean).join('\n\n');
+}
+
+/**
  * Normalize a single Algolia hit. Exported for tests.
  *
  * Field mapping → normalized Job shape:
@@ -111,6 +128,8 @@ export function parseEnvPayload(text) {
  *   - postedAt: `published_at_timestamp` (epoch seconds → ms)
  *   - salary:   {min, max, currency} from salary_yearly_minimum/salary_maximum
  *   - minYears: `experience_level_minimum`, years asked, when 0–20
+ *   - description: summary + key missions + profile (wttjHitText), for the
+ *               posting-text cache the night list's model reads
  *
  * @param {any} h
  * @returns {{ title: string, url: string, company: string, location: string, postedAt?: number, salary?: {min: number, max: number, currency: string}, minYears?: number } | null}
@@ -147,6 +166,9 @@ export function normalizeWttjHit(h) {
   // Read as years; a value outside 0–20 is ignored rather than trusted.
   const exp = typeof h.experience_level_minimum === 'string' ? Number(h.experience_level_minimum) : h.experience_level_minimum;
   if (Number.isFinite(exp) && exp >= 0 && exp <= 20) job.minYears = exp;
+
+  const description = wttjHitText(h);
+  if (description) job.description = description;
 
   const min = Number.isFinite(h.salary_yearly_minimum) && h.salary_yearly_minimum > 0 ? h.salary_yearly_minimum : 0;
   // salary_maximum is per salary_period; only trust it as an annual bound when
@@ -220,7 +242,7 @@ export default {
         query,
         hitsPerPage: String(maxHits),
         attributesToRetrieve:
-          'name,slug,organization,offices,remote,published_at_timestamp,salary_yearly_minimum,salary_maximum,salary_period,salary_currency,experience_level_minimum',
+          'name,slug,organization,offices,remote,published_at_timestamp,salary_yearly_minimum,salary_maximum,salary_period,salary_currency,experience_level_minimum,summary,key_missions,profile',
       });
       // Algolia parses `filters` as a filter expression against the index's
       // faceted attributes; it never reaches a URL or host, so the assertHost
