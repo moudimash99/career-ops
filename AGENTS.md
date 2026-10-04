@@ -372,6 +372,8 @@ A single-string `modes_dir` (today's default, ~90% of users) behaves exactly as 
 
 ### Skill Modes
 
+**Fork override (moudimash99):** in this repo only Free Motion matters. When the user says "scan" / "scan jobs" (or asks in any words to search for or find jobs) or "apply" (in any words, to send applications), do NOT route to the modes below: read "Free Motion is the only workflow here" in `modes/_custom.md` and run those commands (scan = scan + posting texts + scores; apply = pool again + sheets + `freemotion-night/run.sh`).
+
 | If the user... | Mode |
 |----------------|------|
 | Pastes JD or URL | auto-pipeline (evaluate + report + PDF + tracker) |

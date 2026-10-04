@@ -227,9 +227,8 @@ const cliOut = JSON.parse(run(NODE, ['lib/freemotion-validate.mjs', '--captures'
 check('--captures reconciles both captures then validates',
   [cliOut.settling, cliOut.valid, cliOut.failures.length], [['work_history_0'], true, 0]);
 
-// The form modes/apply-freemotion.md tells the orchestrator to call: captures
-// on stdin, expected in a file, attempted refs as a list. If these two forms
-// disagree, the mode file is the one that breaks in a live run.
+// The form the old mode file (modes/apply-freemotion.md, removed 2026-10-04) told the
+// orchestrator to call: captures on stdin, expected in a file, attempted refs as a list.
 const tmp = mkdtempSync(join(tmpdir(), 'fm-validate-'));
 const expectedPath = join(tmp, 'expected.json');
 writeFileSync(expectedPath, JSON.stringify([{ ref: 'e1', name: 'email', value: 'jane@example.com' }]));

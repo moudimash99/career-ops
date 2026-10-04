@@ -395,7 +395,7 @@ check('an end date in the future is clamped to today',
   computeYearsExperience('A, Jan 2020 – Dec 2030', { now: new Date('2026-01-01') }), 6);
 
 // ── Found live on Thales/Workday, report #594 (Phase 8 smoke test) ─────────
-// The sub-field guard lives here, not in freemotion-tier1.mjs, because both
+// The sub-field guard lives here, not in the Tier 1 filler (removed 2026-10-04), because both
 // tiers read the same rule files. When it guarded only Tier 1, Tier 1 correctly
 // refused "Phone Extension" and handed it to Tier 2 — which answered it with
 // the very rule Tier 1 refused, and stamped source:'profile' on the way through.

@@ -525,13 +525,9 @@ const SYSTEM_PATHS = [
   'lib/freemotion-answers.mjs',
   'lib/freemotion-credentials.mjs',
   'lib/freemotion-engine-config.mjs',
-  'lib/freemotion-fillplan.mjs',
   'lib/freemotion-inbox.mjs',
   'lib/freemotion-inventory.mjs',
-  'lib/freemotion-log.mjs',
-  'lib/freemotion-snapshot.mjs',
   'lib/freemotion-submissions.mjs',
-  'lib/freemotion-tier1.mjs',
   'lib/required-years.mjs',
   'lib/posting-text.mjs',
   'lib/posting-fetch.mjs',
@@ -539,7 +535,6 @@ const SYSTEM_PATHS = [
   'lib/freemotion-browser/',
   'freemotion-night/',
   'config/freemotion-candidate.example.md',
-  'modes/apply-freemotion.md',
   'modes/auto-apply.md',
 ];
 

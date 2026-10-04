@@ -4,12 +4,15 @@
 # Skips jobs that already have a final result in this run. Retries network failures.
 # Prints one line per job: "job N (driver): outcome".
 #
-# Drivers, tried in this order for every job (the user's order, 2026-10-01):
+# Drivers, tried in this order for every job (the user's order, 2026-10-04):
 #   agy          agy on its default model
-#   agy-sonnet   agy on Claude Sonnet (agy's own Claude allowance, separate from the default model's)
 #   codex        codex exec (the project's .codex/config.toml gives it the Playwright browser)
 #   sonnet1      claude -p --model sonnet on the SECOND Claude subscription (CLAUDE1_DIR, default
-#                ~/.claude-account1), which no watching session uses: no cap.
+#                ~/.claude-account1, or ~/.claude-account2 when this shell is on account1), which
+#                no watching session uses: no cap.
+#   copilot     GitHub Copilot CLI (see DRIVER=copilot below)
+# Not in the default order, still there for DRIVER_ORDER / DRIVER:
+#   agy-sonnet   agy on Claude Sonnet (agy's own Claude allowance, separate from the default model's)
 #   sonnet       claude -p --model sonnet on this shell's own Claude plan, which the session watching
 #                the run also needs, so it is capped: at most SONNET_MAX_PER_WINDOW jobs (default 8) in
 #                any 5 hours. One 5-hour window held ~18 Sonnet jobs on 2026-09-30, so 8 leaves a buffer.
@@ -32,8 +35,14 @@ ROOT=$(pwd -W 2>/dev/null || pwd)   # Windows-style path when available, for the
 RUN=$(cat tmp/fm/night/run-id 2>/dev/null) || { echo "no tmp/fm/night/run-id: run freemotion-night/make-jobs.mjs first"; exit 1; }
 OUT=tmp/fm/night/out
 mkdir -p tmp/fm/usage "$OUT"
-ORDER=${DRIVER_ORDER:-agy agy-sonnet codex sonnet1 sonnet}
-CLAUDE1_DIR=${CLAUDE1_DIR:-$(cd ~ && (pwd -W 2>/dev/null || pwd))/.claude-account1}
+ORDER=${DRIVER_ORDER:-agy codex sonnet1 copilot}
+# sonnet1 must not be the account of the session watching the run: when this shell is itself on
+# ~/.claude-account1, sonnet1 takes ~/.claude-account2 (user, 2026-10-04).
+if [ -z "$CLAUDE1_DIR" ]; then
+  HOME_W=$(cd ~ && (pwd -W 2>/dev/null || pwd))
+  CLAUDE1_DIR=$HOME_W/.claude-account1
+  case "$CLAUDE_CONFIG_DIR" in *[/\\].claude-account1|*[/\\].claude-account1[/\\]) CLAUDE1_DIR=$HOME_W/.claude-account2 ;; esac
+fi
 [ -n "$AGY_ONLY" ] && DRIVER=agy
 [ -n "$DRIVER" ] && ORDER=$DRIVER
 NDRIVERS=$(echo $ORDER | wc -w)

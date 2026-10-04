@@ -80,7 +80,7 @@ answers broke), so use 31B. `gemini-2.5-flash-lite` answers 404 (closed to new u
 | `pool-rules.mjs` | Same-job keys, Toulouse/Paris places, keep/drop and score. The role words it keeps, drops and scores by are in `config/targets.yml`; the rest (companies handled by hand, defence, seniority and language ranking) is here. |
 | `site-review.mjs` | Weekly: per application site, sent vs failed over the last 7 days, with suggested sites for `data/site-blacklist.md`. |
 | `apec-route.mjs` | For APEC postings: live or gone (APEC search, plain HTTP), the apply route and the full posting text (both read inside one hidden Camoufox page; the search only gives a 282-character excerpt). Runs before the full score; at most `--apec-max` (30) a night, since ~150 quick requests bring up APEC's CAPTCHA. Postings routed before texts were kept are asked once more. No model tokens. |
-| `run.sh` | Goes down the list, starts one AI session per sheet, switches to Sonnet when agy is out of quota, retries network failures. |
+| `run.sh` | Goes down the list, starts one AI session per sheet, moves to the next driver when one is out of quota (agy, then codex, then the second Claude account, then copilot), retries network failures. |
 | `record.sh` | The AI calls it after a confirmed submission. It refuses URLs not on tonight's list and notes that sound like a failure, then adds the Applied row to the tracker. |
 | `imap-link.py` | Finds a verification email and prints its links (stands in for `lib/freemotion-inbox.mjs` while Gmail OAuth is broken). |
 | `usage.mjs` | Per-job result and token count for a run. |
