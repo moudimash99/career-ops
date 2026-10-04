@@ -25,6 +25,7 @@ import { spawn } from 'child_process';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'fs';
 import { tmpdir } from 'os';
 import { dirname, join, resolve } from 'path';
+import * as yaml from 'js-yaml';
 import { fileURLToPath } from 'url';
 import { getCareerOpsRoot } from './path-resolver.mjs';
 import { isMainModule } from './lib/is-main-module.mjs';
@@ -68,9 +69,11 @@ export function schemaBlock(pdfMd) {
 
 /**
  * The full context agy writes from. Pure given its inputs.
- * @param {{customMd: string, pdfMd: string, cvMd: string, jdText: string, arm: string, lang?: string}} p
+ * @param {{customMd: string, pdfMd: string, cvMd: string, jdText: string, arm: string, lang?: string,
+ *          keepRoles?: string[], retry?: string}} p  keepRoles: employers the renderer refuses a payload
+ *          without; retry: why the last payload was refused, when this is a second try
  */
-export function buildCvContext({ customMd, pdfMd, cvMd, jdText, arm, lang }) {
+export function buildCvContext({ customMd, pdfMd, cvMd, jdText, arm, lang, keepRoles = [], retry }) {
   if (!ARMS.includes(arm)) throw new Error(`--arm must be one of ${ARMS.join(', ')}`);
   const rules = cvRuleSections(customMd);
   if (!rules.length) throw new Error('no "## CV …" sections found in modes/_custom.md');
@@ -82,7 +85,11 @@ ${ARM_LINE[arm]}
 ${language}
 Write one ranked payload, a little long; a script cuts it to one page.
 Experience bullets are {"text": "...", "priority": 1|2|3}; roles and projects may carry "priority".
-
+${keepRoles.length ? `These employers MUST appear in "experience", each with at least one bullet (a payload without them is refused): ${keepRoles.join(', ')}.
+` : ''}${retry ? `
+=== YOUR LAST PAYLOAD WAS REFUSED: WRITE THE WHOLE PAYLOAD AGAIN WITH THIS FIXED ===
+${retry}
+` : ''}
 === RULES ===
 ${rules.join('\n\n')}
 
@@ -127,7 +134,13 @@ export function loadContextInputs({ jd, root = getCareerOpsRoot() }) {
   if (!existsSync(jdPath)) throw new Error(`posting not found: ${jd}`);
   // System Layer: always the codebase copy, never the data root (#3500).
   const pdfPath = join(CODE_ROOT, 'modes/pdf.md');
+  let keepRoles = [];
+  try {
+    const keep = yaml.load(readData('config/profile.yml'))?.cv?.always_keep_roles;
+    if (Array.isArray(keep)) keepRoles = keep.map(String);
+  } catch { /* no profile: the renderer has nothing to insist on either */ }
   return {
+    keepRoles,
     customMd: readData('modes/_custom.md'),
     pdfMd: readFileSync(pdfPath, 'utf8'),
     cvMd: readData('cv.md'),

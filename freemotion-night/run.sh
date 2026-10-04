@@ -30,9 +30,54 @@
 # The model is the one set in Copilot itself (/model in an interactive `copilot`, saved in
 # ~/.copilot/config.json; else auto): on this account the --model flag rejects every name
 # (2026-09-30), so COPILOT_MODEL is passed only when set (e.g. auto). COPILOT_MAX_CREDITS caps one job.
+# HEADFUL=1: the Camoufox window is visible for this run (to watch it, or step in), and hidden again
+# when the run ends, on Ctrl+C, or at the start of the next run if this one was killed outright.
+# lib/freemotion-browser-mode.mjs flips only "headless" in config/playwright-mcp-camoufox.json, the
+# file every driver's browser reads; the disguise, executable and MCP version stay as they are.
+# A Claude or agy session opened during the run gets the visible window too.
+# WATCH=1: to watch one job and approve it step by step. The browser is visible, agy's browser goes through
+# freemotion-night/browser-gate.mjs (every input into the page waits for your OK), and the watch window
+# (freemotion-night/control.mjs) opens in your web browser: the action waiting, Continue / Don't do it +
+# a message to agy / Stop, the plain log, "Page now" and agy's last screenshot, links to the CV and
+# letter. Approve THERE, not in agy's terminal window (agy -i, which also opens). Close that window when
+# agy writes DONE; the run then records and checks as usual. agy and agy-sonnet only.
+# WATCH_HOST=lan: the watch window is reachable from other machines too, through a link with a secret key.
+# Before every job, freemotion-night/prepare-docs.mjs makes that posting's CV and cover letter: it draws
+# the two arms (CV generic 15 / loose 50 / strict 35, letter none 15 / short 35 / full 50), has them
+# written and checked, and puts them into the sheet; the agent only uploads and pastes. About two
+# minutes a job. Writers: the job's driver first, then agy, codex, the second Claude account, copilot
+# (DOCS_WRITERS="codex agy" for another order). When none answers, the generic CV goes out with no letter.
+# Every agy job prints its steps live (freemotion-night/agent-log.mjs, agy's own labels and its
+# "NEXT / WHY" lines) and keeps them in tmp/fm/night/actions-<num>.log.
 cd "$(dirname "$0")/.."
+if [ -n "$WATCH" ]; then
+  HEADFUL=1; DRIVER=${DRIVER:-agy}
+  case $DRIVER in agy|agy-sonnet) ;; *) echo "WATCH=1 works with agy only (DRIVER=agy or agy-sonnet)"; exit 1 ;; esac
+fi
 ROOT=$(pwd -W 2>/dev/null || pwd)   # Windows-style path when available, for the agent prompt
 RUN=$(cat tmp/fm/night/run-id 2>/dev/null) || { echo "no tmp/fm/night/run-id: run freemotion-night/make-jobs.mjs first"; exit 1; }
+# ── browser window ──────────────────────────────────────────────────────
+# A visible window left behind by a run that was killed goes back first.
+[ -f tmp/fm/browser-mode.json ] && node lib/freemotion-browser-mode.mjs restore
+if [ -n "$HEADFUL" ]; then
+  node lib/freemotion-browser-mode.mjs headful --run "$RUN" || { echo "could not make the browser window visible; stopping"; exit 1; }
+  trap 'node lib/freemotion-browser-mode.mjs restore' EXIT
+  trap 'exit 130' INT TERM HUP
+fi
+# ── browser gate (WATCH=1) ──────────────────────────────────────────────
+# A watched run sends agy's browser through freemotion-night/browser-gate.mjs: every input into the page
+# waits for the person in the watch window (control.mjs). Any other run uses the plain browser, and puts
+# it back first if a watched run was killed before it could (a gate left in place would hold every action).
+MCPV=$(grep -oE '@playwright/mcp@[0-9.]+' .mcp.json)
+plain_agy_browser() { agy mcp add playwright npx -y "$MCPV" --config "$ROOT/config/playwright-mcp-camoufox.json" > /dev/null; }
+agy mcp list 2>/dev/null | grep -q 'browser-gate' && { plain_agy_browser; echo "agy browser: the gate from an earlier watched run was still in place; back to the plain browser"; }
+if [ -n "$WATCH" ]; then
+  agy mcp add playwright node "$ROOT/freemotion-night/browser-gate.mjs" > /dev/null || { echo "could not put the browser gate in place; stopping"; exit 1; }
+  trap 'plain_agy_browser; node lib/freemotion-browser-mode.mjs restore' EXIT
+  echo "agy browser: through the gate (every input waits for you in the watch window)"
+fi
+BROWSER_MODE=$(node lib/freemotion-browser-mode.mjs show --mode-only) || { echo "could not read the browser mode; stopping"; exit 1; }
+node lib/freemotion-browser-mode.mjs show
 OUT=tmp/fm/night/out
 mkdir -p tmp/fm/usage "$OUT"
 ORDER=${DRIVER_ORDER:-agy codex sonnet1 copilot}
@@ -45,10 +90,23 @@ if [ -z "$CLAUDE1_DIR" ]; then
 fi
 [ -n "$AGY_ONLY" ] && DRIVER=agy
 [ -n "$DRIVER" ] && ORDER=$DRIVER
+# agy's browser comes from agy's own MCP list (~/.gemini/config/mcp_config.json), not from .mcp.json.
+# Without it every agy job ends at once with "I have no browser_* tools" (a new PC, 2026-10-04).
+if echo " $ORDER " | grep -qE ' agy(-sonnet)? ' && ! agy mcp list 2>/dev/null | grep -qE '^playwright[[:space:]].*enabled'; then
+  echo "agy has no 'playwright' browser server. Add it once with:"
+  echo "  agy mcp add playwright npx -y $(grep -oE '@playwright/mcp@[0-9.]+' .mcp.json) --config $ROOT/config/playwright-mcp-camoufox.json"
+  ORDER=$(echo $ORDER | tr ' ' '\n' | grep -vE '^agy(-sonnet)?$' | tr '\n' ' ')
+  [ -z "${ORDER// }" ] && { echo "no driver left; stopping"; exit 1; }
+  echo "note: running without agy: $ORDER"
+fi
 NDRIVERS=$(echo $ORDER | wc -w)
 SONNET_MAX=${SONNET_MAX_PER_WINDOW:-8}
 AGY_SONNET_MODEL=${AGY_SONNET_MODEL:-claude-sonnet-4-6}
-prompt() { echo "Read the file $ROOT/tmp/fm/night/job-$1.md and carry out the task it describes, from start to finish, without stopping to ask."; }
+prompt() {
+  echo "Read the file $ROOT/tmp/fm/night/job-$1.md and carry out the task it describes, from start to finish, without stopping to ask."
+  [ "$BROWSER_MODE" = headful ] && echo "The browser window is visible this run and a person may be watching it. Work exactly as usual."
+  [ -n "$WATCH" ] && echo "A person is watching this run and approves every browser action that types, clicks, chooses or opens a page. Do ONE such action per tool call, with the plain tools (browser_click, browser_type, browser_select_option, browser_file_upload...) rather than page code, so they can see each step. If a browser tool answers WAITING FOR THE PERSON, call the same tool again with exactly the same arguments and do nothing else. If it answers NOT DONE with a message from the person, follow that message. If it answers STOPPED, stop at once. Never invent data, and never record a submission the site did not confirm. When the task is finished, write DONE."
+}
 RUN_START=$(date -u +%Y-%m-%dT%H:%M:%SZ)  # the end-of-run letter sample covers this run only
 url_of() { grep -m1 -oE '^   https?://\S+' "tmp/fm/night/job-$1.md" | tr -d ' '; }
 result_of() { awk -F'\t' -v u="$1" -v r="$RUN" '$2==u && $8==r {o=$6} END {print o}' data/freemotion-submissions.tsv; }
@@ -85,7 +143,25 @@ next_free() {  # earliest epoch any driver in ORDER comes back
 
 # ── drivers ─────────────────────────────────────────────────────────────
 run_agy() {  # <num> <model or empty> <file prefix>
+  [ -n "$WATCH" ] && { run_agy_watch "$@"; return; }
   agy -p "$(prompt $1)" ${2:+--model "$2"} --dangerously-skip-permissions --print-timeout 20m --output-format json > "tmp/fm/usage/$3-$1.json" 2> "tmp/fm/usage/$3-$1.err"
+}
+# WATCH=1: the same prompt in an interactive agy session, in a new terminal window; returns when it closes.
+run_agy_watch() {  # <num> <model or empty> <file prefix>
+  local p="tmp/fm/night/watch-prompt-$1.txt" s="tmp/fm/night/watch-$1.sh"
+  prompt $1 > "$p"
+  printf 'cd "%s"\nagy -i "$(cat "%s")" %s--dangerously-skip-permissions\n' "$(pwd)" "$p" "${2:+--model \"$2\" }" > "$s"
+  # The watch window: plain log, the action waiting for you, Continue / Don't / Stop.
+  node freemotion-night/control.mjs --job $1 --since "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > "tmp/fm/night/control-$1.out" 2>&1 &
+  local ctl=$!
+  sleep 1; cat "tmp/fm/night/control-$1.out"
+  # The link the window printed (with its key when WATCH_HOST=lan makes it reachable from the network).
+  local link; link=$(grep -m1 -oE 'http://127\.0\.0\.1:[0-9]+/[^ ]*' "tmp/fm/night/control-$1.out")
+  cmd //c start "" "${link:-http://127.0.0.1:${WATCH_PORT:-4777}/}"
+  echo "note: agy has its own window for job $1; close it (or /quit) when the job is done"
+  cmd //c start "agy job $1" //wait "$(cygpath -w "$(command -v bash)")" "$(cygpath -w "$(pwd)/$s")"
+  kill $ctl 2>/dev/null
+  : > "tmp/fm/usage/$3-$1.json"   # no print-mode output in watch mode (limit checks find nothing)
 }
 run_codex() {
   timeout 1500 codex exec --dangerously-bypass-approvals-and-sandbox --skip-git-repo-check -C "$ROOT" --json \
@@ -124,7 +200,7 @@ limit_reset() {
   now=$(date +%s)
   case $d in
     agy|agy-sonnet)
-      grep -qiE 'quota|rate.?limit|resource.?exhausted|limit (reached|exceeded)|usage limit|exceeded your|429' "tmp/fm/usage/$d-$n.json" "tmp/fm/usage/$d-$n.err" 2>/dev/null || return
+      grep -qiE 'quota|rate.?limit|resource.?exhausted|limit (reached|exceeded)|usage limit|exceeded your|(^|[^0-9])429([^0-9]|$)' "tmp/fm/usage/$d-$n.json" "tmp/fm/usage/$d-$n.err" 2>/dev/null || return
       # agy says when it resets ("Resets in 1h30m48s"), for the 5-hour and the weekly limit alike.
       rs=$(grep -ohE 'Resets in ([0-9]+d ?)?([0-9]+h)?([0-9]+m)?' "tmp/fm/usage/$d-$n.json" "tmp/fm/usage/$d-$n.err" 2>/dev/null | head -1)
       [ -z "$rs" ] && { echo $(( now + RECHECK )); return; }
@@ -133,11 +209,11 @@ limit_reset() {
     codex)
       # Only error output and error events: the event log also carries the posting's own text.
       { cat "tmp/fm/usage/codex-$n.err" 2>/dev/null; grep -E '"type":"(error|turn\.failed)"' "tmp/fm/usage/codex-$n.json" 2>/dev/null; } \
-        | grep -qiE 'usage limit|rate.?limit|quota|limit reached|try again (at|in)|429' || return
+        | grep -qiE 'usage limit|rate.?limit|quota|limit reached|try again (at|in)|(^|[^0-9])429([^0-9]|$)' || return
       echo $(( now + RECHECK )) ;;
     copilot)
       { cat "tmp/fm/usage/copilot-$n.err" 2>/dev/null; grep -E '"type":"[a-z._]*error' "tmp/fm/usage/copilot-$n.json" 2>/dev/null; } \
-        | grep -qiE 'usage limit|rate.?limit|quota|premium request|ai credits|credit limit|limit reached|exceeded|429' || return
+        | grep -qiE 'usage limit|rate.?limit|quota|premium request|ai credits|credit limit|limit reached|exceeded|(^|[^0-9])429([^0-9]|$)' || return
       echo $(( now + RECHECK )) ;;
     sonnet|sonnet1)
       grep -qiE 'hit your (session|weekly|usage) limit|session limit|usage limit' "tmp/fm/usage/$d-$n.json" 2>/dev/null || return
@@ -164,16 +240,25 @@ for n in "$@"; do
       echo "note: every driver is out at job $n; waiting $(( wait_s / 60 )) min ($(date '+%H:%M'))"
       sleep $wait_s; continue
     fi
+    # This posting's CV and letter (drawn arms, written and checked), put into the sheet, before the job's
+    # clock and its live log start (the writers are agy sessions too). Made once per
+    # posting and reused on a retry. A failure costs nothing: the sheet keeps the generic CV and no letter.
+    CLAUDE1_DIR="$CLAUDE1_DIR" node freemotion-night/prepare-docs.mjs $n --driver $d || echo "note: no documents made for job $n: generic CV, no letter"
     start=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+    # agy's steps, live, from its own transcript (also kept in tmp/fm/night/actions-<num>.log).
+    follower=
+    case $d in agy|agy-sonnet) node freemotion-night/agent-log.mjs --job $n --since "$start" --follow --out "tmp/fm/night/actions-$n.log" & follower=$! ;; esac
     run_driver $d $n
+    [ -n "$follower" ] && { sleep 2; kill $follower 2>/dev/null; wait $follower 2>/dev/null; }
     reset=$(limit_reset $d $n)
     if [ -n "$reset" ] && [ "$(result_of "$u")" != submitted ]; then
       mark_out $d $reset "limit hit on job $n"
       [ "$(result_of "$u")" = in-progress ] && close_open "$u" "$d usage limit mid-job; handing to the next driver"
-      [ "$d" = sonnet ] && printf '%s\t%s\t%s\t%s\n' "$n" "$start" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$d" >> tmp/fm/usage/night-runs.tsv
+      [ "$d" = sonnet ] && printf '%s\t%s\t%s\t%s\t%s\n' "$n" "$start" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$d" "$BROWSER_MODE" >> tmp/fm/usage/night-runs.tsv
       continue
     fi
-    printf '%s\t%s\t%s\t%s\n' "$n" "$start" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$d" >> tmp/fm/usage/night-runs.tsv
+    # 5th column: the browser window (headless | headful), to compare job times between the two.
+    printf '%s\t%s\t%s\t%s\t%s\n' "$n" "$start" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$d" "$BROWSER_MODE" >> tmp/fm/usage/night-runs.tsv
     if grep -qiE 'no such host|network issue|Eligibility check failed|ENOTFOUND|ECONNRESET|connection (error|refused)' "tmp/fm/usage/$d-$n.json" "tmp/fm/usage/$d-$n.err" 2>/dev/null && [ "$(result_of "$u")" != submitted ]; then
       [ "$(result_of "$u")" = in-progress ] && close_open "$u" "network failure mid-run (attempt $attempt); retrying"
       echo "note: network problem on job $n (attempt $attempt), waiting 5 min"; sleep 300; continue
@@ -182,7 +267,11 @@ for n in "$@"; do
   done
   [ "$(result_of "$u")" = in-progress ] && close_open "$u" "run ended without recording a result; check before any retry"
   echo "job $n ($d): $(result_of "$u")"
+  # Only sent applications count in the CV and letter experiments.
+  [ "$(result_of "$u")" = submitted ] && node freemotion-night/prepare-docs.mjs --sync > /dev/null
 done
+# Hidden again before the inbox check (the EXIT trap would do it too, two minutes later).
+[ -n "$HEADFUL" ] && node lib/freemotion-browser-mode.mjs restore
 # Always: 3 random letters written this run, to skim (nothing to approve).
 node letter-write.mjs --sample 3 --since "$RUN_START" || true
 # Always: what the inbox says about this run's applications (HelloWork "arrivée" /

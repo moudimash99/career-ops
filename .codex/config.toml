@@ -1,0 +1,15 @@
+# Same browser as Claude and agy (.mcp.json): Playwright MCP pinned to 0.0.82 with the
+# Camoufox config. "@latest --browser chromium" failed on every job (2026-09-30): the
+# Chromium build it asks for is not installed on this machine.
+[mcp_servers.playwright]
+command = "npx"
+args = [
+    "-y",
+    "@playwright/mcp@0.0.82",
+    "--config",
+    "C:/Users/Moudimash99/Documents/Coding/career-ops/config/playwright-mcp-camoufox.json",
+    # Its own browser profile (2026-09-30): with the shared default one, Camoufox
+    # fails to launch while an agy or Sonnet run has the browser open.
+    "--user-data-dir",
+    "C:/Users/Moudimash99/Documents/Coding/career-ops/tmp/fm/browser-profile-codex",
+]
