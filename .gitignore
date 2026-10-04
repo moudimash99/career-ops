@@ -312,6 +312,17 @@ scratch/
 *.db-shm
 data/agent-inbox.md
 
+# Fork (moudimash99): the Free Motion candidate sheet and the letter facts and rules hold
+# personal details (phone, email), and the repo is public. scripts/backup.mjs saves them
+# to the private backup instead.
+config/freemotion-candidate.md
+config/freemotion-facts-fr.txt
+config/freemotion-rules-fr.txt
+
 # Fork (moudimash99): scratch output of runs (agy reports, messages, screenshots, pools).
 # It can hold personal data, and the repo is public.
 tmp/
+# Fork: a personal CV draft and agy's usage log, local only.
+cv-ccl.html
+cv-ccl.pdf
+agy-usage.tsv

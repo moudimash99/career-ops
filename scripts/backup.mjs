@@ -34,9 +34,25 @@ const GIT_DIR = resolve(WORK_TREE, '..', 'career-ops-data.git');
 const TRACKED = [
   'cv.md', 'article-digest.md', 'voice-dna.md', 'portals.yml', 'resume.tex',
   'config/profile.yml',
+  // Free Motion: the candidate sheet, the letter facts and rules, the form answers.
+  'config/freemotion-candidate.md', 'config/freemotion-facts-fr.txt', 'config/freemotion-rules-fr.txt',
+  'config/apply-answers.yml', 'config/apply-essays.yml',
   'modes/_profile.md', 'modes/_custom.md', 'modes/_brief.md',
   'data', 'reports', 'output', 'documents',
   'interview-prep', 'jds', 'writing-samples', 'scripts',
+];
+
+// Left out, though they sit inside a saved folder:
+//   - saved site logins (plain-text passwords) and a browser profile (sign-in cookies): these
+//     never go into a repo, private or not. `.env` is not saved either, for the same reason.
+//     On another PC, save the logins again with lib/freemotion-credentials.mjs.
+//   - screenshots (about 300 MB) and one 279 MB file, which is over GitHub's 100 MB per-file limit.
+const EXCLUDED = [
+  ':(exclude)data/freemotion-credentials',
+  ':(exclude,glob)data/*/browser-profile/**',
+  ':(exclude)data/screenshots',
+  ':(exclude,glob)data/*/screenshots/**',
+  ':(exclude)data/pipeline.md.mojibake-backup',
 ];
 
 function git(args, { capture = true } = {}) {
@@ -58,7 +74,7 @@ const [cmd = 'status', ...rest] = process.argv.slice(2);
 function stage() {
   const present = TRACKED.filter(p => existsSync(join(WORK_TREE, p)));
   // -f is load-bearing: see the header note about .gitignore precedence.
-  git(['add', '-f', ...present]);
+  git(['add', '-f', '--', ...present, ...EXCLUDED]);
   return present;
 }
 
