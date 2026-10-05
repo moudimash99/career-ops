@@ -10,18 +10,19 @@
  * sign-in page, even when the application really happens on a partner site.
  * APEC's data says both things plainly:
  *
- *   - Live: the search service (/cms/webservices/rechercheOffre, plain HTTP)
- *     returns exactly that offer when searched by its number, and nothing once
- *     it is gone.
+ *   - Live: the search service (/cms/webservices/rechercheOffre) returns
+ *     exactly that offer when searched by its number, and nothing once it is
+ *     gone.
  *   - Route: the offer-detail service (/cms/webservices/offre/public) carries
  *     `typeCandidature` — URL_ONLY (apply on the partner link in
  *     `adresseUrlCandidature`) or EMAIL_ONLY (apply on APEC itself, which needs
  *     the APEC sign-in).
  *
- * The detail service answers plain scripts with a DataDome CAPTCHA page, so it
- * is read from INSIDE one hidden Camoufox page on apec.fr — the same request
- * the site makes for itself. If a CAPTCHA shows up anyway, the script stops
- * and says so. It never tries to get around one.
+ * Both services answer plain scripts with a DataDome page (the search one too
+ * since 2026-10-01), so both are read from INSIDE one hidden Camoufox page on
+ * apec.fr (lib/camoufox-page.mjs) — the same request the site makes for
+ * itself. If a CAPTCHA shows up anyway, the script stops and says so. It never
+ * tries to get around one.
  *
  * Input, first match wins: --ids (offer numbers), --in (a JSON array of rows
  * with an APEC `url`, e.g. a pool already filtered by the night-list rules —
@@ -57,12 +58,12 @@ import { fileURLToPath } from 'url';
 import { htmlToText } from '../providers/_html-to-text.mjs';
 import { savePostingTexts } from '../lib/posting-text.mjs';
 import { localToday } from '../lib/local-today.mjs';
+import { isCaptchaPage, openCamoufoxPage } from '../lib/camoufox-page.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
-const SEARCH_URL = 'https://www.apec.fr/cms/webservices/rechercheOffre';
+const SEARCH_PATH = '/cms/webservices/rechercheOffre';
 const DETAIL_PATH = '/cms/webservices/offre/public?numeroOffre=';
 const OFFER_BASE = 'https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre';
-const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:128.0) Gecko/20100101 Firefox/128.0';
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 const argv = process.argv.slice(2);
@@ -94,16 +95,27 @@ function inputRows() {
   return rows;
 }
 
+/** Thrown when APEC answers with its CAPTCHA page: the run stops there. */
+class Blocked extends Error {}
+
+/** JSON from one request made inside the apec.fr page; a non-JSON answer throws. */
+async function pageJson(page, path, init) {
+  const res = await page.fetchText(path, init);
+  try {
+    return JSON.parse(res.text);
+  } catch {
+    if (isCaptchaPage(res.text)) throw new Blocked(`CAPTCHA page (HTTP ${res.status})`);
+    throw new Error(`unexpected answer (HTTP ${res.status})`);
+  }
+}
+
 /** Search APEC by offer number: the hit when the offer is live, else null. */
-async function searchById(id) {
-  const res = await fetch(SEARCH_URL, {
+async function searchById(page, id) {
+  const json = await pageJson(page, SEARCH_PATH, {
     method: 'POST',
-    headers: { 'User-Agent': UA, 'Content-Type': 'application/json' },
+    headers: { 'content-type': 'application/json', accept: 'application/json' },
     body: JSON.stringify({ motsCles: id, pagination: { range: 5, startIndex: 0 }, activeFiltre: true }),
-    signal: AbortSignal.timeout(20000),
   });
-  if (!res.ok) throw new Error(`search HTTP ${res.status}`);
-  const json = await res.json();
   return (json.resultats || []).find((r) => r.numeroOffre === id) || null;
 }
 
@@ -136,44 +148,43 @@ for (const r of rows) {
 const asking = toAsk.slice(0, MAX);
 const later = toAsk.length - asking.length;
 
-// 1. Liveness of the new ones, plain HTTP. A live hit also refreshes the row's details.
+// Both steps run inside one hidden Camoufox page on apec.fr.
 const live = [];
 let gone = 0;
-for (const r of asking) {
-  try {
-    const hit = await searchById(r.apecId);
-    if (!hit) { gone++; cache[r.apecId] = { gone: true, checkedAt: new Date().toISOString() }; }
-    else {
-      const posted = Date.parse(hit.datePublication);
-      live.push({ ...r, co: hit.nomCommercial || r.co, title: hit.intitule || r.title, loc: hit.lieuTexte || r.loc, sal: hit.salaireTexte || r.sal,
-        ageDays: Number.isFinite(posted) ? Math.floor((Date.now() - posted) / 864e5) : r.ageDays });
-    }
-  } catch (e) {
-    console.error(`apec-route: search failed for ${r.apecId}: ${e.message}`);
-  }
-  await sleep(1500);
-}
-
-// 2. Route of the new live ones, read inside one hidden Camoufox page on apec.fr.
 let blocked = '';
 let routed = 0;
 const texts = [];
-if (live.length) {
-  const { Camoufox } = await import('camoufox-js');
-  const browser = await Camoufox({ headless: true, geoip: true });
-  const page = await browser.newPage();
+if (asking.length) {
+  const page = await openCamoufoxPage(`${OFFER_BASE}/${asking[0].apecId}`);
   try {
-    await page.goto(`${OFFER_BASE}/${live[0].apecId}`, { waitUntil: 'domcontentloaded', timeout: 45000 });
-    await page.waitForTimeout(4000);
-    for (const r of live) {
-      const res = await page.evaluate(async (path) => {
-        const x = await fetch(path);
-        return { status: x.status, text: await x.text() };
-      }, DETAIL_PATH + encodeURIComponent(r.apecId));
+    // 1. Liveness of the new ones. A live hit also refreshes the row's details.
+    for (const r of asking) {
+      try {
+        const hit = await searchById(page, r.apecId);
+        if (!hit) { gone++; cache[r.apecId] = { gone: true, checkedAt: new Date().toISOString() }; }
+        else {
+          const posted = Date.parse(hit.datePublication);
+          live.push({ ...r, co: hit.nomCommercial || r.co, title: hit.intitule || r.title, loc: hit.lieuTexte || r.loc, sal: hit.salaireTexte || r.sal,
+            ageDays: Number.isFinite(posted) ? Math.floor((Date.now() - posted) / 864e5) : r.ageDays });
+        }
+      } catch (e) {
+        if (e instanceof Blocked) {
+          blocked = e.message;
+          console.error(`apec-route: stopped at ${r.apecId}: ${blocked}. Not working around it.`);
+          break;
+        }
+        console.error(`apec-route: search failed for ${r.apecId}: ${e.message}`);
+      }
+      await sleep(1500);
+    }
+
+    // 2. Route of the new live ones.
+    for (const r of blocked ? [] : live) {
+      const res = await page.fetchText(DETAIL_PATH + encodeURIComponent(r.apecId));
       let d = null;
       try { d = JSON.parse(res.text); } catch { /* not JSON */ }
       if (!d) {
-        blocked = /captcha-delivery|captcha/i.test(res.text) ? `CAPTCHA page (HTTP ${res.status})` : `unexpected answer (HTTP ${res.status})`;
+        blocked = isCaptchaPage(res.text) ? `CAPTCHA page (HTTP ${res.status})` : `unexpected answer (HTTP ${res.status})`;
         console.error(`apec-route: stopped at ${r.apecId}: ${blocked}. Not working around it.`);
         break;
       }
@@ -193,7 +204,7 @@ if (live.length) {
       await sleep(GAP * 1000);
     }
   } finally {
-    await browser.close();
+    await page.close();
   }
 }
 

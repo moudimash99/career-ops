@@ -130,22 +130,36 @@ takes applications (`URL_ONLY` = a partner site, `EMAIL_ONLY` = on APEC itself, 
 
 ## Scoring all day
 
-Google counts the free allowance per model, so three loops run side by side, each on its own
-models and its own part of the queue (they skip a job the others already scored):
+Google counts the free allowance per model, so the loops run side by side, each on its own
+models and its own part of the queue (they skip a job the others already scored). Every fit
+score also answers the sector question (see "Sectors" below), so 3.1 Flash-Lite goes first:
 
 ```bash
 # 1. Flash-Lite (~500 calls a day each, one job per call): newest first, does the quick title check
-node freemotion-night/score-loop.mjs --models gemini-3.5-flash-lite,gemini-3.1-flash-lite
+node freemotion-night/score-loop.mjs --models gemini-3.1-flash-lite,gemini-3.5-flash-lite
 # 2. Flash (20 calls a day each, 10 jobs per call): from the middle of the queue
 node freemotion-night/score-loop.mjs --name flash --models gemini-3.8-flash,gemini-3.5-flash,gemini-3.6-flash,gemini-3.7-flash --from-middle --no-gate --rpm 5 --rpm-max 8
-# 3. Gemma 4 31B (slow, ~30 s a call, limited per minute): oldest first, only jobs with posting text
-node freemotion-night/score-loop.mjs --name gemma --model gemma-4-31b-it --oldest-first --no-gate --text-only --parallel 2 --busy-rest 3 --rpm 6 --rpm-max 10
+# 3. Gemma 4 31B: OFF since 2026-10-04 until it passes the sector tests (issue #14). Was:
+# node freemotion-night/score-loop.mjs --name gemma --model gemma-4-31b-it --oldest-first --no-gate --text-only --parallel 2 --busy-rest 3 --rpm 6 --rpm-max 10
 ```
 
 On Windows start each hidden with `Start-Process node -ArgumentList ... -WindowStyle Hidden`.
 `--name flash --status` / `--name gemma --stop` for loops 2 and 3. Notes from 2026-09-30:
 `gemma-4-26b-a4b-it` gets stuck repeating words until it runs out of length (a third of its
 answers broke), so use 31B. `gemini-2.5-flash-lite` answers 404 (closed to new users). Pro is not free.
+
+## Sectors
+
+`config/targets.yml` `sectors:` (user, 2026-10-04): defence, government and clearance jobs get
+score 0 (off the night list), space jobs rank 1 lower. Three layers:
+- title / company words drop the obvious ones before any model call (`pool-rules.mjs` DEFENCE and
+  GOVERNMENT; Safran is not on the list, it is mostly civil aerospace);
+- clearance words in the posting text ("habilitable", "habilitation secret défense"…) count with no model;
+- the fit score's own call answers "sector" and "clearance" (`llm-sector.mjs`), stored in
+  `data/llm-sector.tsv`; `node freemotion-night/llm-sector.mjs --status` counts the answers.
+
+The wording was checked on 100 postings against Flash, every disagreement judged by hand: a
+consultancy's list of sectors ("aéronautique, spatial, défense") is not the job's sector.
 
 ## What each file does
 

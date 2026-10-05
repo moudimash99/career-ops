@@ -96,7 +96,14 @@ const MANUAL = /\b(airbus|thales|capgemini|sogeti|accenture|ntt|alan)\b/i; // co
 // "minist" matched adMINISTrateur (107 sysadmin/DevOps jobs dropped), "dassault"
 // matched Dassault Systèmes (software, not defence), and "La Défense" is a Paris
 // business district, not a sector.
-const DEFENCE = /\bminist[eè]res?\b|\bministry\b|(?<!la )d[ée]fense\b|\barm[ée]es?\b|naval group|\bmbda\b|\bsafran\b|dassault aviation|\bdga\b|gendarmerie|\bpolice\b/i;
+// 2026-10-04: + counter-UAS / anti-drone, missiles, weapons, military words and
+// two land-systems makers ("Counter-UAS" at Groupe ADP reached a night list).
+// Safran out (user, 2026-10-04): mostly civil aerospace; its defence jobs are
+// the fit score's sector answer (llm-sector.mjs), like any posting's text.
+const DEFENCE = /\bminist[eè]res?\b|\bministry\b|(?<!la )d[ée]fense\b|\bdefence\b|\barm[ée]es?\b|\bmilitaires?\b|\bmilitary\b|\barmement|\bmissiles?\b|counter[- ]?uas\b|anti[- ]?drones?\b|naval group|\bmbda\b|dassault aviation|\bknds\b|\bnexter\b|\bdga\b|gendarmerie|\bpolice\b/i;
+// Public administrations by name (user, 2026-10-04: government jobs dropped).
+// Public bodies with other names (France Travail, URSSAF, a CHU) are the model's call.
+const GOVERNMENT = /\bmairie\b|\bville de\b|\bpr[ée]fecture\b|\bconseil (d[ée]partemental|r[ée]gional|g[ée]n[ée]ral)\b|\bcollectivit[ée]s?\b|fonction publique|\b[ée]tablissement public\b/i;
 const SENIOR = /\b(senior|sr\.?|expert|exp[ée]riment[ée]e?|confirm[ée]e?)\b/i;
 // Posting language. The English flag gives the +5 below AND tells the applier
 // which language to write the cover letter in (make-jobs.mjs), so a French
@@ -121,12 +128,14 @@ const MIN_TEXT_WORDS = 40;
 // list. The rule score still orders jobs for scoring and for jobs the model
 // has not seen; a scored job ranks by rankScore() only (make-pool rankOrder).
 // offstack keeps targets.yml `rank_low` meaning "ranked low" at this scale.
+// sectorPenalty: targets.yml `sectors.penalty` for the job's sector (space -1,
+// user 2026-10-04), set by llm-sector.mjs applySectors().
 export const RANK_NUDGES = { toulouse: 0.3, paris: 0.1, english: 0.2, offstack: -0.5 };
 
-/** @param {{ fit: number, toulouse?: boolean, paris?: boolean, english?: boolean, offstack?: boolean }} x */
+/** @param {{ fit: number, toulouse?: boolean, paris?: boolean, english?: boolean, offstack?: boolean, sectorPenalty?: number }} x */
 export function rankScore(x) {
   const place = x.toulouse ? RANK_NUDGES.toulouse : x.paris ? RANK_NUDGES.paris : 0;
-  const r = Number(x.fit) + place + (x.english ? RANK_NUDGES.english : 0) + (x.offstack ? RANK_NUDGES.offstack : 0);
+  const r = Number(x.fit) + place + (x.english ? RANK_NUDGES.english : 0) + (x.offstack ? RANK_NUDGES.offstack : 0) + (x.sectorPenalty || 0);
   return Math.round(r * 100) / 100;
 }
 
@@ -167,6 +176,7 @@ export function judge(x, targets = targetsOrThrow()) {
   if (x.ageDays != null && x.ageDays > MAX_AGE_DAYS) return { ok: false, why: 'older than 14 days' };
   if (co && MANUAL.test(co)) return { ok: false, why: 'company handled by hand' };
   if (DEFENCE.test(`${co} ${t}`)) return { ok: false, why: 'defence/ministry' };
+  if (GOVERNMENT.test(`${co} ${t}`)) return { ok: false, why: 'government' };
   const role = targets.judgeTitle(t);
   if (role.dropped) return { ok: false, why: role.dropped };
   // Kept, but not for agy on the title alone: the model (llm-score.mjs) decides.

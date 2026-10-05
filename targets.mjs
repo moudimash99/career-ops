@@ -80,6 +80,36 @@ export function loadTargets(path = TARGETS_PATH) {
  * @param {any} raw
  * @param {string} [where] - for error messages
  */
+/** The sectors the night list knows (freemotion-night/llm-sector.mjs); clearance = needs a security clearance or a nationality. */
+export const SECTOR_NAMES = ['defence', 'space', 'government', 'clearance'];
+
+/**
+ * `sectors:` (user, 2026-10-04): which sectors drop a job from the night list
+ * and which only rank it lower. Absent: nothing dropped, no penalty.
+ * @returns {{ drop: string[], penalty: Record<string, number> }}
+ */
+export function compileSectors(raw, where = 'targets') {
+  if (raw == null) return { drop: [], penalty: {} };
+  if (typeof raw !== 'object' || Array.isArray(raw)) throw new Error(`${where}: \`sectors:\` must be a mapping with \`drop:\` and/or \`penalty:\``);
+  const known = (s, what) => {
+    if (!SECTOR_NAMES.includes(s)) throw new Error(`${where}: sectors.${what}: unknown sector "${s}" (known: ${SECTOR_NAMES.join(', ')})`);
+    return s;
+  };
+  const drop = raw.drop == null ? [] : Array.isArray(raw.drop) ? raw.drop.map((s) => known(String(s), 'drop')) : null;
+  if (!drop) throw new Error(`${where}: sectors.drop must be a list`);
+  const penalty = {};
+  if (raw.penalty != null) {
+    if (typeof raw.penalty !== 'object' || Array.isArray(raw.penalty)) throw new Error(`${where}: sectors.penalty must be a mapping of sector: points`);
+    for (const [s, v] of Object.entries(raw.penalty)) {
+      known(s, 'penalty');
+      if (typeof v !== 'number' || v > 0) throw new Error(`${where}: sectors.penalty.${s} must be a number of 0 or less`);
+      if (drop.includes(s)) throw new Error(`${where}: sector "${s}" is both dropped and penalized`);
+      penalty[s] = v;
+    }
+  }
+  return { drop, penalty };
+}
+
 export function compileTargets(raw, where = 'targets') {
   if (!raw || typeof raw !== 'object') throw new Error(`${where}: expected a mapping with \`tiers:\``);
   if (!Array.isArray(raw.tiers) || raw.tiers.length === 0) throw new Error(`${where}: \`tiers:\` must be a non-empty list`);
@@ -136,6 +166,7 @@ export function compileTargets(raw, where = 'targets') {
     throw new Error(`${where}: \`candidate:\` must be a mapping`);
   }
   const candidate = raw.candidate ?? null;
+  const sectors = compileSectors(raw.sectors, where);
 
   const searchWords = [];
   for (const g of groups) for (const q of g.search) if (!searchWords.includes(q)) searchWords.push(q);
@@ -149,6 +180,7 @@ export function compileTargets(raw, where = 'targets') {
     searchWords,
     tooManyYears,
     candidate,
+    sectors,
     /**
      * The scanner's title filter as keyword lists: any group's (or rescue)
      * words in, any drop word out. `non_fit` needs no entry: with a match word

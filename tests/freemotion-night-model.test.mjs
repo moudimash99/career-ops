@@ -222,7 +222,7 @@ try {
   const rot = makeRotation(['a', 'b', 'c']);
   const seq = [rot.model, rot.usedUp(), rot.model, rot.unusable(), rot.model, rot.left, rot.usedUp(), rot.left, rot.reset(), rot.model, rot.usedUp(), rot.model];
   if (JSON.stringify(seq) === JSON.stringify(['a', true, 'b', true, 'c', 1, false, 0, true, 'a', true, 'c'])
-      && MODEL_ROTATION[0] === 'gemini-3.5-flash-lite' && new Set(MODEL_ROTATION).size === MODEL_ROTATION.length) {
+      && MODEL_ROTATION[0] === 'gemini-3.1-flash-lite' && new Set(MODEL_ROTATION).size === MODEL_ROTATION.length) {
     pass('score-loop: a model whose daily quota is gone hands over to the next, comes back after the reset; an unusable model never does');
   } else fail(`rotation = ${JSON.stringify(seq)}`);
 

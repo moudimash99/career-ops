@@ -5,6 +5,11 @@
  * Gemini API call per job (Flash-Lite, free tier), never an agent: posting
  * text comes from the internet, and nothing that can run commands may read it.
  *
+ * The same call also says which sector the job's work is for and whether it
+ * needs a clearance (llm-sector.mjs, user 2026-10-04): defence, government and
+ * clearance jobs get score 0 on the night list, space ranks 1 lower. That
+ * answer is stored in data/llm-sector.tsv; data/llm-scores.tsv is unchanged.
+ *
  * The model never gives one gut-feel number. It rates five factors against a
  * fixed scale, writing its evidence BEFORE each score (the schema's field
  * order forces it), and the code computes the overall from those:
@@ -42,6 +47,7 @@ import { fileURLToPath } from 'url';
 import * as yaml from 'js-yaml';
 
 import { companyKey, titleKey } from './pool-rules.mjs';
+import { SECTOR_EXAMPLES, SECTOR_GUIDE, SECTOR_PATH, SECTOR_SCHEMA_FIELDS, appendSector, parseSectorAnswer } from './llm-sector.mjs';
 import { loadTargets } from '../targets.mjs';
 import { computeYearsExperience } from '../lib/freemotion-answers.mjs';
 import { isMainModule } from '../lib/is-main-module.mjs';
@@ -49,7 +55,8 @@ import { getCareerOpsRoot } from '../path-resolver.mjs';
 
 const CODE_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 export const SCORES_PATH = join(getCareerOpsRoot(), 'data/llm-scores.tsv');
-export const DEFAULT_MODEL = 'gemini-3.5-flash-lite';
+// 3.1 first (user, 2026-10-04): it read the sector question best of the Flash-Lite models.
+export const DEFAULT_MODEL = 'gemini-3.1-flash-lite';
 
 export const FACTORS = ['role', 'skills', 'experience', 'language', 'blockers'];
 export const WEIGHTS = { role: 0.35, skills: 0.25, experience: 0.2, language: 0.1, blockers: 0.1 };
@@ -96,23 +103,23 @@ blockers — hard requirements the candidate cannot meet (security clearance, na
   1 = one the candidate cannot meet
 
 Also give "years_required": the number of years of experience the posting asks for, ONLY if the posting text states a number; otherwise null. Never guess it from the title.
-And "summary": one short sentence on the fit.
+Then answer "sector" and "clearance" (below). And "summary": one short sentence on the fit.
 
 Judge the work, not the wording: an unusual title for the candidate's kind of work fits; a familiar word in a title for other work does not ("Reliability Engineer" for electrical products is not SRE). The candidate applies to digital roles they are under-qualified for: missing skills lower "skills", they do not make the role "not digital". When only the title is given, judge from the title and use "not stated" where the title says nothing.`;
 
 const EXAMPLES = `Worked examples (for calibration; they are not the job to rate):
 
 Job: "Ingénieur Cloud AWS / Terraform" — text: "3 ans d'expérience sur AWS et Terraform, anglais courant, CDI Toulouse."
-→ role {evidence "Ingénieur Cloud AWS / Terraform", 5}, skills {"AWS et Terraform", 5}, experience {"3 ans d'expérience", 5}, language {"anglais courant", 5}, blockers {"not stated", 5}, years_required 3.
+→ role {evidence "Ingénieur Cloud AWS / Terraform", 5}, skills {"AWS et Terraform", 5}, experience {"3 ans d'expérience", 5}, language {"anglais courant", 5}, blockers {"not stated", 5}, years_required 3, sector {"not stated", "none"}, clearance false.
 
 Job: "Consultant Salesforce Commerce Cloud" — text: "Vous maîtrisez Apex et Lightning, 2 ans d'expérience sur Salesforce."
-→ role {"Consultant Salesforce", 4}, skills {"Apex et Lightning", 1}, experience {"2 ans d'expérience", 5}, language {"not stated", 3}, blockers {"not stated", 5}, years_required 2.
+→ role {"Consultant Salesforce", 4}, skills {"Apex et Lightning", 1}, experience {"2 ans d'expérience", 5}, language {"not stated", 3}, blockers {"not stated", 5}, years_required 2, sector {"not stated", "none"}, clearance false.
 
 Job: "Technicien de Maintenance Industrielle" — title only.
-→ role {"Technicien de Maintenance Industrielle: maintenance of industrial equipment", 1}, skills {"not stated", 3}, experience {"not stated", 3}, language {"not stated", 3}, blockers {"not stated", 5}, years_required null.
+→ role {"Technicien de Maintenance Industrielle: maintenance of industrial equipment", 1}, skills {"not stated", 3}, experience {"not stated", 3}, language {"not stated", 3}, blockers {"not stated", 5}, years_required null, sector {"not stated", "none"}, clearance false.
 
 Job: "Consultant Avant-Vente Data" — text: "10 ans minimum en avant-vente, français courant avec les clients, habilitation secret défense requise."
-→ role {"Avant-Vente Data", 5}, skills {"avant-vente data", 4}, experience {"10 ans minimum", 1}, language {"français courant avec les clients", 2}, blockers {"habilitation secret défense requise", 1}, years_required 10.`;
+→ role {"Avant-Vente Data", 5}, skills {"avant-vente data", 4}, experience {"10 ans minimum", 1}, language {"français courant avec les clients", 2}, blockers {"habilitation secret défense requise", 1}, years_required 10, sector {"not stated", "none"}, clearance true.`;
 
 /** One candidate block as prompt lines. */
 export function candidateLines(candidate) {
@@ -191,7 +198,11 @@ export function buildInstructions(candidate) {
     '',
     SCALE,
     '',
+    SECTOR_GUIDE,
+    '',
     EXAMPLES,
+    '',
+    SECTOR_EXAMPLES,
   ].join('\n');
 }
 
@@ -223,16 +234,17 @@ export const RESPONSE_SCHEMA = {
   properties: {
     ...Object.fromEntries(FACTORS.map((f) => [f, FACTOR_SCHEMA])),
     years_required: { type: 'integer', nullable: true },
+    ...SECTOR_SCHEMA_FIELDS,
     summary: { type: 'string' },
   },
-  required: [...FACTORS, 'years_required', 'summary'],
-  propertyOrdering: [...FACTORS, 'years_required', 'summary'],
+  required: [...FACTORS, 'years_required', 'sector', 'clearance', 'summary'],
+  propertyOrdering: [...FACTORS, 'years_required', 'sector', 'clearance', 'summary'],
 };
 
 /**
  * Parse and check one model answer.
  * @param {string} raw
- * @returns {{ ok: true, value: { factors: Record<string, {evidence: string, score: number}>, yearsRequired: number|null, summary: string } } | { ok: false, error: string }}
+ * @returns {{ ok: true, value: { factors: Record<string, {evidence: string, score: number}>, yearsRequired: number|null, summary: string, sector: ReturnType<typeof parseSectorAnswer> } } | { ok: false, error: string }}
  */
 export function parseAnswer(raw) {
   let j;
@@ -255,7 +267,7 @@ export function parseAnswer(raw) {
   if (yearsRequired !== null && !(Number.isInteger(yearsRequired) && yearsRequired >= 0 && yearsRequired <= 30)) {
     return { ok: false, error: 'years_required not a whole number' };
   }
-  return { ok: true, value: { factors, yearsRequired, summary: String(j.summary ?? '').replace(/\s+/g, ' ').trim().slice(0, 240) } };
+  return { ok: true, value: { factors, yearsRequired, summary: String(j.summary ?? '').replace(/\s+/g, ' ').trim().slice(0, 240), sector: parseSectorAnswer(j) } };
 }
 
 /**
@@ -302,6 +314,9 @@ export function readScores(path = SCORES_PATH) {
   return out;
 }
 
+/** The sector answers go next to the scores: data/llm-sector.tsv, or beside a test's own store. */
+const sectorStoreFor = (storePath) => (storePath === SCORES_PATH ? SECTOR_PATH : join(dirname(storePath), 'llm-sector.tsv'));
+
 function appendScore(path, row) {
   if (!existsSync(path)) {
     mkdirSync(dirname(path), { recursive: true });
@@ -324,7 +339,7 @@ function retryAfterMs(err) {
   return null;
 }
 
-const isDailyQuota = (err) => /per ?day|PerDay|daily/i.test(`${err?.message || ''} ${JSON.stringify(err?.errorDetails || [])}`);
+export const isDailyQuota = (err) => /per ?day|PerDay|daily/i.test(`${err?.message || ''} ${JSON.stringify(err?.errorDetails || [])}`);
 
 /**
  * A `generate(instructions, prompt) → text` backed by Gemini.
@@ -340,7 +355,7 @@ export async function geminiGenerate({ apiKey, model }) {
       m = genAI.getGenerativeModel({
         model,
         systemInstruction: instructions,
-        generationConfig: { temperature: 0, maxOutputTokens: 1024, responseMimeType: 'application/json', responseSchema: /** @type {any} */ (RESPONSE_SCHEMA) },
+        generationConfig: { temperature: 0, maxOutputTokens: 1536, responseMimeType: 'application/json', responseSchema: /** @type {any} */ (RESPONSE_SCHEMA) },
       });
       byInstructions.set(instructions, m);
     }
@@ -384,7 +399,7 @@ export async function askWithRetry(generate, instructions, prompt, { sleep = (ms
  */
 export async function scoreJobs(jobs, {
   generate, candidate, model = DEFAULT_MODEL, max = 300, rpm = 12, rescore = false, busyRetries, busyWaitMs,
-  storePath = SCORES_PATH, sleep = (ms) => new Promise((r) => setTimeout(r, ms)), now = () => new Date(), log = () => {},
+  storePath = SCORES_PATH, sectorPath = sectorStoreFor(storePath), sleep = (ms) => new Promise((r) => setTimeout(r, ms)), now = () => new Date(), log = () => {},
 }) {
   const instructions = buildInstructions(candidate);
   const version = versionStamp(instructions);
@@ -411,8 +426,10 @@ export async function scoreJobs(jobs, {
       continue;
     }
     if (!answer.ok) { failed++; log(`llm-score: ${job.title}: unreadable answer (${answer.error})`); continue; }
-    const row = scoreRow(job, answer.value, { model, version, at: now() });
+    const at = now();
+    const row = scoreRow(job, answer.value, { model, version, at });
     appendScore(storePath, row);
+    if (answer.value.sector) appendSector(job, answer.value.sector, { model, version, at, path: sectorPath });
     results.set(key, row);
     scored++;
   }
@@ -550,7 +567,7 @@ export async function askBatchWithRetry(generate, instructions, jobs, { sleep = 
  */
 export async function scoreJobsBatch(jobs, {
   generate, candidate, model = DEFAULT_MODEL, batch = FIT_BATCH, rescore = false, busyRetries, busyWaitMs,
-  storePath = SCORES_PATH, sleep = (ms) => new Promise((r) => setTimeout(r, ms)), now = () => new Date(), log = () => {},
+  storePath = SCORES_PATH, sectorPath = sectorStoreFor(storePath), sleep = (ms) => new Promise((r) => setTimeout(r, ms)), now = () => new Date(), log = () => {},
 }) {
   const instructions = buildBatchInstructions(candidate);
   const version = versionStamp(instructions);
@@ -582,8 +599,10 @@ export async function scoreJobsBatch(jobs, {
   todo.forEach((job, i) => {
     const value = answer.value.get(i + 1);
     if (!value) { missing.push(job); log(`llm-score: ${job.title}: missing from the batch answer`); return; }
-    const row = scoreRow(job, value, { model, version, at: now() });
+    const at = now();
+    const row = scoreRow(job, value, { model, version, at });
     appendScore(storePath, row);
+    if (value.sector) appendSector(job, value.sector, { model, version, at, path: sectorPath });
     results.set(row.key, row);
   });
   return { ...none, scored: results.size, failed: missing.length, missing };

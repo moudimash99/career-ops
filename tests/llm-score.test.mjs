@@ -44,7 +44,7 @@ try {
   ].map(parseAnswer);
   if (bad.every((b) => b.ok === false)) pass('parseAnswer() refuses non-JSON, a missing factor, scores outside 1-5, and non-number years');
   else fail(`accepted a bad answer: ${JSON.stringify(bad)}`);
-  if (RESPONSE_SCHEMA.propertyOrdering.join() === [...FACTORS, 'years_required', 'summary'].join() && RESPONSE_SCHEMA.properties.role.propertyOrdering.join() === 'evidence,score') {
+  if (RESPONSE_SCHEMA.propertyOrdering.join() === [...FACTORS, 'years_required', 'sector', 'clearance', 'summary'].join() && RESPONSE_SCHEMA.properties.role.propertyOrdering.join() === 'evidence,score') {
     pass('the schema puts each factor\'s evidence before its score');
   } else fail('schema order wrong');
 

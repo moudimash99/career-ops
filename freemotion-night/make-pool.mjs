@@ -62,6 +62,12 @@
  * non-fit word next to a role word) waits until it has an answer. --no-llm, or no GEMINI_API_KEY:
  * no calls, stored answers still count.
  *
+ * SECTORS (user, 2026-10-04) — config/targets.yml `sectors:`: defence,
+ * government and clearance jobs get score 0, space jobs rank 1 lower. Title
+ * and company words drop the obvious ones before any model call
+ * (pool-rules.mjs); clearance words in the text count without a model; the
+ * rest is the fit score's own sector answer (llm-sector.mjs).
+ *
  * LIVE CHECK — before the list is written, the scheduled jobs are checked in
  * rank order (liveness-api.mjs, then one headless page at a time,
  * liveness-browser.mjs) and only live ones are kept: a dead or unclear link is
@@ -83,6 +89,7 @@ import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 
 import { MAX_AGE_DAYS, capPerCompany, companyKey, judge, rankScore, titleKey } from './pool-rules.mjs';
+import { applySectors, readSectors } from './llm-sector.mjs';
 import { AGY_SCORE_MODEL, CLAUDE_SCORE_MODEL, DEFAULT_MODEL, FACTORS, GATE_SCHEMA, STRETCH_AT, agyGenerate, claudeGenerate, gateJobs, geminiGateGenerate, geminiGenerate, scoreJobsAgy, jobKey, readGate, readScores, resolveCandidate, scoreJobs, verdictOf } from './llm-score.mjs';
 import normalizeUrl from '../url-key.mjs';
 import { readCurrentState } from '../lib/freemotion-submissions.mjs';
@@ -584,11 +591,28 @@ async function main() {
   }
 
   const { kept, merges } = mergeSameJobs(routed);
-  const ranked = capPerCompany([...kept].sort(rankOrder));
+
+  // Sectors (user, 2026-10-04): targets.yml `sectors:`. The fit score's own
+  // answer (llm-sector.mjs, stored in data/llm-sector.tsv) gives defence,
+  // government and clearance jobs score 0 and ranks space lower; clearance
+  // words in the text count without an answer. No model call here.
+  const sectorConfig = targets?.sectors ?? { drop: [], penalty: {} };
+  let sectorLine = '';
+  let sectorKept = kept;
+  if (sectorConfig.drop.length || Object.keys(sectorConfig.penalty).length) {
+    const sectorTexts = loadPostingTexts(getCareerOpsRoot(), kept.map((x) => x.origUrl || x.url));
+    const byUrl = new Map(kept.map((x) => [x.url, sectorTexts.get(x.origUrl || x.url)]));
+    const applied = applySectors(kept, readSectors(), byUrl, sectorConfig);
+    for (const d of applied.dropped) drop(d.why);
+    sectorKept = applied.kept;
+    const penalized = sectorKept.filter((x) => x.sectorPenalty).length;
+    sectorLine = `  sectors: ${applied.dropped.length} at score 0, ${penalized} ranked lower, ${applied.unanswered} not judged yet`;
+  }
+  const ranked = capPerCompany([...sectorKept].sort(rankOrder));
   const scheduled = ranked.filter((x) => SCHEDULED.has(x.route));
   const liveCheck = argv.includes('--no-live-check') ? null : await takeLive(scheduled, TOP);
   const list = (liveCheck ? liveCheck.live : scheduled.slice(0, TOP))
-    .map((x) => ({ co: x.co, title: x.title, url: x.url, english: x.english, toulouse: x.toulouse, paris: x.paris, route: x.route, source: x.source, tier: x.tier, ...(x.fit != null ? { fit: x.fit } : {}) }));
+    .map((x) => ({ co: x.co, title: x.title, url: x.url, english: x.english, toulouse: x.toulouse, paris: x.paris, route: x.route, source: x.source, tier: x.tier, ...(x.fit != null ? { fit: x.fit } : {}), ...(x.sector ? { sector: x.sector } : {}) }));
 
   mkdirSync(OUT, { recursive: true });
   writeFileSync(join(OUT, 'pool.json'), JSON.stringify(ranked.map(({ origUrl, ...x }) => x), null, 1));
@@ -605,6 +629,7 @@ async function main() {
   if (gateLine) console.log(gateLine);
   if (textRun) console.log(textLine(textRun));
   console.log(`  passed the rules: ${routed.length} | merged away as duplicates: ${routed.length - kept.length} (${merges.length} groups, see merges.txt)`);
+  if (sectorLine) console.log(sectorLine);
   console.log(`  kept: ${ranked.length} after the ${4}-per-company cap | by route: ${sorted(count(ranked, (x) => x.route))}`);
   console.log(`  scheduled pool by source: ${sorted(count(ranked.filter((x) => SCHEDULED.has(x.route)), (x) => x.source))}`);
   if (liveCheck) console.log(`  live check: ${liveCheck.checked} checked (the rest cached), ${liveCheck.dropped.length} skipped as dead or unclear (see dead.txt)`);

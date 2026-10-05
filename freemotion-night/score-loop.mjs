@@ -149,9 +149,12 @@ export function makePace({ start, max, min = 2, upEvery = 25 }) {
  * maximum usage"). Cheapest first; the Pro models have the smallest quotas.
  * Scores keep the model that made them (llm-scores.tsv `model`).
  */
+// 3.1 Flash-Lite first, then Flash, 3.5 Flash-Lite as backup (user, 2026-10-04:
+// the fit score now also answers the sector question, which 3.1 read best).
 export const MODEL_ROTATION = [
-  'gemini-3.5-flash-lite', 'gemini-3.1-flash-lite', 'gemini-2.5-flash-lite',
-  'gemini-3.5-flash', 'gemini-3.6-flash', 'gemini-3.7-flash', 'gemini-3.8-flash', 'gemini-2.5-flash',
+  'gemini-3.1-flash-lite',
+  'gemini-3.5-flash', 'gemini-3.6-flash', 'gemini-3.7-flash', 'gemini-3.8-flash',
+  'gemini-3.5-flash-lite', 'gemini-2.5-flash-lite', 'gemini-2.5-flash',
   'gemini-3.1-pro-preview', 'gemini-2.5-pro',
 ];
 

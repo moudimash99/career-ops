@@ -9,11 +9,19 @@
 // two Toulouse rows; APEC alone returns thousands for a single keyword.
 //
 // Transport: the same public JSON endpoint the apec.fr search page calls. No
-// authentication, no key, no cookie. POST a JSON body, get results back.
+// authentication, no key. POST a JSON body, get results back.
 //
 //   POST https://www.apec.fr/cms/webservices/rechercheOffre
 //   { motsCles, pagination: { range, startIndex }, sorts, activeFiltre }
 //   -> { resultats: [...], offreFilters: [...], totalCount }
+//
+// Since 2026-10-01 the endpoint answers plain requests with DataDome's
+// "Please enable JS" page (HTTP 403). So when this machine has the Free Motion
+// Camoufox (config/playwright-mcp-camoufox.json, gitignored), the searches run
+// from inside one hidden Camoufox page on apec.fr, the request the site makes
+// for itself, BROWSER_GAP_MS apart. Without that config the plain request is
+// used, as before. A CAPTCHA inside the browser stops the board with an error;
+// it is never worked around.
 //
 // The board is national and enormous, so a `apec:` config block with explicit
 // search queries is REQUIRED — without one the provider throws rather than
@@ -44,11 +52,41 @@
 // internal ids (799 = the whole country, plus small unlabelled buckets). Those
 // are NOT the same namespace as `lieux` and are not used here.
 
+import { camoufoxLaunchOptions, isCaptchaPage, openCamoufoxPage } from '../lib/camoufox-page.mjs';
+import { sleep } from './_http.mjs';
+
 const SEARCH_URL = 'https://www.apec.fr/cms/webservices/rechercheOffre';
+const SEARCH_PATH = '/cms/webservices/rechercheOffre';
+const SEARCH_PAGE = 'https://www.apec.fr/candidat/recherche-emploi.html/emploi';
 const TRUSTED_HOST = 'www.apec.fr';
 const OFFER_BASE = 'https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre';
 const DEFAULT_MAX_HITS = 100;
 const MAX_HITS_CAP = 200;
+// Between two searches in the browser: ~150 quick requests brought up APEC's
+// CAPTCHA on 2026-09-23 (freemotion-night/apec-route.mjs).
+const BROWSER_GAP_MS = 3000;
+
+/** Opens the Camoufox search page, or null when this machine has no Camoufox config. */
+function defaultBrowserOpener() {
+  const launchOptions = camoufoxLaunchOptions();
+  return launchOptions ? () => openCamoufoxPage(SEARCH_PAGE, { launchOptions }) : null;
+}
+
+/** One search from inside the browser page; a non-JSON answer throws. */
+async function searchInPage(page, body) {
+  const res = await page.fetchText(SEARCH_PATH, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', accept: 'application/json' },
+    body,
+  });
+  try {
+    return JSON.parse(res.text);
+  } catch {
+    throw new Error(isCaptchaPage(res.text)
+      ? `apec: DataDome CAPTCHA page inside Camoufox (HTTP ${res.status}), not working around it`
+      : `apec: non-JSON answer inside Camoufox (HTTP ${res.status})`);
+  }
+}
 
 /** Pin a URL to the expected https host. */
 function assertApecUrl(url) {
@@ -211,47 +249,66 @@ export default {
     const { queries, departments, maxHits } = resolveConfig(entry);
     const url = assertApecUrl(SEARCH_URL);
 
+    // ctx.apecBrowser: an opener returning { fetchText, close }, or null for
+    // the plain request. Absent, the Camoufox page when this machine has one.
+    const openBrowser = ctx?.apecBrowser !== undefined ? ctx.apecBrowser : defaultBrowserOpener();
+    let page = null;
+    if (openBrowser) {
+      try {
+        page = await openBrowser();
+      } catch (err) {
+        throw new Error(`apec: Camoufox failed to start: ${err.message}`);
+      }
+    }
+
     // One search per configured term; dedup across terms by posting URL, since
     // "devops" and "ingénieur cloud" overlap heavily.
     const byUrl = new Map();
 
-    for (const query of queries) {
-      /** @type {any} */
-      const payload = {
-        motsCles: query,
-        pagination: { range: maxHits, startIndex: 0 },
-        // Newest first: the scanner's whole job is finding what is new, and it
-        // keeps the per-query slice meaningful when maxHits truncates.
-        sorts: [{ type: 'DATE', direction: 'DESCENDING' }],
-        activeFiltre: true,
-      };
-      // Omit `lieux` entirely when unconfigured — an empty array is not the
-      // same as absent and has not been verified against the API.
-      if (departments.length > 0) payload.lieux = departments;
-      const body = JSON.stringify(payload);
+    try {
+      for (const [i, query] of queries.entries()) {
+        if (page && i > 0) await sleep(BROWSER_GAP_MS, ctx);
+        /** @type {any} */
+        const payload = {
+          motsCles: query,
+          pagination: { range: maxHits, startIndex: 0 },
+          // Newest first: the scanner's whole job is finding what is new, and it
+          // keeps the per-query slice meaningful when maxHits truncates.
+          sorts: [{ type: 'DATE', direction: 'DESCENDING' }],
+          activeFiltre: true,
+        };
+        // Omit `lieux` entirely when unconfigured — an empty array is not the
+        // same as absent and has not been verified against the API.
+        if (departments.length > 0) payload.lieux = departments;
+        const body = JSON.stringify(payload);
 
-      const json = /** @type {any} */ (
-        await ctx.fetchJson(url, {
-          method: 'POST',
-          redirect: 'error',
-          headers: {
-            'content-type': 'application/json',
-            accept: 'application/json',
-          },
-          body,
-        })
-      );
-
-      if (!json || !Array.isArray(json.resultats)) {
-        throw new Error(
-          `apec: unexpected response for query "${query}" — expected { resultats: [...] }`,
+        const json = /** @type {any} */ (
+          page
+            ? await searchInPage(page, body)
+            : await ctx.fetchJson(url, {
+              method: 'POST',
+              redirect: 'error',
+              headers: {
+                'content-type': 'application/json',
+                accept: 'application/json',
+              },
+              body,
+            })
         );
-      }
 
-      for (const hit of json.resultats) {
-        const job = normalizeApecHit(hit, entry?.name);
-        if (job && !byUrl.has(job.url)) byUrl.set(job.url, job);
+        if (!json || !Array.isArray(json.resultats)) {
+          throw new Error(
+            `apec: unexpected response for query "${query}" — expected { resultats: [...] }`,
+          );
+        }
+
+        for (const hit of json.resultats) {
+          const job = normalizeApecHit(hit, entry?.name);
+          if (job && !byUrl.has(job.url)) byUrl.set(job.url, job);
+        }
       }
+    } finally {
+      if (page) await page.close().catch(() => {});
     }
 
     return [...byUrl.values()];

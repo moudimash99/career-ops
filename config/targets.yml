@@ -92,6 +92,18 @@ rank_low: [salesforce, go, golang, "word:rust", .net, "c#", "word:java", php, sa
 
 too_many_years: 8
 
+# Sectors on the night list (user, 2026-10-04). Judged per job from its title,
+# company and posting text (freemotion-night/llm-sector.mjs): the sector the
+# WORK is for, not the sectors a consultancy lists. Known sectors: defence,
+# space, government, clearance (needs a security clearance, "habilitable", or
+# a nationality). `drop` removes the job; `penalty` is added to its rank
+# (fit 1-5 plus the small place/language nudges), so -1 puts a space job
+# below every comparable non-space one.
+sectors:
+  drop: [defence, government, clearance]
+  penalty:
+    space: -1.0
+
 # What the night list's model scores each job against. No name, contact
 # details or salary here: this is the only thing about the candidate that
 # goes to the model (freemotion-night/llm-score.mjs).
@@ -104,7 +116,7 @@ candidate:
   # Same order as config/profile.yml target_roles (ranked by the user).
   target_work:
     - Cloud / DevOps / SRE / platform engineering (AWS, Kubernetes, Terraform)
-    - Systems engineering / MBSE (requirements, interfaces, V&V, IVV, ground segment), especially aerospace and space
+    - Systems engineering / MBSE (requirements, interfaces, V&V, IVV, ground segment)
     - Data engineering (Airflow, Python, SQL, geospatial pipelines)
     - Backend development (Python, C++, TypeScript)
     - AI engineering

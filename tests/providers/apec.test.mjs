@@ -154,7 +154,7 @@ try {
   if (Array.isArray(mod) === false) {
     let threw = null;
     try {
-      await provider.fetch({ name: 'APEC' }, { fetchJson: async () => ({ resultats: [] }) });
+      await provider.fetch({ name: 'APEC' }, { apecBrowser: null, fetchJson: async () => ({ resultats: [] }) });
     } catch (e) {
       threw = e;
     }
@@ -168,6 +168,7 @@ try {
   // Two queries returning an overlapping row must collapse to one job.
   const sent = [];
   const stubCtx = {
+    apecBrowser: null,
     fetchJson: async (url, opts) => {
       sent.push({ url, body: JSON.parse(opts.body), method: opts.method });
       return {
@@ -209,6 +210,7 @@ try {
   await provider.fetch(
     { name: 'APEC', apec: { queries: ['devops'] } },
     {
+      apecBrowser: null,
       fetchJson: async (url, opts) => {
         sent2.push(JSON.parse(opts.body));
         return { resultats: [] };
@@ -226,6 +228,7 @@ try {
   await provider.fetch(
     { name: 'APEC', apec: { queries: ['x'], max_hits: 99999 } },
     {
+      apecBrowser: null,
       fetchJson: async (url, opts) => {
         sent3.push(JSON.parse(opts.body));
         return { resultats: [] };
@@ -240,7 +243,7 @@ try {
   try {
     await provider.fetch(
       { name: 'APEC', apec: { queries: ['x'] } },
-      { fetchJson: async () => ({ unexpected: true }) },
+      { apecBrowser: null, fetchJson: async () => ({ unexpected: true }) },
     );
   } catch (e) {
     shapeErr = e;
@@ -249,6 +252,69 @@ try {
     pass('fetch() throws when the payload is missing `resultats`');
   } else {
     fail('a malformed payload must throw rather than return []');
+  }
+
+  // ---- browser transport (DataDome on the plain endpoint since 2026-10-01) --
+  // A fake page stands in for Camoufox: searches go through it, never through
+  // fetchJson, and the browser is closed once, error or not.
+  const fakeBrowser = (answer) => {
+    const log = { opened: 0, closed: 0, calls: [] };
+    const opener = async () => {
+      log.opened++;
+      return {
+        fetchText: async (path, init) => {
+          log.calls.push({ path, init, body: JSON.parse(init.body) });
+          return answer(log.calls.length);
+        },
+        close: async () => { log.closed++; },
+      };
+    };
+    return { log, opener };
+  };
+  const noHttp = async () => { throw new Error('fetchJson must not be called in browser mode'); };
+
+  const b1 = fakeBrowser((n) => ({ status: 200, text: JSON.stringify({ resultats: [{ intitule: 'Job ' + n, numeroOffre: 'B' + n, nomCommercial: 'C', lieuTexte: 'Paris - 75' }] }) }));
+  const bJobs = await provider.fetch(
+    { name: 'APEC', apec: { queries: ['devops', 'kubernetes'], departments: ['75'] } },
+    { apecBrowser: b1.opener, sleep: async () => {}, fetchJson: noHttp },
+  );
+  if (bJobs.length === 2 && b1.log.opened === 1 && b1.log.calls.length === 2) {
+    pass('fetch() runs every search through one browser page when one is given');
+  } else {
+    fail(`browser mode: jobs=${bJobs.length} opened=${b1.log.opened} calls=${b1.log.calls.length}`);
+  }
+  if (b1.log.calls.every((c) => c.path === '/cms/webservices/rechercheOffre' && c.init.method === 'POST'
+    && JSON.stringify(c.body.lieux) === '["75"]')) {
+    pass('browser mode POSTs the same search body to the same-origin path');
+  } else {
+    fail(`browser calls = ${JSON.stringify(b1.log.calls.map((c) => [c.path, c.init.method, c.body.lieux]))}`);
+  }
+  if (b1.log.closed === 1) pass('browser mode closes the browser after the searches');
+  else fail(`closed ${b1.log.closed} times`);
+
+  const b2 = fakeBrowser(() => ({ status: 403, text: '<html><script>var dd={\'rt\':\'c\'}</script>Please enable JS and disable any ad blocker</html>' }));
+  let captchaErr = null;
+  try {
+    await provider.fetch({ name: 'APEC', apec: { queries: ['a', 'b'] } }, { apecBrowser: b2.opener, sleep: async () => {}, fetchJson: noHttp });
+  } catch (e) {
+    captchaErr = e;
+  }
+  if (captchaErr && /CAPTCHA/.test(captchaErr.message) && b2.log.calls.length === 1 && b2.log.closed === 1) {
+    pass('a DataDome page inside the browser stops the board with a CAPTCHA error and closes it');
+  } else {
+    fail(`captcha: err=${captchaErr?.message} calls=${b2.log.calls.length} closed=${b2.log.closed}`);
+  }
+
+  let startErr = null;
+  try {
+    await provider.fetch({ name: 'APEC', apec: { queries: ['a'] } }, { apecBrowser: async () => { throw new Error('no exe'); }, fetchJson: noHttp });
+  } catch (e) {
+    startErr = e;
+  }
+  if (startErr && /Camoufox failed to start: no exe/.test(startErr.message)) {
+    pass('a browser that fails to start is reported, not silently swapped for the blocked plain request');
+  } else {
+    fail(`start failure: ${startErr?.message}`);
   }
 } catch (err) {
   fail(`apec provider suite crashed: ${err.message}`);
