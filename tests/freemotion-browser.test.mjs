@@ -47,7 +47,11 @@ for (const file of helpers) {
 const NIGHT_DIR = join(ROOT, 'freemotion-night');
 const EMAIL = /[\w.+-]+@(?!example\.com)[\w-]+\.[\w.]+/;
 const PHONE = /\+\d{2}[\s\d]{8,}/;
-for (const file of readdirSync(NIGHT_DIR)) {
+// One level of sub-folders too (freemotion-night/sites/: the per-site scripts).
+const nightFiles = readdirSync(NIGHT_DIR, { withFileTypes: true }).flatMap((e) => (e.isDirectory()
+  ? readdirSync(join(NIGHT_DIR, e.name), { withFileTypes: true }).filter((s) => s.isFile()).map((s) => `${e.name}/${s.name}`)
+  : [e.name]));
+for (const file of nightFiles) {
   const text = readFileSync(join(NIGHT_DIR, file), 'utf-8');
   const hit = text.match(EMAIL) || text.match(PHONE) || text.match(/[A-Za-z]:\/Users\//);
   if (hit) fail(`freemotion-night/${file} contains personal data or a machine path: ${hit[0]}`);

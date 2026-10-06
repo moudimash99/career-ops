@@ -47,6 +47,11 @@
 # written and checked, and puts them into the sheet; the agent only uploads and pastes. About two
 # minutes a job. Writers: the job's driver first, then agy, codex, the second Claude account, copilot
 # (DOCS_WRITERS="codex agy" for another order). When none answers, the generic CV goes out with no letter.
+# HelloWork postings: after the documents and before the agent, freemotion-night/sites/hellowork.mjs does
+# HelloWork's own form without a model (claim, sign-in, name, CV, letter, "Postuler", the phone step) and
+# writes what it did into the sheet; the agent then only records it, or continues on the employer's page,
+# or from where the script stopped (issue #26). Once per job. NO_HW_SCRIPT=1 leaves HelloWork to the agent;
+# a WATCH=1 run never uses it.
 # Every agy job prints its steps live (freemotion-night/agent-log.mjs, agy's own labels and its
 # "NEXT / WHY" lines) and keeps them in tmp/fm/night/actions-<num>.log.
 cd "$(dirname "$0")/.."
@@ -238,6 +243,7 @@ for n in "$@"; do
   # Retry jobs that only failed because a limit or the network cut them off; skip everything else that has a result.
   note=$(awk -F'\t' -v u="$u" -v r="$RUN" '$2==u && $8==r {o=$9} END {print o}' data/freemotion-submissions.tsv)
   if [ -n "$prev" ] && [ "$prev" != "in-progress" ] && ! { [ "$prev" = errored ] && echo "$note" | grep -qiE 'limit hit|out of quota|network failure|usage limit|limit mid'; }; then echo "job $n: already $prev (skipped)"; continue; fi
+  hw_ran=
   for attempt in $(seq 1 40); do
     d=$(driver)
     if [ "$d" = none ]; then
@@ -250,6 +256,13 @@ for n in "$@"; do
     # clock and its live log start (the writers are agy sessions too). Made once per
     # posting and reused on a retry. A failure costs nothing: the sheet keeps the generic CV and no letter.
     CLAUDE1_DIR="$CLAUDE1_DIR" node freemotion-night/prepare-docs.mjs $n --driver $d || echo "note: no documents made for job $n: generic CV, no letter"
+    # HelloWork's own form, without a model. Exit 2 (claim refused / company cap) or 3 (finalized by the
+    # script): nothing left for an agent. 0: the sheet says what it did, the agent continues. 1: the agent does it all.
+    if [ -z "$WATCH$NO_HW_SCRIPT$hw_ran" ] && echo "$u" | grep -qE '^https?://(www\.)?hellowork\.com/fr-fr/emplois/'; then
+      hw_ran=1
+      node freemotion-night/sites/hellowork.mjs $n ${HEADFUL:+--headful}; hw=$?
+      if [ $hw = 2 ] || [ $hw = 3 ]; then d=hellowork; break; fi
+    fi
     start=$(date -u +%Y-%m-%dT%H:%M:%SZ)
     # agy's steps, live, from its own transcript (also kept in tmp/fm/night/actions-<num>.log).
     follower=
