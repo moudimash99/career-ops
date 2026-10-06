@@ -39,6 +39,9 @@ const PYTHON = flag('--python', process.env.FM_PYTHON || 'python');
 const stamp = () => new Date().toLocaleString('sv-SE').slice(0, 16);
 const today = () => new Date().toLocaleDateString('sv-SE');
 
+// APEC route lookups at the daily scan (issue #25): 30 was the cap; testing 50.
+export const APEC_MAX = 50;
+
 // The scoring loops, as in freemotion-night/README.md "Scoring all day".
 export const LOOPS = [
   { name: '', args: ['--models', 'gemini-3.5-flash-lite,gemini-3.1-flash-lite'] },
@@ -124,7 +127,10 @@ function main() {
   if (cmd === 'scan') {
     appendFileSync(log, `\n##### ${stamp()} scheduled scan\n`);
     step(log, 'scan', NODE, ['scan.mjs']);
-    step(log, 'make-pool', NODE, ['freemotion-night/make-pool.mjs']);
+    // APEC rate test (#25): the first APEC contact of the day asks up to APEC_MAX route lookups. A second
+    // batch the same day hit the CAPTCHA after one request (2026-10-06), so the test runs here, at 06:00.
+    const pool = step(log, 'make-pool', NODE, ['freemotion-night/make-pool.mjs', '--apec-max', String(APEC_MAX)]);
+    if (/CAPTCHA/i.test(`${pool.stdout}${pool.stderr}`)) note(`APEC showed its CAPTCHA during the 06:00 scan at --apec-max ${APEC_MAX} (#25): lower APEC_MAX in freemotion-night/scheduled.mjs.`, `apec captcha ${today()}`);
     const r = step(log, 'reply check', PYTHON, ['freemotion-night/inbox-replies.py']);
     for (const n of replyNotes(r.stdout || '')) note(n.text, n.key);
   } else if (cmd === 'loops') {
