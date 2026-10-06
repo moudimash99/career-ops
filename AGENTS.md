@@ -394,6 +394,8 @@ A single-string `modes_dir` (today's default, ~90% of users) behaves exactly as 
 
   `run.sh` makes each job's CV and cover letter itself right before that job (`freemotion-night/prepare-docs.mjs`), and ends with the inbox check, the reply check (`inbox-replies.py`: proposals only, applied with `--apply`) and the open agent-inbox items. Drivers, in order: agy, codex, the second Claude account (`sonnet1`), copilot; that is `run.sh`'s default, so don't pass `DRIVER_ORDER` unless asked.
 
+- **"weekly review"** = `node freemotion-night/lessons.mjs weekly`, then read the report it writes (`data/lessons-weekly/<year>-W<week>.md`): for the top recurring lessons that are still open, look at the code and propose concrete fixes; the user decides. A fix commit says "fixes Lnn" in its message, which is how the next weekly review checks it. After each run, `run.sh` files that run's failures as lessons by itself (`lessons.mjs review`, one tool-free Claude Code call).
+
 Personal rules on top of these (letter wording, CV rules) stay in `modes/_custom.md`.
 
 | If the user... | Mode |

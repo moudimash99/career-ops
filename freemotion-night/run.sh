@@ -200,6 +200,12 @@ limit_reset() {
   now=$(date +%s)
   case $d in
     agy|agy-sonnet)
+      # Signed out (lesson L53, 2026-10-04): agy waits 60 s for a Google sign-in nobody can give,
+      # then fails. The driver is out like at a limit; look again in an hour, not three tries now.
+      if grep -qiE 'Authentication required|authentication (failed|timed out)' "tmp/fm/usage/$d-$n.err" 2>/dev/null; then
+        echo "note: $d is signed out (Google sign-in); run \`agy\` once by hand to sign in again" >&2
+        echo $(( now + RECHECK )); return
+      fi
       grep -qiE 'quota|rate.?limit|resource.?exhausted|limit (reached|exceeded)|usage limit|exceeded your|(^|[^0-9])429([^0-9]|$)' "tmp/fm/usage/$d-$n.json" "tmp/fm/usage/$d-$n.err" 2>/dev/null || return
       # agy says when it resets ("Resets in 1h30m48s"), for the 5-hour and the weekly limit alike.
       rs=$(grep -ohE 'Resets in ([0-9]+d ?)?([0-9]+h)?([0-9]+m)?' "tmp/fm/usage/$d-$n.json" "tmp/fm/usage/$d-$n.err" 2>/dev/null | head -1)
@@ -278,11 +284,14 @@ node letter-write.mjs --sample 3 --since "$RUN_START" || true
 # "finalisez" / "transmise" emails, employer confirmations) next to our records. Report
 # only: `python freemotion-night/check-sent.py --fix` corrects the records.
 sleep 120   # the last confirmation emails take a minute or two
-python freemotion-night/check-sent.py --days 1 --run "$RUN" || true
+python freemotion-night/check-sent.py --days 1 --run "$RUN" 2>&1 | tee "tmp/fm/night/check-sent-$RUN.txt" || true
 # Always: what employers answered in the last 30 days (rejections, a recruiter who wants to talk),
 # matched to the tracker. Proposals only: `python freemotion-night/inbox-replies.py --apply 1,2`
 # applies the ones you pick.
 python freemotion-night/inbox-replies.py || true
+# Always: what went wrong in this run, filed as lessons (data/lessons-learned.md) by one tool-free
+# Claude Code call on the second account (lessons.mjs; issue #27). Never agy or a browser runner.
+CLAUDE_CONFIG_DIR="${LESSONS_CLAUDE_DIR:-$CLAUDE1_DIR}" node freemotion-night/lessons.mjs review --run "$RUN" || true
 # Always: what is waiting in the agent inbox (data/agent-inbox.md) for a person or a later session.
 if grep -q '^- \[ \]' data/agent-inbox.md 2>/dev/null; then
   echo; echo "AGENT INBOX ($(grep -c '^- \[ \]' data/agent-inbox.md) open):"
