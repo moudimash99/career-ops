@@ -128,6 +128,23 @@ stops before the final submit, and records the outcome `rehearsal`, which does n
 APEC postings: `node freemotion-night/apec-route.mjs --in <rows.json>` checks which are still live and how each
 takes applications (`URL_ONLY` = a partner site, `EMAIL_ONLY` = on APEC itself, behind the APEC sign-in).
 
+## What runs by itself (Windows Task Scheduler)
+
+`node freemotion-night/scheduled.mjs install` creates three tasks in the `career-ops` folder (no admin
+rights needed; `status` shows them, `uninstall` removes them). They run hidden, and a run missed while the PC
+was off starts when it is on again:
+
+| Task | When | What |
+|---|---|---|
+| FreeMotion scan | every day 06:00 | `scan.mjs`, `make-pool.mjs` (posting texts, scores), the reply check |
+| FreeMotion loops | at log-on and 06:00 | starts the three scoring loops below if they are not running |
+| FreeMotion weekly | Mondays 09:00 | `lessons.mjs weekly`: the lessons report |
+
+"apply" is never scheduled: it spends the drivers' allowances and sends real applications.
+Logs: `tmp/fm/scheduled/<task>-<date>.log`. Only what needs a person goes to `data/agent-inbox.md`, once
+each: a step that failed, a recruiter who wants to talk, tracker changes proposed from replies, the weekly report.
+On another PC: `node freemotion-night/scheduled.mjs install --python <path to python.exe>`.
+
 ## Scoring all day
 
 Google counts the free allowance per model, so the loops run side by side, each on its own
