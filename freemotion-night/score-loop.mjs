@@ -56,7 +56,7 @@ import { existsSync, mkdirSync, readFileSync, unlinkSync, writeFileSync, appendF
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 import { MAX_AGE_DAYS } from './pool-rules.mjs';
-import { FIT_BATCH, gateJobs, geminiBatchGenerate, geminiGateGenerate, geminiGenerate, jobKey, readGate, readScores, resolveCandidate, scoreJobs, scoreJobsBatch } from './llm-score.mjs';
+import { FIT_BATCH, gateJobs, gateStore, geminiBatchGenerate, geminiGateGenerate, geminiGenerate, jobKey, readGate, readScores, resolveCandidate, scoreJobs, scoreJobsBatch } from './llm-score.mjs';
 import { applyGate, selectCandidates, strongTitle } from './make-pool.mjs';
 import { fetchMissingTexts } from './fetch-texts.mjs';
 import { loadPostingTexts } from '../lib/posting-text.mjs';
@@ -242,6 +242,11 @@ async function main() {
   const targets = loadTargets();
   if (!targets?.candidate) { log('config/targets.yml has no candidate: block; nothing to do'); process.exit(1); }
   const who = resolveCandidate(targets.candidate).candidate;
+
+  // Quick title check mode (issue #21): config/targets.yml gate.mode, or --gate strict|loose for one run.
+  const gateFlag = flag('--gate', '');
+  if (gateFlag && !['strict', 'loose'].includes(gateFlag)) { console.error('--gate must be strict or loose'); process.exit(1); }
+  const gate = { ...(targets?.gate || { mode: 'loose', experience: {} }), ...(gateFlag ? { mode: gateFlag } : {}) };
   const tooManyYears = targets.tooManyYears ?? null;
   const models = flag('--model', '') ? [flag('--model', '')]
     : flag('--models', '') ? flag('--models', '').split(',').map((m) => m.trim()).filter(Boolean) : MODEL_ROTATION;
@@ -331,14 +336,14 @@ async function main() {
 
     // 1. Quick check: titles not answered yet, English first, newest first.
     const scoresBefore = readScores();
-    const gateAnswers = readGate();
+    const gateAnswers = readGate(undefined, gateStore(who, gate));
     const needGate = candidates.filter((x) => !strongTitle(x) && !scoresBefore.has(jobKey(x)) && !gateAnswers.has(jobKey(x))).sort(newestEnglishFirst);
     if (needGate.length && !noGate) {
       status('quick check', { titles: needGate.length });
       let quota = false;
       const model = rot.model;
       const g = await gateJobs(needGate, {
-        generate: (await gensFor(model)).gate, candidate: who, model,
+        generate: (await gensFor(model)).gate, candidate: who, gate, model,
         log: (m) => { if (/daily quota/.test(m)) quota = true; else log(m); },
       });
       const calls = Math.ceil((g.go + g.noGo) / 100);

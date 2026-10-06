@@ -88,6 +88,29 @@ export const SECTOR_NAMES = ['defence', 'space', 'government', 'clearance'];
  * and which only rank it lower. Absent: nothing dropped, no penalty.
  * @returns {{ drop: string[], penalty: Record<string, number> }}
  */
+/**
+ * The quick title check's mode (user, 2026-10-06; issue #21). `strict`: a title passes only when its
+ * main work is in `experience` (roles held, skills and tools, domains, taken from the CV); `loose`:
+ * any digital work passes. No block means loose, the behaviour before modes existed.
+ * @returns {{ mode: 'strict' | 'loose', experience: { roles: string[], skills: string[], domains: string[] } }}
+ */
+export function compileGate(raw, where = 'targets') {
+  const empty = { roles: [], skills: [], domains: [] };
+  if (raw == null) return { mode: 'loose', experience: empty };
+  if (typeof raw !== 'object' || Array.isArray(raw)) throw new Error(`${where}: \`gate:\` must be a mapping with \`mode:\` and \`experience:\``);
+  const mode = raw.mode ?? 'loose';
+  if (mode !== 'strict' && mode !== 'loose') throw new Error(`${where}: \`gate.mode\` must be strict or loose, not ${JSON.stringify(mode)}`);
+  const e = raw.experience ?? {};
+  const list = (k) => {
+    const v = e[k] ?? [];
+    if (!Array.isArray(v) || v.some((x) => typeof x !== 'string')) throw new Error(`${where}: \`gate.experience.${k}\` must be a list of strings`);
+    return v.map((x) => x.trim()).filter(Boolean);
+  };
+  const experience = { roles: list('roles'), skills: list('skills'), domains: list('domains') };
+  if (mode === 'strict' && !experience.roles.length) throw new Error(`${where}: strict \`gate:\` needs \`experience.roles\``);
+  return { mode, experience };
+}
+
 export function compileSectors(raw, where = 'targets') {
   if (raw == null) return { drop: [], penalty: {} };
   if (typeof raw !== 'object' || Array.isArray(raw)) throw new Error(`${where}: \`sectors:\` must be a mapping with \`drop:\` and/or \`penalty:\``);
@@ -167,6 +190,7 @@ export function compileTargets(raw, where = 'targets') {
   }
   const candidate = raw.candidate ?? null;
   const sectors = compileSectors(raw.sectors, where);
+  const gate = compileGate(raw.gate, where);
 
   const searchWords = [];
   for (const g of groups) for (const q of g.search) if (!searchWords.includes(q)) searchWords.push(q);
@@ -181,6 +205,7 @@ export function compileTargets(raw, where = 'targets') {
     tooManyYears,
     candidate,
     sectors,
+    gate,
     /**
      * The scanner's title filter as keyword lists: any group's (or rescue)
      * words in, any drop word out. `non_fit` needs no entry: with a match word

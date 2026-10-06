@@ -104,6 +104,43 @@ sectors:
   penalty:
     space: -1.0
 
+# The quick title check (freemotion-night/llm-score.mjs gateJobs; issue #21). Titles in our
+# fields (a role group worth 1.5+ points) skip it. Every other title gets a go / no-go from the
+# model on title, company and place only.
+#   strict  a title passes only when its main work is in `experience` below: a role held, a
+#           skill or tool, a domain, all taken from cv.md. A vague title ("Ingénieur H/F")
+#           still passes: a later step reads the posting.
+#   loose   any digital work passes (the check before 2026-10-06).
+# Answers are kept per mode in data/llm-gate.tsv; strict answers are asked again when this
+# list changes. `--gate strict|loose` on make-pool.mjs / score-loop.mjs overrides the mode once.
+gate:
+  mode: loose   # strict once the list below is confirmed (2026-10-06)
+  experience:
+    roles:
+      - Cloud / DevOps / SRE / platform engineer (AWS, Azure, Kubernetes, Terraform, CI/CD, monitoring)
+      - Data engineer (pipelines, ETL, Airflow, geospatial and satellite-imagery data)
+      - Systems engineer / MBSE (requirements, interfaces, architecture, V&V, IVV, integration)
+      - Backend / software developer (Python, C++, C#/.NET, Java, TypeScript/Node.js; REST APIs)
+      - Software architect
+      - Full-stack developer (.NET or Node backend, Angular frontend)
+      - Computer-vision / AI pipeline developer (GPU, real-time video)
+      - Data / quality-data analyst (dashboards, KPIs, Power BI, Palantir Foundry)
+    skills:
+      - AWS (EKS, EC2, S3, IAM), Azure, Docker, Kubernetes, Helm, Terraform, CloudFormation
+      - GitHub Actions, Jenkins, Azure DevOps, GitOps
+      - Prometheus, Grafana, Alertmanager, Loki
+      - Apache Airflow, Python, Pandas, SQL, MongoDB, PostGIS, Redis
+      - FastAPI, Express.js, REST APIs, microservices
+      - C++ (real-time, performance), CUDA / TensorRT / Nvidia DeepStream
+      - GDAL, Rasterio, STAC, Google Earth Engine
+      - SysML / Capella (in progress), requirements management, ISO/IEC 15288, ARP4754 / DO-178 (coursework)
+      - Linux, log analysis
+    domains:
+      - Aerospace (aircraft programmes, quality / non-conformance)
+      - Earth observation and geospatial
+      - Space systems (coursework, student missions)
+      - Finance software, e-commerce, HR / workforce analytics
+
 # What the night list's model scores each job against. No name, contact
 # details or salary here: this is the only thing about the candidate that
 # goes to the model (freemotion-night/llm-score.mjs).

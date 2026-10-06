@@ -90,7 +90,7 @@ import { fileURLToPath } from 'url';
 
 import { MAX_AGE_DAYS, capPerCompany, companyKey, judge, rankScore, titleKey } from './pool-rules.mjs';
 import { applySectors, readSectors } from './llm-sector.mjs';
-import { AGY_SCORE_MODEL, CLAUDE_SCORE_MODEL, DEFAULT_MODEL, FACTORS, GATE_SCHEMA, STRETCH_AT, agyGenerate, claudeGenerate, gateJobs, geminiGateGenerate, geminiGenerate, scoreJobsAgy, jobKey, readGate, readScores, resolveCandidate, scoreJobs, verdictOf } from './llm-score.mjs';
+import { AGY_SCORE_MODEL, CLAUDE_SCORE_MODEL, DEFAULT_MODEL, FACTORS, GATE_SCHEMA, STRETCH_AT, agyGenerate, claudeGenerate, gateJobs, gateStore, geminiGateGenerate, geminiGenerate, scoreJobsAgy, jobKey, readGate, readScores, resolveCandidate, scoreJobs, verdictOf } from './llm-score.mjs';
 import normalizeUrl from '../url-key.mjs';
 import { readCurrentState } from '../lib/freemotion-submissions.mjs';
 import { checkCompany, countByCompany, matchBlacklist } from '../lib/company-cap.mjs';
@@ -469,6 +469,11 @@ async function main() {
   // The model (issue #10): a quick batched go / no-go on the titles that are
   // not clearly ours, then the full score for every job that passed.
   const targets = loadTargets();
+
+  // Quick title check mode (issue #21): config/targets.yml gate.mode, or --gate strict|loose for one run.
+  const gateFlag = flag('--gate', '');
+  if (gateFlag && !['strict', 'loose'].includes(gateFlag)) { console.error('--gate must be strict or loose'); process.exit(1); }
+  const gate = { ...(targets?.gate || { mode: 'loose', experience: {} }), ...(gateFlag ? { mode: gateFlag } : {}) };
   const tooManyYears = targets?.tooManyYears ?? null;
   let textYears = new Map();
   let apiKey = '';
@@ -499,14 +504,14 @@ async function main() {
   if (who) {
     try {
       const g = await gateJobs(candidates.filter((x) => !strongTitle(x) && !scoredBefore.has(jobKey(x))), {
-        generate: cli ? (cli === 'claude' ? claudeGenerate : agyGenerate)({ model, schema: GATE_SCHEMA }) : await geminiGateGenerate({ apiKey, model }), candidate: who, model: cli ? `${cli}/${model}` : model, log: (m) => console.warn(m),
+        generate: cli ? (cli === 'claude' ? claudeGenerate : agyGenerate)({ model, schema: GATE_SCHEMA }) : await geminiGateGenerate({ apiKey, model }), candidate: who, gate, model: cli ? `${cli}/${model}` : model, log: (m) => console.warn(m),
       });
-      gateLine = `  gate: ${g.asked} titles asked (${g.go} go, ${g.noGo} no-go${g.failed ? `, ${g.failed} failed` : ''})`;
+      gateLine = `  gate (${gate.mode}): ${g.asked} titles asked (${g.go} go, ${g.noGo} no-go${g.failed ? `, ${g.failed} failed` : ''})`;
     } catch (err) {
       console.warn(`make-pool: gate step failed (${hideKey(err)}); stored answers still apply.`);
     }
   }
-  const gated = applyGate(candidates, readGate(), scoredBefore);
+  const gated = applyGate(candidates, readGate(undefined, gateStore(who, gate)), scoredBefore);
   for (const d of gated.dropped) drop('gate: no-go');
   candidates.length = 0;
   candidates.push(...gated.passed);
