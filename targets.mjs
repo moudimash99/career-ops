@@ -90,12 +90,13 @@ export const SECTOR_NAMES = ['defence', 'space', 'government', 'clearance'];
  */
 /**
  * The quick title check's mode (user, 2026-10-06; issue #21). `strict`: a title passes only when its
- * main work is in `experience` (roles held, skills and tools, domains, taken from the CV); `loose`:
+ * main work is in `experience` (roles held, skills and tools, domains, taken from the CV) and not in
+ * `experience.weak` (work the CV mentions but the user rates a weak fit); `loose`:
  * any digital work passes. No block means loose, the behaviour before modes existed.
- * @returns {{ mode: 'strict' | 'loose', experience: { roles: string[], skills: string[], domains: string[] } }}
+ * @returns {{ mode: 'strict' | 'loose', experience: { roles: string[], skills: string[], domains: string[], weak: string[] } }}
  */
 export function compileGate(raw, where = 'targets') {
-  const empty = { roles: [], skills: [], domains: [] };
+  const empty = { roles: [], skills: [], domains: [], weak: [] };
   if (raw == null) return { mode: 'loose', experience: empty };
   if (typeof raw !== 'object' || Array.isArray(raw)) throw new Error(`${where}: \`gate:\` must be a mapping with \`mode:\` and \`experience:\``);
   const mode = raw.mode ?? 'loose';
@@ -106,7 +107,7 @@ export function compileGate(raw, where = 'targets') {
     if (!Array.isArray(v) || v.some((x) => typeof x !== 'string')) throw new Error(`${where}: \`gate.experience.${k}\` must be a list of strings`);
     return v.map((x) => x.trim()).filter(Boolean);
   };
-  const experience = { roles: list('roles'), skills: list('skills'), domains: list('domains') };
+  const experience = { roles: list('roles'), skills: list('skills'), domains: list('domains'), weak: list('weak') };
   if (mode === 'strict' && !experience.roles.length) throw new Error(`${where}: strict \`gate:\` needs \`experience.roles\``);
   return { mode, experience };
 }

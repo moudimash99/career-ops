@@ -114,13 +114,15 @@ sectors:
 # Answers are kept per mode in data/llm-gate.tsv; strict answers are asked again when this
 # list changes. `--gate strict|loose` on make-pool.mjs / score-loop.mjs overrides the mode once.
 gate:
-  mode: loose   # strict once the list below is confirmed (2026-10-06)
+  mode: strict   # list confirmed by the user 2026-10-06
   experience:
     roles:
-      - Cloud / DevOps / SRE / platform engineer (AWS, Azure, Kubernetes, Terraform, CI/CD, monitoring)
-      - Data engineer (pipelines, ETL, Airflow, geospatial and satellite-imagery data)
+      - Cloud / DevOps / SRE / platform engineer (AWS, Azure, Kubernetes, Terraform, CI/CD, monitoring); also
+        on another cloud provider (GCP, OVHcloud)
+      - Data engineer (pipelines, ETL, Airflow, geospatial and satellite-imagery data); also on another
+        stack (Spark, Databricks, Snowflake, Talend, DataStage, GCP / Azure data services)
       - Systems engineer / MBSE (requirements, interfaces, architecture, V&V, IVV, integration)
-      - Backend / software developer (Python, C++, C#/.NET, Java, TypeScript/Node.js; REST APIs)
+      - Backend / software developer (Python, C++, C#/.NET, TypeScript/Node.js; REST APIs)
       - Software architect
       - Full-stack developer (.NET or Node backend, Angular frontend)
       - Computer-vision / AI pipeline developer (GPU, real-time video)
@@ -135,6 +137,10 @@ gate:
       - GDAL, Rasterio, STAC, Google Earth Engine
       - SysML / Capella (in progress), requirements management, ISO/IEC 15288, ARP4754 / DO-178 (coursework)
       - Linux, log analysis
+    # Weak fit (the user: "about a 2"): no-go in strict mode, though the CV mentions them.
+    weak:
+      - Java development (Java, Spring) as the main work
+      - Embedded software / firmware (embedded C/C++, embedded Linux, microcontrollers)
     domains:
       - Aerospace (aircraft programmes, quality / non-conformance)
       - Earth observation and geospatial

@@ -20,16 +20,17 @@ const S = await load('freemotion-night/llm-score.mjs');
 if (compileGate(undefined).mode === 'loose') pass('no gate: block means loose'); else fail('missing block is not loose');
 try { compileGate({ mode: 'medium' }); fail('an unknown mode was accepted'); } catch { pass('an unknown mode is refused'); }
 try { compileGate({ mode: 'strict', experience: {} }); fail('strict without roles was accepted'); } catch { pass('strict needs the roles it checks against'); }
+if (compileGate({ mode: 'strict', experience: { roles: ['x'], weak: ['Java'] } }).experience.weak[0] === 'Java') pass('the weak-fit list is read'); else fail('weak list not read');
 const real = loadTargets(join(ROOT, 'config/targets.yml'));
 if (['strict', 'loose'].includes(real.gate.mode) && real.gate.experience.roles.length > 0) pass(`config/targets.yml has a gate block (${real.gate.mode}, ${real.gate.experience.roles.length} roles)`);
 else fail(`config/targets.yml gate block missing or empty: ${JSON.stringify(real.gate)}`);
 
 // ---- instructions ------------------------------------------------------------
 const who = { trade: 'Cloud engineer' };
-const strict = { mode: 'strict', experience: { roles: ['Cloud / DevOps engineer'], skills: ['Terraform'], domains: ['Aerospace'] } };
+const strict = { mode: 'strict', experience: { roles: ['Cloud / DevOps engineer'], skills: ['Terraform'], domains: ['Aerospace'], weak: ['Java development'] } };
 const looseText = S.buildGateInstructions(who, { mode: 'loose' });
 const strictText = S.buildGateInstructions(who, strict);
-if (/STRICT check/.test(strictText) && strictText.includes('Cloud / DevOps engineer') && strictText.includes('Terraform')) pass('strict instructions carry the experience list');
+if (/STRICT check/.test(strictText) && strictText.includes('Cloud / DevOps engineer') && strictText.includes('Terraform') && /Weak fit, NOT enough for go.*Java development/.test(strictText)) pass('strict instructions carry the experience list and the weak-fit list');
 else fail('strict instructions lack the list');
 if (!/STRICT/.test(looseText) && /Answer no-go ONLY when the title clearly means other work/.test(looseText) && looseText === S.buildGateInstructions(who)) pass('loose instructions are the old ones, and the default');
 else fail('loose instructions changed');

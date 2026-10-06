@@ -656,6 +656,7 @@ export function buildGateInstructions(candidate, gate = { mode: 'loose' }) {
       `- Roles held: ${(e.roles || []).join('; ')}`,
       `- Skills and tools: ${(e.skills || []).join('; ')}`,
       `- Domains: ${(e.domains || []).join('; ')}`,
+      ...((e.weak || []).length ? [`- Weak fit, NOT enough for go even though the CV mentions it: ${e.weak.join('; ')}`] : []),
       '',
       'STRICT check. A job is "go" only when BOTH hold:',
       '1. It is digital work. No-go for non-digital engineering (mechanical, civil, thermal, structural, electrical or electronic hardware,',
