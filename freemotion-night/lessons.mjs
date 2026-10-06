@@ -391,7 +391,7 @@ const OPEN_GAPS = [
   ['The run log had no outcome for "the employer refused before Submit"', 'record', 'fixed', 'An already-applied posting was recorded as errored.', 'Outcome `already-applied` in lib/freemotion-submissions.mjs (2026-09-07).'],
   ['The run log had no outcome for a practice run', 'record', 'fixed', 'Rehearsals were recorded as validation-failed and counted as failures.', 'Outcome `rehearsal`.'],
   ['No sample of the user\'s own writing', 'letter', 'open', 'Letters are checked against voice-dna.md but cannot match how the user writes: writing-samples/ holds only its README.', 'Two or three real letters or messages in writing-samples/.'],
-  ['Email-verification walls', 'login', 'known', 'Confirm-your-email gates have been passed (via imap-link.py), but Gmail OAuth is broken, so lib/freemotion-inbox.mjs is unused.', 'Keep one of the two (issue #24).'],
+  ['Email-verification walls', 'login', 'known', 'Confirm-your-email gates have been passed (via imap-link.py), and the unused Gmail-API reader lib/freemotion-inbox.mjs was removed on 2026-10-06.', 'Done: imap-link.py is the one reader (issue #24).'],
   ['Roles outside France scored 4.5+', 'other', 'open', 'Two postings outside France scored high although the visa route rules them out; location is not weighted hard enough.', 'Check the fit score\'s location handling.'],
 ];
 

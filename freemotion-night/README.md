@@ -178,6 +178,17 @@ score 0 (off the night list), space jobs rank 1 lower. Three layers:
 The wording was checked on 100 postings against Flash, every disagreement judged by hand: a
 consultancy's list of sectors ("aéronautique, spatial, défense") is not the job's sector.
 
+## Tools you run by hand
+
+Not part of any run; kept on purpose (2026-10-06):
+
+| Command | When |
+|---|---|
+| `node reread-jd.mjs --company <name>` (or `--report N`, `--count 3`) | Before an interview or when a recruiter calls: the posting of a job you applied to, from a saved copy first, since the posting may be gone. |
+| `node scan-history-prune.mjs` (`--apply` to write) | After changing `config/targets.yml` or the blacklist: removes the scan results the filters would reject today. Backs up first. |
+| `node daily_report.mjs` (`--dry-run`, `--seed`, `--all`) | Emails a digest of the evaluation reports scored 4+ (`DIGEST_SCORE_THRESHOLD`), over the SMTP settings in `.env`. Reads `reports/`, which the career-ops evaluation writes, not Free Motion. |
+| `node scripts/backup.mjs status | save | push` | The private backup of the personal files (CV, profile, tracker, reports, Free Motion sheets) to `../career-ops-data.git`. Logins, the browser profile and `.env` are left out. |
+
 ## What each file does
 
 | File | Job |
@@ -197,7 +208,7 @@ consultancy's list of sectors ("aéronautique, spatial, défense") is not the jo
 | `control.mjs` | WATCH=1 only: the watch window (local web page): the action waiting, Continue / Don't do it + message / Stop, the plain log (`tmp/fm/night/watch-<num>.log`), screenshots, CV and letter links. `--host 0.0.0.0` (WATCH_HOST=lan) with a keyed link; `--keep` restarts it mid-job without clearing. |
 | `agent-log.mjs` | agy's steps from its own transcript, one line each (its label, the target, its NEXT/WHY words, the answer); live with `--follow`. run.sh keeps one per job in `tmp/fm/night/actions-<num>.log`. `agy-transcript.mjs` finds and reads agy's transcripts. |
 | `record.mjs` | The AI calls it after a confirmed submission (`record.sh` only forwards to it: from PowerShell or cmd, `bash` can be WSL's, which cannot run repo scripts). It refuses URLs not on tonight's list and notes that sound like a failure, then adds the Applied row to the tracker. |
-| `imap-link.py` | Finds a verification email and prints its links (stands in for `lib/freemotion-inbox.mjs` while Gmail OAuth is broken). |
+| `imap-link.py` | Finds a verification email and prints its links (read-only IMAP with a Gmail app password; the one verification-mail reader). |
 | `usage.mjs` | Per-job result and token count for a run. |
 | `check-sent.py` | Did the applications really go out? Puts our records (`data/freemotion-submissions.tsv`) next to the inbox (read-only IMAP): HelloWork's "arrivée" (sent), "finalisez" (passed to the employer's site: sent only if the agent finished there), "transmise" (error) emails and employer confirmations, matched by company and, when a company has several jobs, by title. Flags every job where our record and the inbox disagree. `run.sh` runs it at the end of each run; `--fix` corrects the records (a new row per job, nothing deleted) so the not-sent ones get retried. `--days N`, `--run ID`. |
 | `inbox-replies.py` | What did the employers answer? Reads the inbox (read-only IMAP) for rejections and recruiters who want to talk, matches each to its tracker row (the company as whole words, never inside another word; rows saved with a job board as the employer are never matched by company) and prints proposed status changes; `--apply 1,2` (or `all`) applies them through `set-status.mjs`. A refusal that follows a condition in the same sentence ("no answer within a month means not retained") is an acknowledgement, not a rejection. `run.sh` runs it at the end. `--contacts <tsv>` lists senders a person can answer, for follow-ups; `--self-test` holds the wording cases. |

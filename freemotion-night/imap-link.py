@@ -1,6 +1,6 @@
 # freemotion-night/imap-link.py "<subject or sender pattern>" "<expected link host pattern>"
 # Finds the newest matching email from the last 3 days (read-only IMAP) and prints its
-# links on the expected host. Stands in for lib/freemotion-inbox.mjs while Gmail OAuth is broken.
+# links on the expected host. The one verification-mail reader (the Gmail-API one was removed 2026-10-06).
 # Login comes from .env: GMAIL_MACHAKA_USER and GMAIL_MACHAKA_APP_PASSWORD (a Gmail app password).
 import imaplib, email, sys, re, os, datetime
 from email.header import decode_header

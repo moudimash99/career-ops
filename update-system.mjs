@@ -525,7 +525,6 @@ const SYSTEM_PATHS = [
   'lib/freemotion-answers.mjs',
   'lib/freemotion-credentials.mjs',
   'lib/freemotion-engine-config.mjs',
-  'lib/freemotion-inbox.mjs',
   'lib/freemotion-inventory.mjs',
   'lib/freemotion-submissions.mjs',
   'lib/required-years.mjs',

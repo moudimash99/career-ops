@@ -425,13 +425,12 @@ cover_letter:
 #
 # When a site makes you register before it shows the application form, Free
 # Motion creates the account and then has to click a link in the confirmation
-# email. `node lib/freemotion-inbox.mjs check --domain <host>` reads that mail
-# and prints the one link to click.
+# email. `python freemotion-night/imap-link.py "<sender>" "<expected domain>"`
+# reads that mail (read-only IMAP) and prints its links on the expected domain.
 #
-# Reading it from Gmail needs GMAIL_CLIENT_ID / GMAIL_CLIENT_SECRET /
-# GMAIL_REFRESH_TOKEN in your environment (the same three the bundled gmail
-# plugin documents). Without them, paste the email into a file and use
-# `--from-file` — same guard rails, no credentials.
+# It logs in with GMAIL_MACHAKA_USER and GMAIL_MACHAKA_APP_PASSWORD (a Gmail
+# app password) from .env. The earlier Gmail-API reader
+# (lib/freemotion-inbox.mjs) was removed on 2026-10-06.
 #
 # trust_cross_site is the one setting worth thinking about. An inbox is the
 # only input channel a stranger can write to unprompted, so by default a link
