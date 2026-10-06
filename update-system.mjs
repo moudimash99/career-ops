@@ -532,6 +532,9 @@ const SYSTEM_PATHS = [
   'lib/posting-text.mjs',
   'lib/posting-fetch.mjs',
   'lib/freemotion-validate.mjs',
+  'lib/freemotion-browser-mode.mjs',
+  'lib/camoufox-page.mjs',
+  'lib/doc-writers.mjs',
   'lib/freemotion-browser/',
   'freemotion-night/',
   'config/freemotion-candidate.example.md',
@@ -598,6 +601,8 @@ export const USER_PATHS = [
   'plugins.lock',
   'opencode.json',
   '.claude/settings.json',
+  // Fork: codex's browser server, with this machine's paths in it.
+  '.codex/config.toml',
   '.claude/hooks/',
   // Fork (moudimash99): the auto-applier answer files are the user's own data.
   'config/apply-answers.yml',

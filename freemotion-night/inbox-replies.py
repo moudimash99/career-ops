@@ -83,8 +83,8 @@ INTERVIEW = [
 # vous"): no invitation is read from these senders.
 BOARD_SENDERS = r'hellowork|free-work|freework|apec\.fr|welcometothejungle|francetravail|linkedin|indeed'
 CONFIRMATION = [
-    r'bien recu\w* votre candidature', r'accuse\w* (de )?reception', r'bien (ete )?(enregistre|prise en compte|transmise|recue)',
-    r'candidature est (bien )?arrivee', r'merci (d avoir postule|pour votre candidature|de votre candidature|de l interet)',
+    r'bien recu\w* (votre|ta) candidature', r'accuse\w* (de )?reception', r'bien (ete )?(enregistre|prise en compte|transmise|recue)',
+    r'candidature est (bien )?arrivee', r'merci (d avoir postule|pour (votre|ta) candidature|de (votre|ta) candidature|de l interet)',
     r'received your application', r'thank you for (applying|your application|your interest)', r'application (has been )?(received|submitted)',
 ]
 # The subject, or failing that the sender's name, must look like recruiting ("Mohammad x Swile",
@@ -151,11 +151,38 @@ def read_inbox():
             k, v = line.split('=', 1); env[k.strip()] = v.strip().strip('"').strip("'")
     user, pw = env.get('GMAIL_MACHAKA_USER'), env.get('GMAIL_MACHAKA_APP_PASSWORD')
     if not user or not pw: sys.exit('GMAIL_MACHAKA_USER and GMAIL_MACHAKA_APP_PASSWORD must be set in .env')
-    M = imaplib.IMAP4_SSL('imap.gmail.com'); M.login(user, pw); M.select('INBOX', readonly=True)
-    ids = M.search(None, f'(SINCE "{since.strftime("%d-%b-%Y")}")')[1][0].split()
-    mails, skipped = [], []
+    # Fetched in batches of 100 messages, and a dropped connection is opened again and the batch
+    # retried: one message per request took over 10 minutes for ~1,250 emails, and Gmail cut the
+    # connection partway (2026-10-05, WinError 10053).
+    conn = {}
+    def connect():
+        try: conn['M'].logout()
+        except Exception: pass
+        conn['M'] = imaplib.IMAP4_SSL('imap.gmail.com'); conn['M'].login(user, pw); conn['M'].select('INBOX', readonly=True)
+    def fetch(ids, part):
+        """-> {id: raw bytes} for these message ids."""
+        for attempt in range(4):
+            try:
+                typ, data = conn['M'].fetch(b','.join(ids), part)
+                out = {}
+                for item in data:
+                    if isinstance(item, tuple):
+                        m = re.match(rb'(\d+) ', item[0])
+                        if m: out[m.group(1)] = item[1]
+                return out
+            except (imaplib.IMAP4.abort, OSError) as e:
+                if attempt == 3: raise
+                print(f'  connection dropped ({e.__class__.__name__}); reconnecting', file=sys.stderr)
+                connect()
+    connect()
+    ids = conn['M'].search(None, f'(SINCE "{since.strftime("%d-%b-%Y")}")')[1][0].split()
+    chunks = lambda xs: [xs[k:k + 100] for k in range(0, len(xs), 100)]
+    heads = {}
+    for c in chunks(ids): heads.update(fetch(c, '(BODY.PEEK[HEADER.FIELDS (SUBJECT FROM DATE REPLY-TO MESSAGE-ID)])'))
+    keep, skipped = [], []
     for i in ids:
-        h = email.message_from_bytes(M.fetch(i, '(BODY.PEEK[HEADER.FIELDS (SUBJECT FROM DATE REPLY-TO MESSAGE-ID)])')[1][0][1])
+        if i not in heads: continue
+        h = email.message_from_bytes(heads[i])
         subj, frm = dec(h['Subject']), dec(h['From'])
         if address(frm) == user.lower(): continue                      # our own mail
         ps = plain(subj)
@@ -165,11 +192,18 @@ def read_inbox():
             continue
         try: date = parsedate_to_datetime(h['Date'])
         except Exception: continue
-        text = body_text(email.message_from_bytes(M.fetch(i, '(BODY.PEEK[])')[1][0][1]))
+        keep.append((i, h, subj, frm, date))
+    bodies = {}
+    for c in chunks([k[0] for k in keep]): bodies.update(fetch(c, '(BODY.PEEK[])'))
+    mails = []
+    for i, h, subj, frm, date in keep:
+        if i not in bodies: continue
+        text = body_text(email.message_from_bytes(bodies[i]))
         mails.append({'date': date.isoformat(), 'from': frm, 'subject': subj, 'text': text[:6000],
                       'reply_to': address(dec(h['Reply-To'])) or address(frm),
                       'message_id': (h['Message-ID'] or f'imap-{i.decode()}').strip()})
-    M.logout()
+    try: conn['M'].logout()
+    except Exception: pass
     return mails, len(ids), skipped
 
 # ── the tracker ─────────────────────────────────────────────────────────
@@ -205,10 +239,19 @@ def title_score(role, mail):
     return len(rw & words(mail['subject'] + ' ' + mail['text'][:1500])) / max(1, len(rw))
 
 OPEN = {'Applied', 'Responded', 'Interview'}
+# Rows saved with the job board as the employer ("Hellowork"): every email relayed through that
+# board would name them, so they are never matched by company (2026-10-06).
+BOARDS = {'hellowork', 'cadremploi', 'apec', 'france travail', 'meteojob', 'free work', 'jobteaser', 'indeed', 'linkedin', 'welcome to the jungle'}
+def needs(row, to):
+    """Does this row still need the change? A row already there, or past it, is left alone."""
+    return row['status'] == 'Applied' or (to == 'Rejected' and row['status'] in ('Responded', 'Interview'))
+
 def match(mail, rows):
-    """-> (rows to change, rows to choose from). One of the two is empty."""
+    """-> (rows the email is about, rows to choose from). One of the two is empty.
+    Every status counts here: once an email's row has been updated, the email must keep pointing
+    at that row, not move on to the company's next open one."""
     day = mail['date'][:10]
-    here = [r for r in rows if r['status'] in OPEN and r['date'] <= day and names_company(r['company'], mail)]
+    here = [r for r in rows if norm(r['company']) not in BOARDS and r['date'] <= day and names_company(r['company'], mail)]
     if len(here) <= 1: return here, []
     scored = sorted(((title_score(r['role'], mail), r) for r in here), key=lambda p: -p[0])
     top = scored[0][0]
@@ -229,7 +272,43 @@ def apply(which):
                            cwd=ROOT, capture_output=True, text=True, encoding='utf-8')
         print(f"{p['n']:>3}  #{p['row']} {p['company']} | {p['role'][:50]}: {p['to']}  {'ok' if r.returncode == 0 else 'FAILED: ' + (r.stderr or r.stdout).strip()[:200]}")
 
+# ── self-test (tests/inbox-replies.test.mjs runs it) ─────────────────────
+# Real wording seen in the inbox, 2026-10-05, names changed.
+SELF_TEST = [
+    ('rejection', 'Votre candidature', "Votre candidature ne convient malheureusement pas pour ce poste, nous n'allons pas y donner suite.", 'x@example.com'),
+    ('rejection', 'Candidature', "A ce jour celle-ci ne correspond malheureusement pas au profil recherché sur le poste.", 'x@example.com'),
+    ('rejection', 'Votre candidature', "Votre candidature ne peut pas être retenue aujourd'hui pour ce poste.", 'x@example.com'),
+    ('rejection', 'Mohammad x Société', "Malheureusement, malgré tes expériences, nous sommes à la recherche d'un profil disposant d'une expérience plus significative.", 'x@example.com'),
+    ('rejection', 'Your application', "We have unfortunately decided not to progress with your application on this occasion.", 'x@example.com'),
+    ('rejection', 'Update', "At this time, we do not feel like this position best matches your skill set.", 'x@example.com'),
+    ('confirmation', 'Accusé de réception', "Nous avons bien reçu votre candidature. Toutefois, sans contact de notre part dans un délai d'un mois, veuillez considérer que votre profil n'a pas été retenu.", 'x@example.com'),
+    ('confirmation', 'Merci', "Nous avons bien reçu ta candidature. Si tu n'as pas de retour dans les 14 prochains jours, c'est que malheureusement nous ne donnons pas suite à celle-ci.", 'x@example.com'),
+    ('confirmation', 'Thank you for your application', "We received your application. If you are not selected for this position, keep an eye on our jobs page.", 'x@example.com'),
+    ('confirmation', 'Candidature', "Nous avons bien reçu votre candidature. Nous pourrions être amenés à vous inviter à un entretien vidéo.", 'x@example.com'),
+    ('confirmation', 'Thank you for applying', "We received your application. Our hiring team plans to schedule interviews over the next few weeks.", 'x@example.com'),
+    ('interview', 'Echange opportunité', "Etes-vous toujours à l'écoute du marché ? Si oui, pouvez-vous me remonter vos disponibilités sur les 10 prochains jours ?", 'x@example.com'),
+    ('other', 'Votre candidature à Ingénieur', "J'aimerais échanger avec vous sur le programme.", 'Hellowork <notification@' + 'hellowork.com>'),
+]
+
+def self_test():
+    bad = 0
+    for want, subject, body, sender in SELF_TEST:
+        got, ev = classify(subject, body, sender)
+        if got != want:
+            bad += 1; print(f'FAIL {want} != {got} ({ev!r}): {body[:70]}')
+    rows = [{'num': 1, 'date': '2026-09-01', 'company': 'Stime', 'role': 'Data Engineer', 'status': 'Applied', 'notes': ''},
+            {'num': 2, 'date': '2026-09-01', 'company': 'Hellowork', 'role': 'Ingénieur Système', 'status': 'Applied', 'notes': ''}]
+    mail = {'date': '2026-09-04', 'subject': 'Update', 'from': 'Talent <no-reply@' + 'us.greenhouse-mail.io>',
+            'text': 'at this time we do not feel like this position matches. Sent via reply.hellowork.com'}
+    if match(mail, rows) != ([], []):
+        bad += 1; print('FAIL a company found inside another word ("at this time" / Stime), or a board-named row matched')
+    for addr, want in [('recrutement@example.com', True), ('no-reply@example.com', False), ('jean@' + 'smartrecruiters.com', False)]:
+        if answerable(addr) != want: bad += 1; print(f'FAIL answerable({addr}) != {want}')
+    print(f'self-test: {len(SELF_TEST) + 4 - bad} passed, {bad} failed')
+    sys.exit(1 if bad else 0)
+
 def main():
+    if '--self-test' in args: return self_test()
     if APPLY: return apply(APPLY)
     if FROM_DUMP:
         mails = [m for m in json.load(open(FROM_DUMP, encoding='utf-8')) if m.get('kind') != 'skipped']
@@ -255,12 +334,16 @@ def main():
     print(f'Inbox since {since}: {total} emails, {len(mails)} about an application')
     for k in ('rejection', 'interview', 'confirmation', 'other'): print(f'  {k:13} {counts.get(k, 0)}')
 
-    props, choose, norow, seen = [], [], [], set()
+    props, choose, norow, seen, done = [], [], [], set(), 0
     for m in sorted(answers, key=lambda m: m['date']):
         to = 'Rejected' if m['kind'] == 'rejection' else 'Responded'
         hit, among = match(m, rows)
+        if hit and not any(needs(r, to) for r in hit): done += 1; continue
+        if among:
+            among = [r for r in among if needs(r, to)]
+            if not among: done += 1; continue
         for r in hit:
-            if (r['num'], to) in seen: continue                        # the same answer sent twice
+            if not needs(r, to) or (r['num'], to) in seen: continue    # already there, or the same answer twice
             seen.add((r['num'], to))
             what = 'Rejected by email' if to == 'Rejected' else 'Recruiter wrote, asks to talk'
             props.append({'n': len(props) + 1, 'row': r['num'], 'company': r['company'], 'role': r['role'], 'from': r['status'], 'to': to,
@@ -274,6 +357,7 @@ def main():
     if talk:
         print(f'\nA RECRUITER WANTS TO TALK ({len(talk)}): answer these yourself')
         for m in talk: print(f"   {m['date'][:10]}  {who(m)} | {m['subject'][:70]}  <{m.get('reply_to') or address(m['from'])}>")
+    if done: print(f'\nAlready in the tracker: {done} answer(s)')
     print(f'\nPROPOSED CHANGES ({len(props)}): nothing is changed until you run --apply')
     for p in props: print(f"{p['n']:>3}  #{p['row']} {p['company']} | {p['role'][:52]}: {p['from']} -> {p['to']}   [{p['date']}, \"{p['evidence']}\"]")
     if choose:
@@ -291,7 +375,8 @@ def main():
         with open(CONTACTS, 'w', encoding='utf-8') as fh:
             fh.write('address\tname\tmails\tkinds\tlast\tlast_subject\n')
             for c in sorted(contacts.values(), key=lambda c: c['last'], reverse=True):
-                fh.write('\t'.join([c['address'], c['name'].replace('\t', ' '), str(c['mails']), ','.join(sorted(c['kinds'])), c['last'][:10], c['subject'].replace('\t', ' ')]) + '\n')
+                one = lambda s: re.sub(r'\s+', ' ', s).strip()           # folded headers carry line breaks
+                fh.write('\t'.join([c['address'], one(c['name']), str(c['mails']), ','.join(sorted(c['kinds'])), c['last'][:10], one(c['subject'])]) + '\n')
         print(f'\n{len(contacts)} senders a person can answer -> {os.path.relpath(CONTACTS, ROOT)}')
 
 if __name__ == '__main__':

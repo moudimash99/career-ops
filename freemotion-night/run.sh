@@ -279,4 +279,13 @@ node letter-write.mjs --sample 3 --since "$RUN_START" || true
 # only: `python freemotion-night/check-sent.py --fix` corrects the records.
 sleep 120   # the last confirmation emails take a minute or two
 python freemotion-night/check-sent.py --days 1 --run "$RUN" || true
+# Always: what employers answered in the last 30 days (rejections, a recruiter who wants to talk),
+# matched to the tracker. Proposals only: `python freemotion-night/inbox-replies.py --apply 1,2`
+# applies the ones you pick.
+python freemotion-night/inbox-replies.py || true
+# Always: what is waiting in the agent inbox (data/agent-inbox.md) for a person or a later session.
+if grep -q '^- \[ \]' data/agent-inbox.md 2>/dev/null; then
+  echo; echo "AGENT INBOX ($(grep -c '^- \[ \]' data/agent-inbox.md) open):"
+  grep '^- \[ \]' data/agent-inbox.md | cut -c7-220 | sed 's/^/   /'
+fi
 echo "ALL DONE"

@@ -326,3 +326,6 @@ tmp/
 cv-ccl.html
 cv-ccl.pdf
 agy-usage.tsv
+
+# Python bytecode (freemotion-night/*.py)
+__pycache__/

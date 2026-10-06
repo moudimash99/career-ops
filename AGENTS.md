@@ -374,7 +374,27 @@ A single-string `modes_dir` (today's default, ~90% of users) behaves exactly as 
 
 ### Skill Modes
 
-**Fork override (moudimash99):** in this repo only Free Motion matters. When the user says "scan" / "scan jobs" (or asks in any words to search for or find jobs) or "apply" (in any words, to send applications), do NOT route to the modes below: read "Free Motion is the only workflow here" in `modes/_custom.md` and run those commands (scan = scan + posting texts + scores; apply = pool again + sheets + `freemotion-night/run.sh`).
+**Fork override (moudimash99): Free Motion is the only workflow here.** "scan" and "apply" always mean the Free Motion pipeline (`freemotion-night/`), never the `scan` / `apply` / `pipeline` / `batch` modes below. The same goes for the same request in other words ("find jobs", "search for new offers", "send applications") and for `/career-ops scan` and `/career-ops apply`. The old modes run only when asked for by name ("run the career-ops scan mode"). No onboarding check, no evaluation reports, no questions first: run it. Long steps run in the background; report the counts each step prints.
+
+- **"scan" / "scan jobs"** = scan + all posting texts + scores. Then say how many jobs are new, how many got text, how many were scored, and what is left over (texts not fetched, jobs not scored because a quota ran out), and list the open items in `data/agent-inbox.md`.
+
+  ```bash
+  node scan.mjs                             # all sources -> data/scan-history.tsv
+  node freemotion-night/make-pool.mjs       # rules, quick gate, posting texts, fit scores
+  ```
+
+- **"apply"** = everything from A to Z, no scan. A number after it ("apply 10") is `--top`.
+
+  ```bash
+  node freemotion-night/make-pool.mjs --top 25                         # the pool again: fresh list, live links only
+  node freemotion-night/make-jobs.mjs tmp/fm/night/list.json <first>   # <first> = highest job-<N>.md under 9000, plus 1
+  bash freemotion-night/run.sh <first> ... <last>                      # one job at a time
+  node freemotion-night/usage.mjs                                      # results and tokens, when the run ends
+  ```
+
+  `run.sh` makes each job's CV and cover letter itself right before that job (`freemotion-night/prepare-docs.mjs`), and ends with the inbox check, the reply check (`inbox-replies.py`: proposals only, applied with `--apply`) and the open agent-inbox items. Drivers, in order: agy, codex, the second Claude account (`sonnet1`), copilot; that is `run.sh`'s default, so don't pass `DRIVER_ORDER` unless asked.
+
+Personal rules on top of these (letter wording, CV rules) stay in `modes/_custom.md`.
 
 | If the user... | Mode |
 |----------------|------|
