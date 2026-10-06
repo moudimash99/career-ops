@@ -9361,6 +9361,820 @@ Paste job URLs below as `- [ ] {url}` then run `/career-ops pipeline`.
 - [ ] https://www.linkedin.com/jobs/view/4471397291 | Jobgether | Python Engineer | France | posted: 2026-09-28
 - [ ] https://www.linkedin.com/jobs/view/4447123861 | Framatome | Administrateur des moyens de calcul F/H | Lyon, Auvergne-Rhône-Alpes, France | posted: 2026-10-04
 
+- [ ] https://jobs.ashbyhq.com/elevenlabs/1f7a2786-46d3-46c9-81f3-c3849b412988 | ElevenLabs | Forward Deployed Engineer - Software Engineer - Argentina | Argentina | posted: 2026-10-04
+- [ ] https://jobs.ashbyhq.com/elevenlabs/d05779a0-51da-417f-9921-39be5271402a | ElevenLabs | Enterprise Solutions Engineer - Greece | Europe · European Union · Greece · Remote | posted: 2026-10-04
+- [ ] https://jobs.ashbyhq.com/elevenlabs/ec04799b-6567-4032-8d6c-3c27261618e1 | ElevenLabs | Enterprise Solutions Engineer - Colombia | Colombia · Remote | posted: 2026-10-04
+- [ ] https://jobs.ashbyhq.com/elevenlabs/69694001-b760-4939-9a02-e75c046b89d3 | ElevenLabs | Marketing Data Scientist | Remote | posted: 2026-10-05
+- [ ] https://jobs.ashbyhq.com/elevenlabs/41b892ba-b530-44cb-9ae1-178908fc324c | ElevenLabs | Data Scientist - Product Analytics | Remote | posted: 2026-10-05
+- [ ] https://careers.allianz.com/global/en/job/106424/Data-Analyst | Allianz | Data Analyst | posted: 2026-10-05
+- [ ] https://www.welcometothejungle.com/en/companies/link-consulting/jobs/consultant-cloud-azure-open-webui-docker-h-f-teletravail_toulouse | Link Consulting | Consultant(e) Cloud Azure - Open WebUI & Docker (H/F) Télétravail | Toulouse, France, Remote | posted: 2026-10-05
+- [ ] https://www.welcometothejungle.com/en/companies/betclic/jobs/senior-genai-cloud-engineer-f-m_bordeaux | Betclic Group | Senior GenAI Cloud Engineer F/M | Bordeaux, France | posted: 2026-10-06
+- [ ] https://www.welcometothejungle.com/en/companies/la-fabrique-by-ca/jobs/khome-senior-platform-engineer_paris | La Fabrique by CA | \[KHOME\] Senior Platform Engineer | Paris, France | posted: 2026-10-04
+- [ ] https://www.welcometothejungle.com/en/companies/the-adecco-group/jobs/architecte-devops-kubernetes-h-f_toulouse | The Adecco Group | Architecte DevOps Kubernetes H/F | Toulouse, France | posted: 2026-10-05
+- [ ] https://www.welcometothejungle.com/en/companies/accenture-france/jobs/consultant-devops-experimente-f-h_clermont-ferrand | Accenture France | Consultant DevOps expérimenté F/H | Clermont-Ferrand, France | posted: 2026-10-05
+- [ ] https://www.welcometothejungle.com/en/companies/isagri/jobs/devops-tech-transverse-h-f_nantes | ISAGRI | DevOps / Tech transverse (H/F) | Nantes, France | 35000-55000 EUR | posted: 2026-10-05
+- [ ] https://www.welcometothejungle.com/en/companies/pole-sud-1/jobs/73d3bab3-89d1-4a90-bab2-6279c120087d | Pôle Sud | Ingénieur DevOps _Marseille | Marseille, France | 40000-48000 EUR | posted: 2026-10-05
+- [ ] https://www.welcometothejungle.com/en/companies/kolecto/jobs/devops-engineer-h-f-x_paris_KOLEC_j72gORa | Kolecto | DevOps Engineer (H/F/X) | Paris, France | posted: 2026-10-05
+- [ ] https://www.welcometothejungle.com/en/companies/framatome-1/jobs/data-engineer-and-business-tool-developer-f-h_la-defense_FRAMA_pqaQ0JJ | Framatome | DATA ENGINEER AND BUSINESS TOOL DEVELOPER F/H | La Défense, France | 40000-42000 EUR | posted: 2026-10-05
+- [ ] https://www.welcometothejungle.com/en/companies/the-adecco-group/jobs/data-engineer-gcp_niort | The Adecco Group | Data Engineer ( GCP ) | Niort, France | posted: 2026-10-05
+- [ ] https://www.welcometothejungle.com/en/companies/sopra-steria/jobs/data-engineer-big-data-aerospatial-toulouse_colomiers_SS_pbbGgQ8 | Sopra Steria | Data Engineer - Big Data - Aerospatial - Toulouse | Colomiers, France | posted: 2026-10-05
+- [ ] https://www.welcometothejungle.com/en/companies/sopra-steria/jobs/data-engineer-confirme-services-financiers-lille_villeneuve-d-ascq_SS_Geap8JJ | Sopra Steria | Data Engineer confirmé(e) Services Financiers Lille | Villeneuve-d'Ascq, France | posted: 2026-10-04
+- [ ] https://www.welcometothejungle.com/en/companies/rexel-france/jobs/data-engineer-marketing-digital-ecommerce-h-f-cdi-paris-17eme_paris | Rexel France | Data Engineer - Marketing Digital & eCommerce H/F - CDI - Paris (17ème) | Paris, France | posted: 2026-10-05
+- [ ] https://www.welcometothejungle.com/en/companies/safran-aircraft-engines/jobs/data-engineer-collecting-and-decoding-of-data-for-fleet-data-engineering-f-h_montereau-sur-le-jard | Safran Aircraft Engines | Data Engineer Collecting and decoding of data for Fleet Data Engineering F/H | Montereau-sur-le-Jard, France | posted: 2026-10-06
+- [ ] https://www.welcometothejungle.com/en/companies/pix/jobs/data-ingenieur-ingenieure_paris_PIX_YZ0QA22 | Pix | Data ingénieur / ingénieure | Paris, France | posted: 2026-10-06
+- [ ] https://www.welcometothejungle.com/en/companies/groupement-les-mousquetaires/jobs/data-engineer-databricks-azure_chatillon | Groupement Mousquetaires | Data Engineer (Databricks /Azure) | Châtillon, France | 50000-55000 EUR | posted: 2026-10-05
+- [ ] https://www.welcometothejungle.com/en/companies/digitalforge/jobs/b4a06f4f-6781-4522-9471-a08a42db0fd9 | Digitalforge | Data Engineer Senior | Montpellier, France | 45000-60000 EUR | posted: 2026-10-06
+- [ ] https://www.welcometothejungle.com/en/companies/scorp-io/jobs/machine-learning-engineer-data-scientist-f-h_paris | Scorp-io | Machine Learning Engineer / Data Scientist (F/H) | Paris, France | posted: 2026-10-06
+- [ ] https://www.welcometothejungle.com/en/companies/actinvision/jobs/consultant-data-engineer-dbt-snowflake-f-h_paris | ActinVision | CONSULTANT.E SNOWFLAKE - DATA ENGINEER (F/H) | Paris, France | 52000-65000 EUR | posted: 2026-10-06
+- [ ] https://www.welcometothejungle.com/en/companies/ekinox/jobs/senior-machine-learning-engineer-data-ia-h-f-x_paris | Ekinox | Senior Machine Learning Engineer - Data & IA (H/F/X) | Paris, France | posted: 2026-10-05
+- [ ] https://www.welcometothejungle.com/en/companies/sopra-steria/jobs/expert-observabilite-dynatrace-ile-de-france_courbevoie_SS_XqLV9W2 | Sopra Steria | Expert(e) Observabilité - Dynatrace - Île-de-France | Courbevoie, France | posted: 2026-10-05
+- [ ] https://www.welcometothejungle.com/en/companies/biocodex/jobs/ingenieur-microsoft-365-chef-de-projet-tous-genres_gentilly | BIOCODEX | Ingénieur Microsoft 365 & Chef de projet - Tous genres | Gentilly, France | posted: 2026-10-06
+- [ ] https://www.welcometothejungle.com/en/companies/naval-group-fr/jobs/cdi-ingenieur-infrastructure-devsecops-data-platform-h-f_brest | Naval Group \[FR\] | CDI – Ingénieur Infrastructure DevSecOps Data Platform – H/F | Brest, France | posted: 2026-10-05
+- [ ] https://www.welcometothejungle.com/en/companies/alten-1/jobs/20e22ed4-5e75-4dd2-806e-579d723d3af0 | ALTEN | Cloud & Infrastructure Administrator | Paris, France | 45000 EUR | posted: 2026-10-06
+- [ ] https://www.welcometothejungle.com/en/companies/numberly-1000mercis/jobs/ingenieur-e-devsecops_paris | Numberly | Ingénieur·e DevSecOps | Paris, France | posted: 2026-10-06
+- [ ] https://www.welcometothejungle.com/en/companies/edf/jobs/ingenieur-etudes-travaux-h-f_courbevoie | EDF | Ingenieur etudes travaux H/F | Courbevoie, France | posted: 2026-10-06
+- [ ] https://www.welcometothejungle.com/en/companies/l-oreal/jobs/ingenieur-de-recherche-avancee-biophysique-peau_aulnay-sous-bois | L'Oréal Groupe | Ingénieur(e) de Recherche Avancée - Biophysique Peau | Aulnay-sous-Bois, France | posted: 2026-10-05
+- [ ] https://www.welcometothejungle.com/en/companies/exalt/jobs/architecte-reseau-senior_bordeaux | eXalt | Architecte Réseau Senior | Bordeaux, France | posted: 2026-10-06
+- [ ] https://www.welcometothejungle.com/en/companies/kiiro/jobs/jinto-ai-engineer-ingenieur-ia_paris | Kiiro | JINTO - AI Engineer / Ingénieur IA | Paris, France | 55000-65000 EUR | posted: 2026-10-05
+- [ ] https://www.welcometothejungle.com/en/companies/deloitte/jobs/consultant-secteur-public-ia-data-f-h_paris_DELOI_2d2YWVM | Deloitte | Consultant Secteur Public IA/Data – F/H | Paris, France | posted: 2026-10-05
+- [ ] https://www.welcometothejungle.com/en/companies/rexel-france/jobs/cdi-data-scientist_paris | Rexel France | CDI - Data Scientist | Paris, France | posted: 2026-10-05
+- [ ] https://candidat.francetravail.fr/offres/recherche/detail/214VCFC | HANDIPULSE | Ingénieur-e IA/DevOps - Inclusion et Accessibilité Numérique F/H (H/F) | 31 - TOULOUSE | 35000-45000 EUR | posted: 2026-10-05
+- [ ] https://candidat.francetravail.fr/offres/recherche/detail/214VDNQ | OSCAR-GREEN-TECH | Ingénieur Support Applicatif / Infrastructures / Développement (H/F) | 92 - Courbevoie | posted: 2026-10-05
+- [ ] https://www.jobposting.pro/emploi-2716649-120 | AIS | Ingénieur intégrateur DevOps (H/F) | 31 - Toulouse | posted: 2026-10-06
+- [ ] https://api-v2-multidiff.xtramile.io/collect/e6774b9092639cae6b0c788bfcde36ef | Collective.work | DBA DevOps Senior Oracle et automatisation - CDI (H/F) | 75 - Paris | posted: 2026-10-06
+- [ ] https://fr.indeed.com/job/ing%C3%A9nieur-devops-sre-senior-hf-alliez-passion-technique-et-excellence-op%C3%A9rationnelle-8e9bbbee6f42b34d?from=poleemploi | France Travail | Ingénieur DevOps / SRE Senior (H/F) - Alliez passion technique et excellence opérationnelle | 92 - Puteaux | posted: 2026-10-05
+- [ ] https://careers.cegedim.com/fr/annonce/4491461-ingenieur-devops-infrastructure-hf-92100-boulogne-billancourt?s_o=France+Travail&s_b=DigitalRecruiters | Cegedim | Cegedim - Ingénieur / Ingénieure DevOps (H/F) | 92 - Boulogne-Billancourt | posted: 2026-10-05
+- [ ] https://www.directemploi.com/candidatOffre/56600181?utm_source=pole-emploi&utm_medium=referral&utm_campaign=Pôle-Emploi | France Travail | Architecte Modern Workplace F/H - Puteaux | 92 - Nanterre | posted: 2026-10-06
+- [ ] https://seyos.nicoka.com/public/jobs/1096-2f5ccb0e65457c5/?source=90 | Seyos | Software Architect Node.js - H/F | 75 - Paris 8e Arrondissement | 80000-95000 EUR | posted: 2026-10-05
+- [ ] https://www.jobposting.pro/emploi-2716529-120 | AIS | Architecte Cloud (H/F) | 31 - Toulouse | posted: 2026-10-06
+- [ ] https://www.jobposting.pro/emploi-2716462-120 | KLANIK | Chef de Projet IA (H/F) | 75 - Paris 1er Arrondissement | posted: 2026-10-06
+- [ ] https://www.jobposting.pro/emploi-2718586-120 | KLANIK | Senior AMOA SI Travaux (H/F) | 75 - Paris 1er Arrondissement | posted: 2026-10-06
+- [ ] https://www.jobposting.pro/emploi-2718595-120 | KLANIK | Expert Solution Data / Data Engineer Senior - Snowflake (H/F) | 31 - Toulouse | posted: 2026-10-06
+- [ ] https://candidat.francetravail.fr/offres/recherche/detail/7676432 | France Travail | Data Engineer (Cloud Azure) - Confirmé H/F - 92 h/f | 92 - Boulogne-Billancourt | posted: 2026-10-05
+- [ ] https://candidat.francetravail.fr/offres/recherche/detail/214VMTB | France Travail | Architecte Infra et Cyber - Nouvelles menaces IA - Mythos (H/F) | 92 - Puteaux | 36000-38000 EUR | posted: 2026-10-05
+- [ ] https://www.jobdefense.com/emploi-defense/ingenieur-systeme-mission-milsatcom-hf~28942.html?fromref=poleemploi | France Travail | Ingénieur système mission milsatcom - h/f (H/F) | 31 - Toulouse | posted: 2026-10-06
+- [ ] https://www.meteojob.com/jobs/57280784?utm_source=pole-emploi&utm_medium=aggregator-free | France Travail | Expert technique télécom (H/F) | 92 - Puteaux | 45000-50000 EUR | posted: 2026-10-06
+- [ ] https://candidat.francetravail.fr/offres/recherche/detail/214WCTX | DEDIENNE AEROSPACE | Technicien de Maintenance Bâtiment/Infrastructure (H/F) | 31 - Toulouse | posted: 2026-10-06
+- [ ] https://candidat.francetravail.fr/offres/recherche/detail/214TGBZ | PRESTANOVA | Data Engineer confirmé - PostgreSQL / ETL / Migration de données (H/F) | 75 - Paris | 55000-70000 EUR | posted: 2026-10-05
+- [ ] https://api-v2-multidiff.xtramile.io/collect/fcc52857b3a777976882fa551913ff26 | Collective.work | Fiche de poste - Data Engineer confirmé - CDI (H/F) | 75 - Paris | 55000 EUR | posted: 2026-10-06
+- [ ] https://www.emploi-environnement.com/fr/gestion_offre/visu_offre.php4?reference_offre=346370#xtor=AD-47 | France Travail | Coordinateur.trice gouvernance de la donnée - CDI H/F | 75 - Paris | posted: 2026-10-06
+- [ ] https://candidat.francetravail.fr/offres/recherche/detail/214MTXS | TALINTS Data Center | Ingénieur Data & Data Center (H/F) | 92 - NANTERRE | 34000-38000 EUR | posted: 2026-09-28
+- [ ] https://candidat.francetravail.fr/offres/recherche/detail/214TKSP | UNOVA | Ingénieur.e Travaux Principal CET - MOEX - Data Center (H/F) | 92 - Meudon | posted: 2026-10-05
+- [ ] https://recrutement.constellation.fr/fr/offres/administrateur-systeme-et-reseaux---m365-ef860e?utm_source=francetravail&utm_medium=job-board | EASYTEAM | Administrateur système et réseaux - M365 F/H - EASYTEAM | 92 - Saint-Cloud | 50000-55000 EUR | posted: 2026-10-05
+- [ ] https://joinus.saint-gobain.com/description?nPostingTargetId=325675&id=Q2FFK026203F3VBQBLO7V8M1O&LG=FR&languageSelect=FR&cType=JobBoard&sType=FranceTravail | SAINT-GOBAIN DISTRIBUTION BATIMENT FRANC | Concepteur gestionnaire d'application Transport F/H (H/F) | 92 - COURBEVOIE | 45000-55000 EUR | posted: 2026-10-06
+- [ ] https://taleez.com/apply/technicien-ingenieur-support-systemes-reseau-infrastructure-n1-n2-f-h-labege-itekway-cdi | ITEKWAY | TECHNICIEN / INGENIEUR SUPPORT SYSTEMES & RESEAU (H/F) | 31 - TOULOUSE | posted: 2026-10-05
+- [ ] https://candidat.francetravail.fr/offres/recherche/detail/214VBZM | ENGINEERING TECHNICAL TECHNOLOGY SERVICE | Ingénieur Projet Bancs Essais (H/F) | 92 - Colombes | posted: 2026-10-05
+- [ ] https://www.altays-progiciels.com/sncf-recrutement-externe/back/offre/redirectOffreSiteCarriere/1?NoOffre=2885025&NoSociete=389&NoLangue=1&NoSource=16003 | SNCF GARES & CONNEXIONS | Ingénieur ou ingénieure de chef de lots télécom (H/F) | 75 - Paris 4e Arrondissement | 34000-44000 EUR | posted: 2026-10-05
+- [ ] https://www.aerocontact.com/emploi-aeronautique/ingenieur-etude-et-performance-systemes-anti-aeriens-navals-fh~1189623.html?fromref=poleemploi | France Travail | Ingénieur étude et performance systèmes anti-aériens navals f/h (H/F) | 92 - Plessis-Robinson | posted: 2026-10-06
+- [ ] https://www.aerocontact.com/emploi-aeronautique/ingenieur-systeme-fh~1189028.html?fromref=poleemploi | France Travail | Ingénieur système f/h (H/F) | 92 - Plessis-Robinson | posted: 2026-10-05
+- [ ] https://www.jobposting.pro/emploi-2715788-120 | DAVRICOURT | Ingénieur conception de moyens industriels (H/F) | 75 - Paris 1er Arrondissement | posted: 2026-10-06
+- [ ] https://www.jobposting.pro/emploi-2715751-120 | METIGA | Ingénieur expert GTB/Automatisme (H/F) | 75 - Paris 3e Arrondissement | posted: 2026-10-06
+- [ ] https://careers.werecruit.io/fr/bechtle/offres/ingenieur-avant-vente-cybersecurite-4dbad2?utm_source=francetravail&utm_medium=job-board | BECHTLE COMSOFT | Ingénieur Avant-Vente Cybersécurité F/H - BECHTLE COMSOFT | 92 - Antony | 42000-50000 EUR | posted: 2026-10-05
+- [ ] https://www.jobdefense.com/emploi-defense/technicien-d-essais-ivvq-systemes-terrestres-fh~29019.html?fromref=poleemploi | France Travail | Technicien d'essais ivvq - systèmes terrestres f/h (H/F) | 92 - Plessis-Robinson | posted: 2026-10-06
+- [ ] https://candidat.francetravail.fr/offres/recherche/detail/214SWFP | QUALEES | Data scientist (H/F) | 75 - PARIS | 40000-45000 EUR | posted: 2026-10-02
+- [ ] https://candidat.francetravail.fr/offres/recherche/detail/214VKKF | HEYME | Chargé d'études actuarielles - Levallois Perret (H/F) | 92 - Levallois-Perret | posted: 2026-10-05
+- [ ] https://careers.groupe-rocher.com/job-invite/111737/ | LABORATOIRES DE BIOLOGIE VEGETALE YVES R | CDI - Product Performance Analyst - H/F/X - Groupe Rocher (H/F) | 92 - ISSY LES MOULINEAUX | posted: 2026-10-05
+- [ ] https://taleez.com/apply/ingenieur-en-aerodynamique-cfd-f-h-blagnac-itekway-cdi | ITEKWAY | INGÉNIEUR IVV F/H (H/F) | 31 - LABEGE | posted: 2026-10-05
+- [ ] https://www.randstadprofessional.fr/offre/307-S38-R001344_01R/A?utm_medium=jobboard_organic&utm_source=france-travail&utm_campaign=offres | RANDSTAD PROFESSIONAL | Développeur informatique (F/H) | 31 - Toulouse | 40000 EUR | posted: 2026-10-05
+- [ ] https://www.jobposting.pro/emploi-2716459-120 | Soors | Consultant Sécurité DSPM (Varonis) (H/F) | 31 - Toulouse | posted: 2026-10-06
+- [ ] https://api-v2-multidiff.xtramile.io/collect/f5b467fcd2d607bb949df36e704eca88 | Collective.work | Senior Manager - Lead Tech Snowflake (CDI, Paris) - CDI (H/F) | 75 - Paris | 80000 EUR | posted: 2026-10-06
+- [ ] https://api-v2-multidiff.xtramile.io/collect/5f788c5548007418d3ad4a0689efdaf3 | Collective.work | CDI - Senior Data Analyst Finance d'entreprise / Contrôle de Gestion - CDI (H/F) | 75 - Paris | 65000 EUR | posted: 2026-10-06
+- [ ] https://www.meteojob.com/jobs/57282983?utm_source=pole-emploi&utm_medium=aggregator-free | DOMINO RH ACADEMY | Expert intelligence artificielle (H/F) | 75 - Paris 9e Arrondissement | 30000-60000 EUR | posted: 2026-10-06
+- [ ] https://careers.cegedim.com/fr/annonce/4357133-architecte-reseau-messagerie-hf-labege-31670-labege?s_o=France+Travail&s_b=DigitalRecruiters | Cegedim | Cegedim - Analyste réseau (H/F) | 31 - Labège | posted: 2026-10-05
+- [ ] https://careers.cegedim.com/fr/annonce/4478913-architecte-reseau-messagerie-hf-boulogne-billancourt-92100-boulogne-billancourt?s_o=France+Travail&s_b=DigitalRecruiters | Cegedim | Cegedim - Security architect (H/F) | 92 - Boulogne-Billancourt | posted: 2026-10-05
+- [ ] https://careers.werecruit.io/fr/ionis-group/offres/developpeur-web-fullstack-confirme-48c6d1?utm_source=francetravail&utm_medium=job-board | IONIS Group | Développeur Web Fullstack Confirmé F/H - IONIS Group | 75 - Paris | 40000-45000 EUR | posted: 2026-10-05
+- [ ] https://api-v2-multidiff.xtramile.io/collect/e146bc0f2012b1f705ee1bff68483ba1 | Collective.work | Concepteur/Développeur C# Dotnet - CDI (H/F) | 75 - Paris | posted: 2026-10-06
+- [ ] https://careers.werecruit.io/fr/sgl/offres/business-developer-immobilier---developpeur-de-portefeuille-gestion-locative-hf-39eb9c?utm_source=francetravail&utm_medium=job-board | SGL Immobilier | Business Developer Immobilier - Développeur de portefeuille Gestion Locative (H/F) - SGL Immobilier | 75 - Paris 1er Arrondissement | 35000-50000 EUR | posted: 2026-10-05
+- [ ] https://candidat.francetravail.fr/offres/recherche/detail/7706632 | CTS Corporate | Data Manager Senior - Gouvernance et Data Office F/H | 75 - Paris 1er Arrondissement | 55000-60000 EUR | posted: 2026-10-06
+- [ ] https://candidat.francetravail.fr/offres/recherche/detail/7709060 | Siège de l'AP-HP | Expert technico-fonctionnel F/H | 75 - Paris 12e Arrondissement | 35000-55000 EUR | posted: 2026-10-06
+- [ ] https://candidat.francetravail.fr/offres/recherche/detail/214WCQK | France Travail | Ingénieur validation utilities (H/F) | 75 - PARIS | posted: 2026-10-06
+- [ ] https://www.lindustrie-recrute.fr/candidat/offre/828522?utm_source=NQ== | FRANSOR INDUSTRIE | Ingénieur opérationnel en Procédés de Fabrication Numérique et Transformation d'Alliages H/F | 92 - Colombes | posted: 2026-09-30
+- [ ] https://careers.werecruit.io/fr/bealink/offres/account-executive-fceda7?utm_source=francetravail&utm_medium=job-board | Bealink | Account Executive F/H - Bealink | 75 - Paris 15e Arrondissement | posted: 2026-10-05
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179547058W | Externatic | Manager Production Mainframe - F/H | Paris 09 - 75 | 65000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179546669W | Conseils d'Any | Lead DevOps On-Premise (Linux / Docker / Ansible) – Paris F/H | Boulogne-Billancourt - 92 | 50000-65000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179546995W | NEURONES IT | Incident Manager F/H | Fontenay-aux-Roses - 92 | 40000-60000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179546628W | OREL SERVICES FRANCE | Devops terraform Azure F/H | Paris 01 - 75 | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179546625W | OREL SERVICES FRANCE | Ingénieur Sécurité M365 F/H | Paris 01 - 75 | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179546569W | COMPUTACENTER | Ingénieur N3 Cloud F/H | Paris 01 - 75 | 50000-60000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179546481W | SIGNE + | Ingénieur(e) DevOps, spécialiste Kubernetes F/H | Toulouse - 31 | 44000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179546249W | LIORA | POEI - Consultant Technico-fonctionnel Odoo - Nantes F/H | Paris 01 - 75 | 36000-45000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179545954W | DIGGERS | Développeur C# / .NET - SECTEUR FINANCE F/H | Paris 01 - 75 | 40000-70000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179545946W | LIORA | POEI - Consultant Technico-fonctionnel Odoo - Rouen/ Tours F/H | Paris 01 - 75 | 35000-46000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179540777W | Externatic | Lead Engineer Réseau @ Groupe international - F/H | Paris 16 - 75 | 70000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179545878W | FERMIC EDITIONS-ANNU-UMTS-GPRS-ILIAD TELECOM | Ingénieur Network DevOps - Paris - F/H | Paris 08 - 75 | 55000-80000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179545805W | ELMARK | Architecte Expérimenté (Infra, Cloud, DevOps, Digital ou Data) F/H | Levallois-Perret - 92 | 60000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179545650W | DECASOFT | DevOps Kubernetes expérimenté(e) F/H | Toulouse - 31 | 45000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179545643W | viseo | Consultant(e) Cloud & DevOps Junior F/H | Toulouse - 31 | 34000-38000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179545590W | W.G. CONSULTING | DevOps Data Azure - Snowflake - Terraform – IA agentique F/H | Asnières-sur-Seine - 92 | 55000-60000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179545518W | ZZ_Confidentiel | Appsec/DevSecOps - N4 F/H | Paris - 75 | 60000-80000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179362098W | CLOUD TEMPLE | Manager Réseaux F/H | Puteaux - 92 | 70000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179545312W | EZIA | Expert NetDevOps F/H | Paris 01 - 75 | 38000-70000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179544102W | Act Digital France | Ingénieur Cybersécurité WAAP / Akamai F/H | Paris 01 - 75 | 55000-60000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179545103W | Hellowork | Ingénieur Cloud Gcp F/H | Toulouse - 31 | 38000-57000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179545081W | Hellowork | Consultant Pmo SSI F/H | Toulouse - 31 | 35000-40000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179545073W | Hellowork | Ingénieur DevOps - Devsecops F/H | Toulouse - 31 | 35000-40000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179544924W | Hellowork | Cloud Software Engineer F/H | Saint-Cloud - 92 | 55000-65000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179544754W | Hellowork | Ingénieur Intégrateur DevOps F/H | Toulouse - 31 | 45000-55000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179544586W | Hellowork | Tech Lead DevOps - Sre F/H | Levallois-Perret - 92 | 60000-85000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179544560W | Hellowork | Ingénieur Réseau Sécurité F/H | Toulouse - 31 | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179544486W | Hellowork | Consultant DevOps Expert Kafka F/H | Levallois-Perret - 92 | 50000-60000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179544351W | Hellowork | Développeur Logiciel - Software Engineer F/H | Paris 02 - 75 | 42000-50000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179544177W | Hellowork | Expert en Sécurité des Données - Dspm Varonis K161 F/H | Balma - 31 | 50000-53000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179543860W | Hellowork | RSSI Adjoint Groupe International F/H | Paris 16 - 75 | 80000-90000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179543782W | Hellowork | Chef de Projet Cybersécurité - Outillage & Run - CDI F/H | Paris 01 - 75 | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179543773W | Hellowork | Architecte DevOps Kubernetes F/H | Toulouse - 31 | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179543192W | NEETCH | INGENIEUR ARCHITECTE LOGICIEL F/H | Toulouse - 31 | 35000-45000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179512471W | cadremploi | Architecte Expérimenté IAOps F/H | Levallois-Perret - 92 | 75000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179542915W | cadremploi | Ingénieur Devops F/H | Paris 01 - 75 | 55000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179512670W | cadremploi | Support technico-fonctionnel ALMT F/H | Rueil-Malmaison - 92 | 40000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179542852W | cadremploi | Ingénieur DevOps/FullStack F/H | Paris 01 - 75 | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179542844W | cadremploi | Devops F/H | Montrouge - 92 | 40000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179542533W | CO-MARTIN | Tech Lead DevOps - SRE F/H | Levallois-Perret - 92 | 60000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179542528W | CO-MARTIN | Tech Lead MLOps F/H | Levallois-Perret - 92 | 50000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179542517W | CO-MARTIN | Consultant DevOps Expert Kafka F/H | Levallois-Perret - 92 | 50000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179542396W | PMEJOB | Chef de Projet IA F/H | Paris 01 - 75 | posted: 2026-10-05
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179542348W | PMEJOB | 2026RFQ0968633 - Senior AMOA SI Travaux 14/10 F/H | Paris 01 - 75 | posted: 2026-10-05
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179541622W | AIS | Architecte Cloud F/H | Toulouse - 31 | 50000-55000 EUR | posted: 2026-10-05
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179541616W | AIS | Ingénieur intégrateur DevOps F/H | Toulouse - 31 | 45000-55000 EUR | posted: 2026-10-05
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179541439W | OREL SERVICES FRANCE | Data Platform Engineer GCP F/H | Paris 02 - 75 | posted: 2026-10-05
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179541418W | OREL SERVICES FRANCE | Consultant IAM F/H | Paris 01 - 75 | posted: 2026-10-05
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179540919W | Externatic | Ingénieur Virtualisation & Stockage @ Groupe International - F/H | Paris 16 - 75 | 50000 EUR | posted: 2026-10-05
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179541407W | OREL SERVICES FRANCE | PMO Senior - Assurance collective F/H | Paris 01 - 75 | posted: 2026-10-05
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179540988W | Externatic | RSSI adjoint @ Groupe International - F/H | Paris 16 - 75 | 80000 EUR | posted: 2026-10-05
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179540692W | HANDIPULSE | Ingénieur-e IA / DevOps - Inclusion et Accessibilité Numérique F/H | Toulouse - 31 | 35000-45000 EUR | posted: 2026-10-05
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179540853W | SQORUS | TECH LEAD INTEGRATION DATA H-F F/H | Paris 09 - 75 | posted: 2026-10-05
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179540722W | LEON RECRUTEMENT | Expert technico-fonctionnel SAP FICO S/4HANA F/H | Paris 01 - 75 | 70000-75000 EUR | posted: 2026-10-05
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179540580W | OREL SERVICES FRANCE | AMOA Data / Assistant Chef de Projet BI F/H | Paris 01 - 75 | posted: 2026-10-05
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179540280W | Seyos | Software Architect Node.js - F/H | Paris 08 - 75 | 80000 EUR | posted: 2026-10-05
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179540022W | Externatic | Senior Data Engineer &quot;Databricks&quot; - @Conseil F/H | Neuilly-sur-Seine - 92 | 55000 EUR | posted: 2026-10-05
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179539676W | ELMARK | Tech Lead DevOps - SRE F/H | Levallois-Perret - 92 | 60000-85000 EUR | posted: 2026-10-05
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179539670W | R D CONSEIL | Tech Lead — Solution de gestion des données immobilières IA F/H | Paris 09 - 75 | 50000-60000 EUR | posted: 2026-10-05
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179539169W | BREAKERS CONSULTING | AI Engineer F/H | Paris 02 - 75 | 45000-55000 EUR | posted: 2026-10-05
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179530316W | SKAELIA | Ingénieur d'affaires - Conseil et services numériques - F/H | Paris 01 - 75 | 50000 EUR | posted: 2026-10-05
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179365633W | CASTLE FROG | Ingénieur Développement/Devops F/H | Paris 01 - 75 | 48000 EUR | posted: 2026-10-05
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179537437W | GESER BEST | Business Analyst (/X) F/H | Paris 01 - 75 | 38000-45000 EUR | posted: 2026-10-05
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179537796W | Hellowork | Développeur Senior - Tech Lead Itsm - Cmdb - Secops F/H | Toulouse - 31 | posted: 2026-10-05
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179536515W | Hellowork | Administrateur Kubernetes DevOps Sécurité F/H | Toulouse - 31 | 38000-48000 EUR | posted: 2026-10-05
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179359545W | OREL SERVICES FRANCE | Expert AWS Production / SRE F/H | Paris 01 - 75 | posted: 2026-10-05
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179349928W | OREL SERVICES FRANCE | Ingénieur Cloud / Conteneurisation F/H | Paris 01 - 75 | posted: 2026-10-05
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179349950W | OREL SERVICES FRANCE | Consultant QA / Test Logiciel F/H | Paris 01 - 75 | posted: 2026-10-05
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179534545W | Meteojob | DevOps Engineer GCP - Paris / Lille F/H | Paris 09 - 75 | 50000 EUR | posted: 2026-10-05
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179546884W | AXYS CONSULTANTS | Consultant(e) Senior EPM et consolidation F/H | Levallois-Perret - 92 | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179546850W | Thales Services Numériques Sas | Administrateur SysSecOps F/H | Toulouse - 31 | 35000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179545819W | ELMARK | Data Engineer F/H | Levallois-Perret - 92 | 45000-55000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179545755W | CELAD | Testeur Fonctionnel F/H | Toulouse - 31 | 38000-45000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179545737W | Capgemini Engineering | Ingénieure / Ingénieur en Systèmes de Management de la Qualité F/H | Blagnac - 31 | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179545690W | CELAD | Ingénieur Validation - Automatisation des tests - Domaine Environnement F/H | Toulouse - 31 | 40000-44000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179545334W | EZIA | Analyste CSIRT F/H | Paris 01 - 75 | 38000-62000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179545331W | EZIA | Chef de projet IAM Fonctionnel F/H | Paris 01 - 75 | 38000-65000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179319807W | ECONOCOM EXAPROBE | Ingénieur.e Avant-Vente Services F/H | Le Plessis-Robinson - 92 | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179545326W | EZIA | Chef de projet réseau et sécurité F/H | Paris 01 - 75 | 38000-70000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179545322W | EZIA | Architecte réseau WIFI F/H | Paris 01 - 75 | 38000-80000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179545318W | EZIA | Architecte Cybersécurité F/H | Paris 01 - 75 | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179545314W | EZIA | Ingénieur NetDevOps F/H | Paris 01 - 75 | 37000-70000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179545308W | EZIA | Consultant IAM Technique F/H | Paris 01 - 75 | 38000-65000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179545302W | EZIA | Ingénieur réseau et sécurité - Micro segmentation F/H | Paris 01 - 75 | 38000-70000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179545298W | EZIA | Architecte sécurité SASE Zero Trust F/H | Paris 01 - 75 | 38000-80000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179544509W | Hellowork | Ingénieur Système Linux F/H | Toulouse - 31 | 38000-44000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179544096W | Hellowork | Ingénieur Sécurité Ad F/H | Paris 01 - 75 | 60000-65000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179543605W | Hellowork | Développeur - Logiciel de Rédaction de Procédures F/H | Issy-les-Moulineaux - 92 | 44000-57000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179542532W | CO-MARTIN | Data Engineer Hadoop Spark Scala F/H | Levallois-Perret - 92 | 45000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179542529W | CO-MARTIN | Data Engineer DBT Snowflake F/H | Levallois-Perret - 92 | 45000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179542521W | CO-MARTIN | Tech Lead Full Stack F/H | Levallois-Perret - 92 | 55000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179542520W | CO-MARTIN | Expert Databricks / Power BI F/H | Levallois-Perret - 92 | 45000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179542515W | CO-MARTIN | Data Engineer Microsoft Fabric F/H | Levallois-Perret - 92 | 45000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179542452W | PMEJOB | Tech Lead Developpement F/H | Paris 12 - 75 | 60000-65000 EUR | posted: 2026-10-05
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179542427W | PMEJOB | Business Analyst Monétique / SAE F/H | Paris 12 - 75 | 60000-65000 EUR | posted: 2026-10-05
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179542411W | PMEJOB | tech lead DevSecOps F/H | Paris 12 - 75 | 65000-70000 EUR | posted: 2026-10-05
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179542022W | Atos | Consultant GRC F/H | Toulouse - 31 | posted: 2026-10-05
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179541128W | POISSON SOFTWARE TECHNOLOGIES | Ingénieur Logiciel C++ – Infrastructure & Applications CAO F/H | Boulogne-Billancourt - 92 | 45000-70000 EUR | posted: 2026-10-05
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179540926W | DIGGERS | Développeur Java F/H | Paris 08 - 75 | 45000-55000 EUR | posted: 2026-10-05
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179540848W | CTS Corporate | Data Manager / Data Architect - Traçabilité et Continuité Numérique F/H | Paris 01 - 75 | 55000 EUR | posted: 2026-10-05
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179540681W | Atos | Ingénieur Qualité Projets IT Spatiaux F/H | Toulouse - 31 | posted: 2026-10-05
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179540551W | Capgemini Engineering | Ingénieure / Ingénieur Qualité Conformité Aéronautique F/H | Blagnac - 31 | posted: 2026-10-05
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179539898W | ELMARK | Expert Databricks / Power BI F/H | Levallois-Perret - 92 | 45000-65000 EUR | posted: 2026-10-05
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179539810W | ELMARK | Tech Lead Full Stack F/H | Levallois-Perret - 92 | 55000-80000 EUR | posted: 2026-10-05
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179539773W | REXEL DEVELOPPEMENT SAS | CDI - Data Scientist F/H | Paris 17 - 75 | posted: 2026-10-05
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179539723W | ELMARK | Data Engineer DBT Snowflake F/H | Levallois-Perret - 92 | 45000-60000 EUR | posted: 2026-10-05
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179538920W | OGF | Responsable opérationnel de la cybersécurité F/H | Courbevoie - 92 | 70000-75000 EUR | posted: 2026-10-05
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179353886W | MERCURI URVAL | Ingénieur d’Affaires – New Business IT F/H | Paris 01 - 75 | 85000-100000 EUR | posted: 2026-10-05
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179539073W | CDC Informatique | Responsable Opérationnel de la Cybersécurité - CISO F/H | Bagneux - 92 | 90000-110000 EUR | posted: 2026-10-05
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179538525W | EASYTEAM | Responsable Infrastructure F/H | Saint-Cloud - 92 | posted: 2026-10-05
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179538404W | ELMARK | Data Engineer Microsoft Fabric F/H | Levallois-Perret - 92 | 45000-55000 EUR | posted: 2026-10-05
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179537951W | Hellowork | Expert Système Défense Aéronautique F/H | Toulouse - 31 | posted: 2026-10-05
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179544207W | Hellowork | Lead Solution Architect - IA Data & Software F/H | Courbevoie - 92 | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179543493W | Hellowork | Architecte Modern Workplace - Puteaux F/H | Nanterre - 92 | 60000-65000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179542540W | CO-MARTIN | Architecte Modern Workplace - Puteaux F/H | Nanterre - 92 | 60000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179541633W | SOORS | Consultant Proxy Cloud (Netskope & Palo Alto) F/H | Toulouse - 31 | posted: 2026-10-05
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179541191W | Dassault Aviation | Acheteur contrat F/H | Saint-Cloud - 92 | posted: 2026-10-05
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179540761W | Dassault Aviation | Responsable des comptes sociaux F/H | Saint-Cloud - 92 | posted: 2026-10-05
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179540645W | KPMG SA | Lead Solution Architect - IA, Data & Software F/H | Courbevoie - 92 | posted: 2026-10-05
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179539681W | PLATEFORME DES DONNEES DE SANTE | Développeur senior Golang et Kubernetes F/H | Paris 15 - 75 | posted: 2026-10-05
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179539279W | Dassault Aviation | Contrôleur de gestion F/H | Saint-Cloud - 92 | posted: 2026-10-05
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179359492W | OREL SERVICES FRANCE | Architecte Applicatif / Technique Java - Cloud F/H | Paris 01 - 75 | posted: 2026-10-05
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179535253W | Hellowork | Architecte Système Mbse F/H | Toulouse - 31 | posted: 2026-10-05
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179534664W | HANDICAP.FR | Architecte data F/H | Issy-les-Moulineaux - 92 | 70000 EUR | posted: 2026-10-05
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179533286W | cadremploi | Architecte Système C2 des futures Défense Anti-Aérienne F/H | Boulogne-Billancourt - 92 | 50000 EUR | posted: 2026-10-05
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179533230W | cadremploi | Agentic AI Engineer F/H | Paris 01 - 75 | 50000 EUR | posted: 2026-10-05
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179533148W | cadremploi | Architecte Cloud Senior F/H | Courbevoie - 92 | posted: 2026-10-05
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179532664W | cadremploi | Business Analyst Data confirmé - Connaissance Client - Banque F/H | Paris 01 - 75 | posted: 2026-10-05
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179530796W | BLUETHINK | Engineering Manager - Logiciel Embarqué F/H | Toulouse - 31 | 65000-85000 EUR | posted: 2026-10-04
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179546368W | CELIOS | Data Engineer BI Senior F/H | Toulouse - 31 | 40000-46000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179532312W | cadremploi | Tech lead data engineer gcp / sql / power bi F/H | Paris 01 - 75 | posted: 2026-10-05
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179258068W | STORM GROUP | Développeur Python F/H | Paris 02 - 75 | 40000-55000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179542423W | PMEJOB | Scrum Master F/H | Paris 12 - 75 | 50000-55000 EUR | posted: 2026-10-05
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179359506W | OREL SERVICES FRANCE | Ingénieur de production Devops F/H | Paris 01 - 75 | posted: 2026-10-05
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179535967W | Hexanet | Ingénieur cloud native F/H | Paris 01 - 75 | 45000-55000 EUR | posted: 2026-10-05
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179535807W | Hellowork | Ingénieur Bases de Données F/H | Toulouse - 31 | 42000-56000 EUR | posted: 2026-10-05
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179535480W | Hellowork | Ingénieur Cloud Native F/H | Paris 09 - 75 | 45000-55000 EUR | posted: 2026-10-05
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179535371W | Hellowork | Expert Cloud Native Engineer F/H | Paris 01 - 75 | 95000-100000 EUR | posted: 2026-10-05
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179534453W | Meteojob | DevOps AWS / Kubernetes – F/H | Paris 09 - 75 | 50000 EUR | posted: 2026-10-05
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179534391W | Meteojob | Ingénieur DevOps / SRE – Linux & Cloud F/H | Nanterre - 92 | 50000 EUR | posted: 2026-10-05
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179532972W | cadremploi | Expert cloud ibm F/H | Courbevoie - 92 | posted: 2026-10-05
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179532344W | cadremploi | Consultant Data - IA F/H | Issy-les-Moulineaux - 92 | 65000 EUR | posted: 2026-10-05
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179532291W | cadremploi | Ingénieur Systèmes, Réseaux & Support Applicatif F/H | Paris 01 - 75 | posted: 2026-10-05
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179531357W | CO-MARTIN | Consultant Data - IA - F/H | Issy-les-Moulineaux - 92 | 65000 EUR | posted: 2026-10-05
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179534427W | Meteojob | Ingénieur DevOps Cloud AWS / Azure – EKS / ECS F/H | La Garenne-Colombes - 92 | 55000 EUR | posted: 2026-10-05
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179533139W | cadremploi | Développeur Backend Python & Cloud GCP Expert F/H | Paris 01 - 75 | 50000 EUR | posted: 2026-10-05
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179546839W | ALTRION | Data Analyst - Senior - Paris F/H | Paris 01 - 75 | 50000-80000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179544967W | DAVRICOURT | Ingénieur IA Générative - F/H | Toulouse - 31 | 40000-45000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179544959W | DAVRICOURT | Développeur Full Stack C#/.NET - F/H | Toulouse - 31 | 40000-45000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179539155W | Collective | Senior Manager – Lead Tech Snowflake (CDI, Paris) - CDI F/H | Paris 04 - 75 | 80000-81000 EUR | posted: 2026-10-05
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179538307W | ADUNEO | Administrateur Informatique (92) F/H | Malakoff - 92 | 40000-44000 EUR | posted: 2026-10-05
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179531278W | PMEJOB | Ingénieur de Test Cloud F/H | Paris 14 - 75 | posted: 2026-10-05
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179534900W | Hellowork | Ingénieur Sécurité Opérationnelle - Proxy Cloud Senior K158 F/H | Toulouse - 31 | 50000-53000 EUR | posted: 2026-10-05
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179534637W | Welcome to the Jungle | Tech Lead — Solution de gestion des données immobilières IA F/H | Paris 09 - 75 | 50000-60000 EUR | posted: 2026-10-05
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179534596W | Meteojob | Principal IA Engineer F/H | Paris 09 - 75 | 70000 EUR | posted: 2026-10-05
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179545776W | ELMARK | Analytics engineer F/H | Levallois-Perret - 92 | 45000-60000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179541554W | Collective | Fiche de poste – Data Engineer confirmé - CDI F/H | Paris 04 - 75 | 55000-56000 EUR | posted: 2026-10-05
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179534549W | Meteojob | Data Product Owner Retail F/H | Paris 09 - 75 | 50000 EUR | posted: 2026-10-05
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179532797W | cadremploi | Data scientist - prompt engineer F/H | Puteaux - 92 | posted: 2026-10-05
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179530994W | AKXIO CONSEILS | O&M Method Engineer F/H | Nanterre - 92 | 50000-70000 EUR | posted: 2026-10-04
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179547172W | OCY Technologies | Technicien d'études infrastructure F/H | Levallois-Perret - 92 | 24000-30000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179547145W | GECI Int. | Ingénieur Réseaux ToIP / Cisco F/H | Paris 02 - 75 | 50000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179547024W | UNION INTER DES CHEMINS FER | Chargé.e de mission Matériel Roulant F/H | Paris 15 - 75 | 65000-75000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179546974W | SAPIENS CONSULTING | Commercial - Business Developer - Data IA & Cybersécurité F/H | Paris 08 - 75 | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179546923W | UNION INTER DES CHEMINS FER | Spécialiste systèmes énergétiques ferroviaires et coordinateur de programme F/H | Paris 15 - 75 | 55000-60000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179546879W | OCY Technologies | Surveillant de travaux infrastructure F/H | Levallois-Perret - 92 | 24000-30000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179546878W | HOUSE OF ABY | Business Manager / Ingénieur d'Affaires (Energie) X/ F/H | Paris 08 - 75 | 30000-50000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179545390W | Inserm | Administrateur des systèmes d'information F/H | Paris 01 - 75 | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179456480W | HORISIS | Pilote Projet Immobilier/Travaux F/H | Paris 10 - 75 | 36000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179456468W | HORISIS | Ordonnanceur/Appui Technique F/H | Paris 10 - 75 | 36000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179541728W | LUTESSA | Service Delivery Manager F/H | Paris 01 - 75 | 55000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179456426W | HORISIS | Appui projet F/H | Paris 10 - 75 | 36000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179456416W | HORISIS | Appui Pilotage de projet/ordonnancement F/H | Paris 10 - 75 | 36000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179456335W | HORISIS | Contract Manager Sénior F/H | Paris 10 - 75 | 45000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179456310W | HORISIS | Consultant.e junior Gestion de Projet/PMO F/H | Paris 10 - 75 | 36000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179456304W | HORISIS | Consultant.e en Gestion de Projets/PMO Confirmé F/H | Paris 10 - 75 | 36000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179456293W | HORISIS | Consultant.e Contract Manager Junior F/H | Paris 10 - 75 | 36000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179456276W | HORISIS | Consultant.e Contract Manager Confirmé Marchés Publics F/H | Paris 10 - 75 | 36000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179456265W | HORISIS | Consultant.e Contract Manager Confirmé Contrats EPC F/H | Paris 10 - 75 | 36000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179546591W | IM PROJET | Ingénieur Management de Projet Industriel F/H | Courbevoie - 92 | 42000-55000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179546530W | TORING | Ingénieur Exploitation Réseaux & Systèmes (ITOps) – 4G/5G & Wi-Fi F/H | Toulouse - 31 | 41000-46000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179546426W | VACOA | Ingénieur Génie Électrique - Secteur Energie F/H | Puteaux - 92 | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179546090W | Delair | Ingénieur logiciel embarqué C++/QT HF F/H | Labège - 31 | 45000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179546293W | Prime Technology - Prime Engineering | Ingénieur Études Électricité CFO/CFA F/H | Boulogne-Billancourt - 92 | 35000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179546105W | ISAGRI, AGIRIS, TERRE-NET, SO'NEO, PROMIZE, C2J INFO, I-CONE | Product Owner Comptabilité confirmé F/H | Paris 01 - 75 | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179546075W | CREDEY & ASSOCIES | Consultant(e) Talent & Executive Search / Chasseur(se) de têtes F/H | Paris 01 - 75 | 35000-50000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179546062W | FORVIS MAZARS | Senior Manager Risk Consulting 26-27 F/H | Levallois-Perret - 92 | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179546056W | CELIOS | Ingénieur de Production Infrastructure Linux F/H | Toulouse - 31 | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179540983W | LGM | Ingénieur Système Électronique – Qualification & Certification CEM - F/H | Toulouse - 31 | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179245509W | STORM GROUP | Ingénieur de Production F/H | Paris 02 - 75 | 40000-46000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179423437W | LEARN2FLY RH | Ingénieur Réglementation Ferroviaire N/ F/H | Paris 17 - 75 | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179545045W | Hellowork | Ingénieur de Recherche en Analyse d'Images Biologiques F/H | Paris 01 - 75 | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179544066W | TerX | Prototyping Design Engineer F/H | Paris 01 - 75 | 50000-55000 EUR | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179543863W | Hellowork | Graduate Program Finance F/H | Rueil-Malmaison - 92 | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179543550W | Hellowork | Chef de Projets Communication F/H | Paris 14 - 75 | posted: 2026-10-06
+- [ ] https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/179428995W | Hellowork | Chef - Cheffe de Projet Études Ferroviaire Cep - Signalisation F/H | Paris 01 - 75 | posted: 2026-10-06
+- [ ] https://www.free-work.com/fr/tech-it/ingenieur-securite/job-mission/ingenieur-e-devsecops-12 | Signe + | Ingénieur(e) DevOps, spécialiste Kubernetes | Toulouse, Occitanie | 44000-46000 EUR | posted: 2026-10-06
+- [ ] https://www.free-work.com/fr/tech-it/ingenieur-devops-cloud/job-mission/ingenieur-devops-api-management-h-f | STORM GROUP | Ingénieur DevOps API management (H/F) | Toulouse, Occitanie | 40000-45000 EUR | posted: 2026-10-05
+- [ ] https://fr.linkedin.com/jobs/view/architecte-devops-kubernetes-h-f-at-akkodis-4475565351 | Akkodis | Architecte DevOps Kubernetes H/F | Toulouse, Occitanie | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/directeur-des-systemes-dinformation-dsi/job-mission/responsable-systemes-dinformation-aix-en-provence-1 | Talents Finance | Responsable Systèmes d'Information - Montpellier | Montpellier, Occitanie | 55000-70000 EUR | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/ingenieur-devops-cloud/job-mission/expert-proxy-cloud-h-f | STORM GROUP | Expert proxy cloud (H/F) | Toulouse, Occitanie | 45000-50000 EUR | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/administrateur-de-base-de-donnee-oracle-sybase/job-mission/administrateur-rice-reseau-1 | TDS | Administrateur(rice) Réseau | Toulouse, Occitanie | 35000-40000 EUR | posted: 2026-10-06
+- [ ] https://www.free-work.com/fr/tech-it/expert-e-protection-donnees/job-mission/ingenieur-securite-securite-des-donnees-h-f | STORM GROUP | Ingénieur sécurité / sécurité des données (H/F) | Toulouse, Occitanie | 45000-50000 EUR | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/consultant-erp-ms-dynamics-oracle-sage-sap/job-mission/sap-sd-mm-pp | OCTOGONE | SAP SD MM PP | Toulouse, Occitanie | posted: 2026-10-06
+- [ ] https://www.free-work.com/fr/tech-it/ingenieur-apres-vente/job-mission/ingenieur-deep-learning-computer-vision-h-f | Link Consulting | Ingénieur traitement du signal & IA / Deep Learning (H/F) | Toulouse, Occitanie | 50000-55000 EUR | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/ingenieur-apres-vente/job-mission/ingenieur-automaticien-senior-h-f | Signe + | Ingénieur Automaticien Senior (H/F) | Toulouse, Occitanie | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/expert-e-protection-donnees/job-mission/ingenieur-en-securite-operationnelle-securite-des-donnees-dspm-n3 | KEONI CONSULTING | Ingénieur en sécurité Opérationnelle - Sécurité des Données & DSPM - N3 | Toulouse, Occitanie | 20000-40000 EUR | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/ingenieur-devops-cloud/job-mission/ingenieur-devops-python-dynatrace | Proxiad | Ingénieur Devops Python / Dynatrace | Île-de-France, France | 40000-65000 EUR | posted: 2026-10-06
+- [ ] https://www.free-work.com/fr/tech-it/ingenieur-devops-cloud/job-mission/integrateur-devops-h-f-51 | CONSORT GROUP | Intégrateur DevOps H/F | Saint-Herblain | posted: 2026-10-06
+- [ ] https://www.free-work.com/fr/tech-it/ingenieur-devops-cloud/job-mission/ingenieur-devops-f-h-184 | AIS | Ingénieur DevOps - F/H | Nantes, Pays de la Loire | 43000-50000 EUR | posted: 2026-10-06
+- [ ] https://www.free-work.com/fr/tech-it/ingenieur-de-production/job-mission/ingenieur-de-production-ops-kubernetes | CONSORT GROUP | Ingénieur de production / OPS - Kubernetes | Paris, Île-de-France | posted: 2026-10-06
+- [ ] https://www.free-work.com/fr/tech-it/administrateur-systeme-linux/job-mission/ingenieur-integration-validation-linux-international | Lùkla | Ingénieur Intégration & Validation Linux – International | Osny, Île-de-France | posted: 2026-10-06
+- [ ] https://www.free-work.com/fr/tech-it/ingenieur-devops-cloud/job-mission/ingenieur-cloud-azure-devsecops-senior-terraform-gouvernance | TEOLIA CONSULTING | Ingénieur Cloud Azure / DevSecOps senior — Terraform & Gouvernance | Paris, Île-de-France | posted: 2026-10-06
+- [ ] https://www.free-work.com/fr/tech-it/ingenieur-devops-cloud/job-mission/architecte-experimente-infra-cloud-devops-digital-ou-data-h-f-3 | JEMS | Architecte Expérimenté (Infra, Cloud, DevOps, Digital ou Data) H/F | Levallois-Perret, Île-de-France | 60000-90000 EUR | posted: 2026-10-06
+- [ ] https://www.free-work.com/fr/tech-it/ingenieur-securite/job-mission/poste-appsec-devsecops-senior-9-ans-et-plus | Digistrat consulting | AppSec / DevSecOps / SENIOR (9 ans et plus) | Paris, Île-de-France | 40000-75000 EUR | posted: 2026-10-06
+- [ ] https://www.free-work.com/fr/tech-it/ingenieur-securite/job-mission/expert-devsecops-22 | VISIAN | Coach DevSecOps | Île-de-France, France | posted: 2026-10-06
+- [ ] https://www.free-work.com/fr/tech-it/lead-developer/job-mission/lead-developer-60 | ATTINEOS | Lead Developer | Hauts-de-Seine, France | 50000-57000 EUR | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/consultant/job-mission/architecte-solution-finance-aml | VISIAN | Architecte Solution - Finance/AML | Paris, Île-de-France | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/ingenieur-devops-cloud/job-mission/ingenieur-tibco-businessworks-ems-1 | OMICRONE | Ingénieur Devops// TIBCO – BusinessWorks / EMS | Île-de-France, France | 40000-45000 EUR | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/ingenieur-devops-cloud/job-mission/ingenieur-devops-python-h-f | STORM GROUP | Ingénieur Devops / Python (H/F) | Île-de-France, France | 50000-55000 EUR | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/data-engineer/job-mission/senior-data-engineer-azure-middleware-h-f | VISIAN | Senior Data Engineer Azure / Middleware (H/F) | Orly, Île-de-France | posted: 2026-10-05
+- [ ] https://fr.linkedin.com/jobs/view/ingenieur-e-devops-de-plateformes-d%E2%80%99intelligence-artificielle-at-adar-4475811583 | ADAR | INGENIEUR.E DEVOPS DE PLATEFORMES D’INTELLIGENCE ARTIFICIELLE | Rennes, Bretagne | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/ingenieur-devops-cloud/job-mission/consultant-devops-expert-kafka-h-f | JEMS | Consultant DevOps Expert Kafka H/F | Levallois-Perret, Île-de-France | 50000-60000 EUR | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/ingenieur-devops-cloud/job-mission/tech-lead-devops-sre-h-f | JEMS | Tech Lead DevOps - SRE H/F | Levallois-Perret, Île-de-France | 60000-85000 EUR | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/ingenieur-devops-cloud/job-mission/devops-aws-connect-genesys-cloud-f-h-3 | Experis France | DevOps AWS Connect / Genesys Cloud (F/H) | Niort, Nouvelle-Aquitaine | 45000-50000 EUR | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/autre/job-mission/dataops-snowflake-1 | ANDEMA | DataOps / Snowflake | Orléans, Centre-Val de Loire | 55000-65000 EUR | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/autre/job-mission/dba-postgresql-80 | ANDEMA | DBA PostgreSQL | Orléans, Centre-Val de Loire | 55000-60000 EUR | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/lead-developer/job-mission/tech-lead-f-h-23 | CELAD | Lead DevOps (F/H) | Strasbourg, Grand Est | 45000-50000 EUR | posted: 2026-10-05
+- [ ] https://recrutement.solent.fr/jobs/8497297-ingenieur-e-devops | SOLENT | Ingénieur.e DevOps |  | 43000-55000 EUR | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/ingenieur-securite/job-mission/expert-devsecops-21 | VISIAN | Expert DevSecOps | Île-de-France, France | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/ingenieur-devops-cloud/job-mission/tech-lead-python-cloud-devops-senior-expert | Etixway | Tech Lead Python / Cloud / DevOps – Senior Expert | Île-de-France, France | 40000-65000 EUR | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/ingenieur-devops-cloud/job-mission/ingenieur-devops-kubernetes-ci-cd-h-f | CONSORT GROUP | Ingénieur DevOps Kubernetes / CI-CD H/F | Vierzon | 43000-50000 EUR | posted: 2026-10-05
+- [ ] https://jobs.smartrecruiters.com/EVERIENCE/744000153422826-ingenieur-devops-observabilite-h-f | EVERIENCE | Ingénieur DevOps Observabilité H/F | Nantes, Pays de la Loire | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/ingenieur-devops-cloud/job-mission/devops-872 | bdevit | Ingénieur DevOps/FullStack | Île-de-France, France | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/ingenieur-devops-cloud/job-mission/ingenieur-devops-sre-confirme-niort | Gamme solutions | Ingénieur DevOps / SRE confirmé – Niort | Niort, Nouvelle-Aquitaine | posted: 2026-10-04
+- [ ] https://www.free-work.com/fr/tech-it/lead-developer/job-mission/lead-tech-fullstack-confirme-niort | Gamme solutions | Lead Tech Fullstack confirmé – Niort | Niort, Nouvelle-Aquitaine | posted: 2026-10-04
+- [ ] https://www.free-work.com/fr/tech-it/consultant/job-mission/consultant-ccaas-avaya-and-genesys-xp-assurance | ARDEMIS PARTNERS | Consultant CCaaS AVAYA and GENESYS XP assurance | Malakoff, Île-de-France | 35000-40000 EUR | posted: 2026-10-06
+- [ ] https://www.free-work.com/fr/tech-it/developpeur-java-kotlin-groovy-scala/job-mission/developpeur-back-end-java-h-f-74 | DAVRICOURT | Développeur Back-end Java H/F | Lille, Hauts-de-France | 45000-50000 EUR | posted: 2026-10-06
+- [ ] https://www.free-work.com/fr/tech-it/architecte-systeme-et-reseau/job-mission/architecte-du-systeme-information-maitrise-infrastructure-chaine-ci-cd | Digistrat consulting | Architecte du Système Information -Maîtrise infrastructure chaîne CI / CD | Paris, Île-de-France | 40000-70000 EUR | posted: 2026-10-06
+- [ ] https://www.free-work.com/fr/tech-it/architecte-cloud/job-mission/architecte-applicatif-cloud-native | CAT-AMANIA | Architecte applicatif Cloud Native | Paris, France | 40000-45000 EUR | posted: 2026-10-06
+- [ ] https://www.free-work.com/fr/tech-it/consultant-microsoft-sharepoint-365/job-mission/expert-securite-de-la-donnee-microsoft-purview | KEONI CONSULTING | Expert Sécurité de la Donnée – Microsoft Purview | Niort, Nouvelle-Aquitaine | 20000-40000 EUR | posted: 2026-10-06
+- [ ] https://www.free-work.com/fr/tech-it/consultant-cyber-securite/job-mission/chef-de-projet-cybersecurite-h-f-89 | TENEXA GROUP | Chef de Projet Cybersécurité (H/F) | Paris, Île-de-France | 65000-75000 EUR | posted: 2026-10-06
+- [ ] https://www.free-work.com/fr/tech-it/analyste-programmeur/job-mission/consultant-cyber-analyste-de-risques | CONSORT GROUP | Consultant Cyber/Analyste de risques | Paris, Île-de-France | posted: 2026-10-06
+- [ ] https://www.free-work.com/fr/tech-it/scrum-master/job-mission/scrum-master-1414 | CAT-AMANIA | Scrum Master | Paris, Île-de-France | 40000-60000 EUR | posted: 2026-10-06
+- [ ] https://www.free-work.com/fr/tech-it/data-analyst/job-mission/data-analyst-confirme-flux-kpi-transformation-data-h-f | K-Lagan | Data Analyst Confirmé - Flux, KPI & Transformation Data (H/F) | Niort, Nouvelle-Aquitaine | 40000-45000 EUR | posted: 2026-10-06
+- [ ] https://www.free-work.com/fr/tech-it/consultant-erp-ms-dynamics-oracle-sage-sap/job-mission/sap-tm-consultant-2 | Focus Cloud Group | SAP TM Consultant | Île-de-France, France | posted: 2026-10-06
+- [ ] https://www.free-work.com/fr/tech-it/developpeur-java-kotlin-groovy-scala/job-mission/expert-kafka-java-audit-des-usages-kafka-dans-les-applications-java | LOVOTECH | Expert Kafka / Java – Audit des usages Kafka dans les applications Java | Île-de-France, France | posted: 2026-10-06
+- [ ] https://www.free-work.com/fr/tech-it/developpeur-autre-langage-cobol-perl-vba-ruby-shell/job-mission/developpeur-full-stack-418 | CAT-AMANIA | Développeur Full-Stack | Niort, Nouvelle-Aquitaine | 40000-45000 EUR | posted: 2026-10-06
+- [ ] https://www.free-work.com/fr/tech-it/developpeur-python/job-mission/developpeur-backend-python-h-f-25 | CONSORT GROUP | Développeur Backend Python H/F | Auvergne-Rhône-Alpes, France | posted: 2026-10-06
+- [ ] https://www.free-work.com/fr/tech-it/product-owner/job-mission/epic-owner-h-f-2 | CONSORT GROUP | Epic Owner H/F | Auvergne-Rhône-Alpes, France | posted: 2026-10-06
+- [ ] https://www.free-work.com/fr/tech-it/data-engineer/job-mission/data-platform-engineer-databricks | VISIAN | Data Platform Engineer Databricks | Paris, Île-de-France | posted: 2026-10-06
+- [ ] https://www.free-work.com/fr/tech-it/autre/job-mission/dba-postgresql-81 | OBJECTWARE | DBA PostgreSQL | Île-de-France, France | 40000-59000 EUR | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/expert-seo-consultant-referencement/job-mission/expert-atlassian-7 | CAT-AMANIA | Expert Atlassian | Paris, Île-de-France | 40000-45000 EUR | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/data-engineer/job-mission/data-engineer-gcp-199 | DATA CONSEIL | DATA ENGINEER GCP | Nantes, Pays de la Loire | 40000-45000 EUR | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/assistant-chef-de-projet/job-mission/chef-de-projet-moe-data-bi-h-f | CONSORT GROUP | Chef de projet MOE Data BI H/F | 75017, Paris, Île-de-France | 60000-65000 EUR | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/ingenieur-de-production/job-mission/ingenieur-infrastructure-production-it-saint-denis | Gamme solutions | Ingénieur Infrastructure & Production IT – Saint-Denis | Saint-Denis, Île-de-France | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/developpeur-java-kotlin-groovy-scala/job-mission/ingenieur-integration-developpement-java | CAT-AMANIA | Ingénieur Intégration & Développement Java | Île-de-France, France | 40000-45000 EUR | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/charge-daffaire/job-mission/expert-performance-applicative-tests-de-charge | CAPEST conseils | Expert Performance Applicative / Tests de charge | Ivry-sur-Seine, Île-de-France | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/scrum-master/job-mission/scrum-master-h-f-654 | Genwaves Group | Scrum Master (H/F) | Paris, France | 50000-55000 EUR | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/ingenieur-securite/job-mission/tech-lead-devsecops-h-f-1 | Genwaves Group | tech lead DevSecOps (H/F) | Paris, France | 65000-70000 EUR | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/ingenieur-dexploitation/job-mission/lead-operations-run-dinfrastructure-itil-finops | KOLABS Group | Lead Operations – Run d'Infrastructure (ITIL / FinOps) | Paris, France | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/consultant-microsoft-sharepoint-365/job-mission/expert-telephonie-microsoft-teams-phone-support-n3 | AVA2I | Expert Téléphonie Microsoft Teams Phone – Support N3 | Île-de-France, France | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/community-manager-social-media-manager/job-mission/project-manager-transformation-infrastructure-h-f | Freelance.com | Project Manager Transformation & Infrastructure (H/F) | Paris, France | 40000-45000 EUR | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/expert-seo-consultant-referencement/job-mission/expert-azure-databricks-azure-batch-h-f | Freelance.com | Expert Azure Databricks / Azure Batch (H/F) | Paris, Île-de-France | 40000-45000 EUR | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/developpeur-java-kotlin-groovy-scala/job-mission/developpeur-back-end-java-spring-boot-confirme-nantes | ASAP TECHNOLOGIES | Développeur Back-End Java / Spring Boot confirmé – Nantes | Nantes, Pays de la Loire | 45000-49000 EUR | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/directeur-des-systemes-dinformation-dsi/job-mission/responsable-systemes-dinformation-montpellier | Talents Finance | Responsable Systèmes d'Information - Lyon | Lyon, Auvergne-Rhône-Alpes | 55000-70000 EUR | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/consultant-erp-ms-dynamics-oracle-sage-sap/job-mission/chef-de-projet-responsable-fonctionnel-sap | Savane Consulting | Chef de projet / Responsable Fonctionnel SAP | Gonfreville-l'Orcher, Normandie | 70000-90000 EUR | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/administrateur-systeme-linux/job-mission/accompagnement-en-expertise-systeme-et-integratio | R&S TELECOM | Accompagnement en Expertise système et intégratio | Île-de-France, France | 40000-48000 EUR | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/data-engineer/job-mission/tech-lead-data-engineer-kafka-palantir-foundry | OBJECTWARE | Tech Lead Data Engineer Kafka & Palantir Foundry | Île-de-France, France | 40000-84000 EUR | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/ingenieur-devops-cloud/job-mission/ai-platform-engineer-cloud-azure | LEVUP | AI Platform Engineer / Cloud Azure | Guyancourt, Île-de-France | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/directeur-de-la-transformation-digitale-cdo/job-mission/chef-de-projet-digital-senior-6 | DATACORP | Chef de Projet Digital - Senior | Lyon, Auvergne-Rhône-Alpes | 70000-75000 EUR | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/assistant-chef-de-projet/job-mission/pilote-de-projet-ia-rapporteur-portefeuille-ia-data-ia-3-5-ans | Digistrat consulting | Pilote de Projet IA / Rapporteur Portefeuille IA - Data & IA (3-5 ans) | Paris, Île-de-France | 40000-45000 EUR | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/architecte-de-base-de-donnees/job-mission/architecte-solution-m365 | Focus Cloud Group | Architecte Solution M365 | Île-de-France, France | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/developpeur-logiciel-embarque-assembleur-arduino/job-mission/architecte-reseau-securite-sase-iot | UMANTIC | Architecte Réseau & Sécurité (SASE / IOT ) | Roissy-en-France, Île-de-France | 60000-70000 EUR | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/assistant-chef-de-projet/job-mission/chef-de-projet-infrastructure-senior-68 | AVA2I | Chef de Projet Infrastructure Senior | Île-de-France, France | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/consultant-decisionnel-bi-powerbi-sas-tableau/job-mission/expert-power-bi-fabric-h-f | Atos | Expert Power BI / Fabric H/F | Nanterre, Île-de-France | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/administrateur-systeme-linux/job-mission/h-f-administrateur-systemes-linux-6 | ADSearch | (H/F) Administrateur Systèmes Linux | Villeurbanne, Auvergne-Rhône-Alpes | 40000-50000 EUR | posted: 2026-10-05
+- [ ] https://recrutement.solent.fr/jobs/8497148-ingenieur-e-logiciel-java-secteur-bancaire | SOLENT | Ingénieur.e logiciel Java - Secteur bancaire | Puteaux, Île-de-France | 43000-52000 EUR | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/architecte-de-base-de-donnees/job-mission/architecte-modern-workplace-f-h-puteaux | Experis France | Architecte Modern Workplace F/H - Puteaux | Nanterre, Île-de-France | 60000-65000 EUR | posted: 2026-10-05
+- [ ] https://recrutement.solent.fr/jobs/8497083-ingenieur-e-developpement-fullstack-java | SOLENT | Ingénieur·e développement fullstack Java | Noisy-le-Grand, Île-de-France | 40000-55000 EUR | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/developpeur-net/job-mission/senior-developpeur-net-c-azure | Gamme solutions | Senior Développeur .NET / C# / Azure | Paris, Île-de-France | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/administrateur-reseaux/job-mission/administrateur-systeme-windows-reseaux-h-f-5 | Linkup Partner | Administrateur Système Windows & réseaux (H/F) | Paris, France | 42000-50000 EUR | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/data-engineer/job-mission/data-engineer-1421 | bdevit | Data Engineer | Île-de-France, France | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/lead-developer/job-mission/tech-lead-developpement-h-f | Genwaves Group | Tech Lead Developpement (H/F) | Paris, France | 60000-65000 EUR | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/data-engineer/job-mission/qa-lead-engineer-h-f | Genwaves Group | QA Lead Engineer (H/F) | Paris, France | 60000-65000 EUR | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/architecte-de-base-de-donnees/job-mission/architecte-data-platform | VISIAN | Architecte Data Platform | Paris, Île-de-France | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/developpeur-autre-langage-cobol-perl-vba-ruby-shell/job-mission/developpeur-backend-microservices | VISIAN | Développeur Backend Microservices | Paris, France | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/developpeur-java-kotlin-groovy-scala/job-mission/developpeur-java-banque-1 | VISIAN | Développeur Java - Banque | Paris, Île-de-France | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/administrateur-systeme-linux/job-mission/integrateur-technique-applicatif-expert-linux-shell-kubernetes | ARDEMIS PARTNERS | Intégrateur technique applicatif expert LINUX SHELL kubernetes | Aix-en-Provence, Provence-Alpes-Côte d'Azur | 40000-45000 EUR | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/assistant-chef-de-projet/job-mission/architecte-infrastructure-chef-de-projet-h-f | Le Groupe SYD | Architecte Infrastructure / Chef de Projet H/F | Nantes, Pays de la Loire | 40000-50000 EUR | posted: 2026-10-06
+- [ ] https://www.free-work.com/fr/tech-it/gestionnaire-prestation-services/job-mission/ops-service-delivery-manager-iam-ad-entra-id-okta | KOLABS Group | OPS & Service Delivery Manager IAM (AD / Entra ID / Okta) | Paris, France | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/directeur-de-la-transformation-digitale-cdo/job-mission/expert-digital-workplace-workspace-one-apple | KOLABS Group | Expert Digital Workplace (Workspace ONE / Apple) | Paris, France | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/architecte-de-base-de-donnees/job-mission/architecte-infrastructure-la-hague | Lùkla | Architecte infrastructure — La Hague | La Hague, Normandie | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/assistant-chef-de-projet/job-mission/chef-de-projet-infrastructure-compute | Lùkla | Chef de projet Infrastructure / Compute | Brest, Bretagne | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/autre/job-mission/accompagnement-en-pilotage-de-lot-dinfrastructure-it | R&S TELECOM | Accompagnement en pilotage de lot d’infrastructure IT | Île-de-France, France | 40000-48000 EUR | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/expert-seo-consultant-referencement/job-mission/expert-cisco-prime-infrastructure | AGH CONSULTING | Expert Cisco Prime Infrastructure | Vélizy-Villacoublay, Île-de-France | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/data-engineer/job-mission/data-engineer-f-h-112 | AIS | Data Engineer - F/H | Nantes, Pays de la Loire | 46000-56000 EUR | posted: 2026-10-06
+- [ ] https://www.free-work.com/fr/tech-it/data-engineer/job-mission/data-engineer-expert-snowflake-4 | ARDEMIS PARTNERS | Data Engineer expert Snowflake | Roubaix, Hauts-de-France | 45000-55000 EUR | posted: 2026-10-06
+- [ ] https://www.free-work.com/fr/tech-it/developpeur-fonctionnel/job-mission/data-engineer-hadoop-spark-scala-h-f | JEMS | Data Engineer Hadoop Spark Scala H/F | Levallois-Perret, Île-de-France | 45000-55000 EUR | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/data-engineer/job-mission/data-engineer-dbt-snowflake-h-f-5 | JEMS | Data Engineer DBT Snowflake H/F | Levallois-Perret, Île-de-France | 45000-60000 EUR | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/consultant-microsoft-sharepoint-365/job-mission/data-engineer-microsoft-fabric-h-f-3 | JEMS | Data Engineer Microsoft Fabric H/F | Levallois-Perret, Île-de-France | 45000-55000 EUR | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/data-analyst/job-mission/data-analyst-oriente-data-engineering-f-h-1 | HOXTON PARTNERS | Data Analyst Orienté Data Engineering (F/H) | La Défense, Île-de-France | 50000-60000 EUR | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/data-scientist/job-mission/data-scientist-senior-53 | Streamlink | Data Scientist Senior | Clichy, Île-de-France | 40000-45000 EUR | posted: 2026-10-06
+- [ ] https://www.free-work.com/fr/tech-it/consultant/job-mission/consultant-senior-neoxam-datahub-market-data | OMICRONE | Consultant senior Neoxam Datahub – Market Data | Île-de-France, France | 40000-45000 EUR | posted: 2026-10-06
+- [ ] https://www.free-work.com/fr/tech-it/consultant/job-mission/consultant-ssi-conformite-trm-dora | KEONI CONSULTING | Consultant SSI & Conformité TRM / DORA | Paris, Île-de-France | 20000-40000 EUR | posted: 2026-10-06
+- [ ] https://www.free-work.com/fr/tech-it/developpeur-python/job-mission/ml-engineer-developpeur-python-senior-developpement-assiste-par-ia-h-f | Craftman data | ML Engineer / Développeur Python Senior – Développement assisté par IA (H/F) | Montrouge, Île-de-France | 40000-45000 EUR | posted: 2026-10-06
+- [ ] https://www.free-work.com/fr/tech-it/business-analyst/job-mission/business-developer-data-ia-h-f-3 | JEMS | Business Developer Data & IA H/F | Levallois-Perret, Île-de-France | 45000-80000 EUR | posted: 2026-10-06
+- [ ] https://www.free-work.com/fr/tech-it/ingenieur-apres-vente/job-mission/ingenieur-validation-ip-hebergement-datacenter-1 | R&S TELECOM | Ingénieur Validation IP Hébergement Datacenter | Vélizy-Villacoublay, Île-de-France | posted: 2026-10-06
+- [ ] https://www.free-work.com/fr/tech-it/business-analyst/job-mission/business-analyst-senior-h-f-32 | Argain Consulting Innovation | Business Analyst Senior H/F | Vannes, Bretagne | 40000-45000 EUR | posted: 2026-10-06
+- [ ] https://www.free-work.com/fr/tech-it/product-owner/job-mission/product-owner-mobilite-industrielle-1 | MGI Consultants | Product Owner (mobilité industrielle) | Courbevoie, Île-de-France | 55000-65000 EUR | posted: 2026-10-06
+- [ ] https://www.free-work.com/fr/tech-it/consultant/job-mission/consultant-power-apps-grade-b1-b2-tjm-480 | Craftman data | CONSULTANT POWER APPS – GRADE B1/B2 TJM 480 | Paris, France | 40000-45000 EUR | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/product-owner/job-mission/epic-owner-domaine-sante-prevoyance | KEONI CONSULTING | EPIC OWNER domaine Santé Prévoyance | Paris, France | 20000-40000 EUR | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/developpeur-python/job-mission/developpeur-ia-python-ai-engineer-h-f | CAT-AMANIA | Développeur IA Python / AI Engineer H/F | Montrouge, Île-de-France | 52000-59000 EUR | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/consultant-sea-traffic-manager/job-mission/consultant-clinical-data-manager-h-f | Signe + | Consultant Clinical Data Manager (H/F) | Saint-Vulbas, Auvergne-Rhône-Alpes | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/data-scientist/job-mission/data-scientist-senior-forecasting-machine-learning | Signe + | Data Scientist Senior Forecasting & Machine Learning | Guyancourt, Île-de-France | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/data-engineer/job-mission/senior-software-engineer-data-referentiel | VISIAN | Senior Software Engineer - Data Referentiel | Paris, Île-de-France | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/consultant-moa-amoa/job-mission/amoa-data-assistant-chef-de-projet-bi | Etixway | AMOA Data / Assistant Chef de Projet BI | Île-de-France, France | 40000-45000 EUR | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/lead-developer/job-mission/tech-lead-mlops-h-f-4 | JEMS | Tech Lead MLOps H/F | Levallois-Perret, Île-de-France | 50000-65000 EUR | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/assistant-chef-de-projet/job-mission/chef-de-projets-data-h-f-19 | JEMS | Chef de Projets Data H/F | Levallois-Perret, Île-de-France | 45000-60000 EUR | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/consultant-decisionnel-bi-powerbi-sas-tableau/job-mission/expert-databricks-power-bi-h-f | JEMS | Expert Databricks / Power BI H/F | Levallois-Perret, Île-de-France | 45000-65000 EUR | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/data-scientist/job-mission/data-scientist-491 | VISIAN | Data Scientist | Paris, Île-de-France | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/product-owner/job-mission/product-owner-senior-h-f-30 | Signe + | Product Owner Senior (H/F) | Nantes, Pays de la Loire | 35000-40000 EUR | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/analyste-web/job-mission/analytics-engineer-18 | Espritek | Analytics Engineer | Paris, France | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/ingenieur-apres-vente/job-mission/ingenieur-workplace-senior-2 | RIDCHA DATA | Ingénieur Workplace Senior | Romainville, Île-de-France | 40000-45000 EUR | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/lead-developer/job-mission/lead-product-designer-7 | RIDCHA DATA | Lead Product Designer | Paris, France | 40000-45000 EUR | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/consultant/job-mission/data-bi-portfolio-manager-finance | Octopus Group | Data / BI Portfolio Manager Finance | Paris, Île-de-France | 40000-60000 EUR | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/architecte-de-base-de-donnees/job-mission/architecte-data-data-platform-dbt-starburst | OBJECTWARE | Architecte Data / Data Platform DBT & Starburst | Île-de-France, France | 40000-85000 EUR | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/autre/job-mission/ingenieur-systeme-reseau-n3-lyon | CONSULT IT | Ingénieur Système & Réseau N3 – Lyon | Lyon, Auvergne-Rhône-Alpes | posted: 2026-10-06
+- [ ] https://www.free-work.com/fr/tech-it/administrateur-systeme-linux/job-mission/ingenieur-systemes-linux-cdi | ASAP TECHNOLOGIES | Ingénieur Systèmes Linux CDI | Île-de-France, France | 55000-59000 EUR | posted: 2026-10-06
+- [ ] https://www.free-work.com/fr/tech-it/consultant-microsoft-sharepoint-365/job-mission/ingenieur-systeme-microsoft-vmware | Proxiad | Ingénieur système Microsoft VMWARE | Île-de-France, France | 40000-60000 EUR | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/administrateur-systeme-linux/job-mission/ingenieur-systeme-linux-339 | STHREE SAS | Ingénieur Système Linux | Paris, France | 38000-44000 EUR | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/ingenieur-apres-vente/job-mission/ingenieur-integration-applicative-planisware | Lùkla | Ingénieur intégration applicative Planisware | Rennes, Bretagne | posted: 2026-10-06
+- [ ] https://www.free-work.com/fr/tech-it/ingenieur-apres-vente/job-mission/ingenieur-integration-tests-automatises-h-f | Genwaves Group | Ingénieur Intégration & Tests Automatisés - H/F | Aix-en-Provence, Provence-Alpes-Côte d'Azur | 45000-50000 EUR | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/expert-seo-consultant-referencement/job-mission/expert-integration-validation | AGH CONSULTING | Expert Intégration Validation | Neuville-sur-Oise, Île-de-France | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/ingenieur-apres-vente/job-mission/ingenieur-validation-fonctionnelle-drone-h-f | VIVERIS | Ingénieur validation fonctionnelle Drone H/F | Paris | 45000-50000 EUR | posted: 2026-10-06
+- [ ] https://www.free-work.com/fr/tech-it/developpeur-logiciel-embarque-assembleur-arduino/job-mission/developpeur-logiciel-embarque-h-f-65 | DAVRICOURT | Développeur Logiciel Embarqué H/F | Lille, Hauts-de-France | 45000-50000 EUR | posted: 2026-10-06
+- [ ] https://www.free-work.com/fr/tech-it/developpeur-net/job-mission/developpeur-c-net-it-quant-equity | OMICRONE | Développeur C#/.NET – IT Quant Equity | Paris, France | 40000-45000 EUR | posted: 2026-10-06
+- [ ] https://www.free-work.com/fr/tech-it/developpeur-python/job-mission/developpeur-python-h-f-260 | CELAD | Développeur Python H/F | Rennes, Bretagne | 35000-45000 EUR | posted: 2026-10-06
+- [ ] https://www.free-work.com/fr/tech-it/consultant-en-architecture/job-mission/expert-architecture-mcp-ia-generative | VISIAN | Expert Architecture MCP - IA Générative | Paris, Île-de-France | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/business-analyst/job-mission/business-analyst-front-office-ion-fixed-income | OMICRONE | Business Analyst Front Office – ION / Fixed Income | Île-de-France, France | 40000-45000 EUR | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/developpeur-php-symfony-laravel-drupal/job-mission/developpeur-backend-laravel-telecommunication-h-f | EASY PARTNER | Développeur Backend Laravel - Télécommunication (H/F) | Chennevières-sur-Marne, Île-de-France | 40000-48000 EUR | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/developpeur-java-kotlin-groovy-scala/job-mission/developpeur-java-h-f-1335 | CELAD | Développeur Java H/F | Rennes, Bretagne | 32000-42000 EUR | posted: 2026-10-06
+- [ ] https://www.free-work.com/fr/tech-it/developpeur-integrateur-dapplication-erp-crm-dynamics-oracle-salesforce-sap-sage-sharepoint-sybase/job-mission/developpeur-integrateur-iam-saviynt | VISIAN | Développeur / Intégrateur IAM Saviynt | Île-de-France, France | 40000-45000 EUR | posted: 2026-10-06
+- [ ] https://www.free-work.com/fr/tech-it/analyste-programmeur/job-mission/analyste-developpeur-pacbase-sdp | CAT-AMANIA | Analyste développeur PACBASE / SDP | Montreuil, Île-de-France | 40000-55000 EUR | posted: 2026-10-06
+- [ ] https://www.free-work.com/fr/tech-it/developpeur-php-symfony-laravel-drupal/job-mission/developpeur-senior-windev-php-et-javascript | Zenith Rh | Développeur Senior WinDev, PHP et JavaScript | Yvelines, France | 40000-60000 EUR | posted: 2026-10-06
+- [ ] https://www.free-work.com/fr/tech-it/consultant/job-mission/developpeur-c-net-liquidite-finance-de-marche | I-lead Consulting | Développeur C# / .NET – Liquidité / Finance de marché | Paris, France | 40000-51000 EUR | posted: 2026-10-06
+- [ ] https://www.free-work.com/fr/tech-it/developpeur-net/job-mission/lead-developpeur-net-h-f-21 | CONSORT GROUP | Lead Développeur .NET H/F | Tassin-la-Demi-Lune | posted: 2026-10-06
+- [ ] https://www.free-work.com/fr/tech-it/developpeur-autre-langage-cobol-perl-vba-ruby-shell/job-mission/lead-developpeur-full-stack-5 | CAT-AMANIA | Lead Développeur Full-Stack | Niort, Nouvelle-Aquitaine | 40000-45000 EUR | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/developpeur-autre-langage-cobol-perl-vba-ruby-shell/job-mission/developpeur-as-400-h-f-11 | Amiltone | Développeur AS/400 (H/F) | Laval, Pays de la Loire | 35000-40000 EUR | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/consultant-fonctionnel/job-mission/developpeur-vba-net-et-analyste-fonctionnel-rpa-finance | VISIAN | Développeur VBA/.Net et Analyste Fonctionnel RPA - Finance | Paris, Île-de-France | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/developpeur-logiciel-embarque-assembleur-arduino/job-mission/developpeur-logiciel-trading-risk-pnl | VISIAN | Développeur Logiciel - Trading Risk & Pnl | Paris, France | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/developpeur-java-kotlin-groovy-scala/job-mission/java-developpeur-5 | VISIAN | Java Développeur | Paris, France | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/developpeur-php-symfony-laravel-drupal/job-mission/lead-developpeur-php-symfony-36 | Gamme solutions | Lead Développeur PHP / Symfony | Paris, Île-de-France | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/developpeur-autre-langage-cobol-perl-vba-ruby-shell/job-mission/developpeur-4d-6 | CAT-AMANIA | Développeur 4D | Île-de-France, France | 40000-45000 EUR | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/developpeur-autre-langage-cobol-perl-vba-ruby-shell/job-mission/lead-developpeur-c-11 | Signe + | Lead Développeur C++ | Aix-en-Provence, Provence-Alpes-Côte d'Azur | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/developpeur-net/job-mission/developpeur-c-net-confirme-remediation-dobsolescence-et-de-vulnerabilites-risque-de-credit | CAT-AMANIA | Développeur C# / .NET confirmé — Remédiation d'obsolescence et de vulnérabilités, risque de crédit | Paris, France | 39000-49000 EUR | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/developpeur-autre-langage-cobol-perl-vba-ruby-shell/job-mission/un-developpeur-expert-utility-network-sur-paris | Almatek | Un développeur Expert Utility Network sur Paris | Paris, France | 40000-45000 EUR | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/developpeur-net/job-mission/developpeur-senior-net-c-4 | Signe + | Développeur Senior .NET / C# | Bordeaux, Nouvelle-Aquitaine | 42000-45000 EUR | posted: 2026-10-05
+- [ ] https://www.free-work.com/fr/tech-it/business-analyst/job-mission/business-analyst-support-sur-le-logiciel-aladdin-h-f | Amiltone | Business Analyst/support sur le logiciel Aladdin (H/F) | Paris, France | 40000-45000 EUR | posted: 2026-10-05
+- [ ] https://www.hellowork.com/fr-fr/emplois/84096325.html | ALTEN | Ingénieur Cloud Gcp H/F | Toulouse - 31 | 38000-57000 EUR | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/84126286.html |  | Senior Site Reliability Engineer Sre H/F | Labège - 31 | 55000-65000 EUR | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/84097050.html | Geser Best | Ingénieur DevOps - Devsecops H/F | Toulouse - 31 | 35000-40000 EUR | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/81010892.html | Celad | Ingénieur DevOps - Exploitation Applicative - Domaine de l'Informatique H/F | Toulouse - 31 | 37000-41000 EUR | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/84090864.html | Decasoft | DevOps Senior Kubernetes H/F | Toulouse - 31 | posted: 2026-10-05
+- [ ] https://www.hellowork.com/fr-fr/emplois/82108755.html | Approach People Recruitment | Responsable Technique Infrastructure Sécurité H/F | Toulouse - 31 | 40000-50000 EUR
+- [ ] https://www.hellowork.com/fr-fr/emplois/84099468.html | Kaiman Services | Expert Infrastructure Middleware et Progiciel K168 H/F | Toulouse - 31 | 44000-47000 EUR | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/84098877.html | Kaiman Services | Administrateur Infrastructures - Sauvegardes Distribuées K162 H/F | Toulouse - 31 | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/82070479.html | Randstad professional | Ingénieur Sécurité Réseaux et Infrastructures H/F | Toulouse - 31 | 45000-55000 EUR | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/84130254.html | Audensiel Technologies | Ingénieur Citrix Run & Build H/F | Toulouse - 31 | 42000-47000 EUR | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/78673450.html | Randstad professional | Expert Support Run Infrastructure et Sécurité N2 - N3 H/F | Toulouse - 31 | 45000-55000 EUR | posted: 2026-10-05
+- [ ] https://www.hellowork.com/fr-fr/emplois/84076979.html | néosoft | Ingénieur Système Linux H/F | Toulouse - 31 | 38000-44000 EUR | posted: 2026-10-05
+- [ ] https://www.hellowork.com/fr-fr/emplois/84096907.html | Eurofiber | Data Engineer H/F | Toulouse - 31 | 40000-45000 EUR | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/84099736.html | Q Energy | Performance And Data Engineer - CDI - Toulouse Montpellier Paris H/F | Toulouse - 31 | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/83046890.html | Arpon Technologies | Responsable - Ingénieur Mise en Service CVC - Data Center H/F | Toulouse - 31 | 45000-55000 EUR | posted: 2026-10-05
+- [ ] https://www.hellowork.com/fr-fr/emplois/84109861.html | Airbus Defense and Space | Ai-Assisted Compute Resource Optimization on Big Data Platforms H/F | Toulouse - 31 | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/83059963.html | Airbus Defense and Space | Senior Business Analyst - Se Mbse & ai F - M - D H/F | Toulouse - 31 | posted: 2026-10-05
+- [ ] https://www.hellowork.com/fr-fr/emplois/82078879.html | Rheso.tech | Responsable Ivvq H/F | Toulouse - 31
+- [ ] https://www.hellowork.com/fr-fr/emplois/84113909.html | AXEAL | Ingénieur Technico-Fonctionnel Plm 3Dx H/F | Toulouse - 31 | 39000-47000 EUR | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/83032329.html | Geser Best | Ingénieur Méthodes et Outils de Gestion de Configuration H/F | Toulouse - 31 | 34000-39000 EUR | posted: 2026-10-05
+- [ ] https://www.hellowork.com/fr-fr/emplois/82039031.html | Scalian | Ingénieur Fpga H/F | Toulouse - 31 | 42000-55000 EUR | posted: 2026-10-05
+- [ ] https://www.hellowork.com/fr-fr/emplois/82092779.html | Scalian | Ingénieur Logiciel Embarqué Senior - Bureau d'Études H/F | Toulouse - 31 | 45000-55000 EUR
+- [ ] https://www.hellowork.com/fr-fr/emplois/84081317.html | Adentis | Chef de Projets en Electronique Spatiale H/F | Toulouse - 31 | 40000-54000 EUR | posted: 2026-10-05
+- [ ] https://www.hellowork.com/fr-fr/emplois/84073144.html | Alveor | Ingenieur Robotique - Traitement d'Image - c - C++ - C# - Toulouse H/F | Toulouse - 31 | 55000-60000 EUR | posted: 2026-10-05
+- [ ] https://www.hellowork.com/fr-fr/emplois/75294215.html | Absys Cyborg | Tech Lead Sage X3 H/F | Marseille - Toulouse | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/82108488.html | Approach People Recruitment | Développeur IA H/F | Toulouse - 31 | 40000-50000 EUR
+- [ ] https://www.hellowork.com/fr-fr/emplois/82024053.html | Adexcel Consulting | Développeur .Net Core H/F | Toulouse - 31 | 35000-45000 EUR | posted: 2026-10-05
+- [ ] https://www.hellowork.com/fr-fr/emplois/81012425.html | Viveris. | Développeur Back-End - Spatial H/F | Toulouse - 31
+- [ ] https://www.hellowork.com/fr-fr/emplois/79863047.html | Kyosei | Business Developer H/F | Toulouse - 31 | 37000-60000 EUR | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/84111903.html | Plus que pro | Business Developer Btob 31 H/F | Toulouse - 31 | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/84121502.html | Exotrail | Embedded Software Engineer H/F | Toulouse - 31 | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/84109855.html | Airbus Defense and Space | Ingénieur Développement Logiciel Embarqué H/F | Toulouse - 31 | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/84112556.html | Accenture France | Consultant Manufacturing & Supply Chain Expérimenté H/F | Blagnac - 31 | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/82080189.html | Rheso.tech | Architecte Sécurité Senior Programme Ground Segment H/F | Toulouse - 31 | 60000 EUR
+- [ ] https://www.hellowork.com/fr-fr/emplois/84081289.html | fortil group | Ingénieur DevOps - Cloud H/F | Paris - 75 | 55000-65000 EUR | posted: 2026-10-05
+- [ ] https://www.hellowork.com/fr-fr/emplois/84109688.html | CGI | Développeur Fullstack Java Cloud H/F | Paris - 75 | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/79861092.html | Talan | Consultant Fonctionnel SAP Public Cloud H/F | Paris - 75 | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/79861567.html | ITS Services | Ingénieur Cloud DevOps H/F | Paris - 75 | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/79856841.html | CNS Communications | Ingénieur Cloud & Réseau - Paris H/F | Paris 9e - 75 | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/84111424.html | OVHCloud | Site Reliability Engineer H/F | Paris 17e - 75 | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/78729612.html | Onepoint | Ingénieur Cloud Aws Confirmé - Senior H/F | Paris - 75
+- [ ] https://www.hellowork.com/fr-fr/emplois/82056266.html | Interstis | DevOps Senior - Lead H/F | Paris - 75 | 65000-75000 EUR | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/76482970.html | Viveris. | Ingénieur Développeur - DevOps H/F | Île-de-France | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/84099383.html | Kaiman Services | Ingénieur DevOps - Production Applicative K165 H/F | Île-de-France | 42000-45000 EUR | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/84098850.html | Kaiman Services | Ingénieur DevOps - Production Applicative K164 H/F | Île-de-France | 42000-45000 EUR | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/82108575.html | Approach People Recruitment | Ingénieur DevOps H/F | Paris - 75 | 55000-65000 EUR
+- [ ] https://www.hellowork.com/fr-fr/emplois/84099471.html | Kaiman Services | Appsec - Devsecops - Expert Gitlab CI - CD et Sécurité Applicative K169 H/F | Île-de-France | 65000-70000 EUR | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/83073623.html | Prospectis RH | Engineering Manager Infra Sre H/F | Paris - 75 | 75000-90000 EUR | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/84097474.html | Arkose&co | Responsable Plateforme Sécurité & Fiabilité Senior Platform - Sre H/F | Paris 20e - 75 | 60000-70000 EUR | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/84109285.html | Genwaves | Scrum Master H/F | Paris 12e - 75 | 50000-55000 EUR | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/84109263.html | Genwaves | Tech Lead Devsecops H/F | Paris 12e - 75 | 65000-70000 EUR | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/84096770.html |  | Développeur Java Spring Boot H/F | Paris - 75 | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/70858820.html | Artelia | Chef - Cheffe de Projet Infrastructure Ferroviaire H/F | Paris - 75 | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/84099430.html | Kaiman Services | Ingénieur de Production - Infrastructures Serveurs K167 H/F | Île-de-France | 42000-45000 EUR | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/81020120.html | Crédit Agricole Assurances | Ingénieur Système et Infrastructure Linux H/F | Paris - 75
+- [ ] https://www.hellowork.com/fr-fr/emplois/82984063.html | Artelia | Assistant Chef - Assistante Cheffe de Projet Ferroviaire H/F | Paris - 75 | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/83029060.html | AMAGO | Ingénieur Middleware - Devsecops - Linux - Aix - Openshift H/F | Paris - 75 | posted: 2026-10-05
+- [ ] https://www.hellowork.com/fr-fr/emplois/82108750.html | Approach People Recruitment | Data Engineer H/F | Paris - 75 | 50000-75000 EUR
+- [ ] https://www.hellowork.com/fr-fr/emplois/82108561.html | Approach People Recruitment | Senior Data Engineer H/F | Paris - 75 | 50000-70000 EUR
+- [ ] https://www.hellowork.com/fr-fr/emplois/78703535.html | SIBYLONE | Data Engineer - Data Analyst - Dataiku H/F | Paris - 75
+- [ ] https://www.hellowork.com/fr-fr/emplois/84081272.html | fortil group | Data Ingénieur H/F | Paris - 75 | 50000-60000 EUR | posted: 2026-10-05
+- [ ] https://www.hellowork.com/fr-fr/emplois/82108803.html | Approach People Recruitment | Cheminformatics Engineer H/F | Paris - 75 | 50000-100000 EUR
+- [ ] https://www.hellowork.com/fr-fr/emplois/82101781.html | Cabinet EKINOX | Ingénieur IA Staff - Principal Engineer - Traitement du Signal & Imagerie H/F | Paris 14e - 75
+- [ ] https://www.hellowork.com/fr-fr/emplois/83049944.html | Hymaïa | Ingénieur IA Ingénieur en Intelligence Artificielle H/F | Paris 3e - 75 | posted: 2026-10-05
+- [ ] https://www.hellowork.com/fr-fr/emplois/82108583.html | Approach People Recruitment | Ingénieur IA H/F | Paris - 75 | 40000-50000 EUR
+- [ ] https://www.hellowork.com/fr-fr/emplois/84109695.html | CGI | Consultant Data Gouvernance H/F | Paris - 75 | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/84097017.html | Pix | Data Ingénieur - Ingénieure H/F | Paris 19e - 75 | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/84107525.html | JEMS | Fiche de Poste - Data Engineer Confirmé H/F | Paris - 75 | 55000 EUR | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/84082674.html | Team.is | Founding Engineer - MLOps H/F | Paris 2e - 75 | 60000-75000 EUR | posted: 2026-10-05
+- [ ] https://www.hellowork.com/fr-fr/emplois/75289242.html | Sopra Steria | Architecte IA - Services Financiers - Ile-De-France H/F | Paris 16e - 75 | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/84099827.html | Nexton | Business Analyst Dataiku & Genai H/F | Paris - 75 | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/71838144.html | SPIE ICS | Ingénieur - Ingénieure Réseau-Sécurité - Guyancourt 78 H/F | Île-de-France | posted: 2026-10-05
+- [ ] https://www.hellowork.com/fr-fr/emplois/82068670.html | Artemys | Ingénieur Active Directory H/F | Paris 10e - 75 | 58000-65000 EUR | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/82055789.html | OCSI Group | Expert Active Directory H/F | Paris - 75 | 55000-57000 EUR | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/84098159.html | Astek | Ingénieur Fpga - Secteur Aéronautique H/F | Paris 1er - 75 | 35000 EUR | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/76456905.html | Talan | Trading Application Support Engineer - New York City Usa H/F | Paris - 75 | posted: 2026-10-05
+- [ ] https://www.hellowork.com/fr-fr/emplois/82102402.html | T-T CONSULTING | Ingénieur Conception - Business Analyst IT H/F | Île-de-France | 40000-42000 EUR
+- [ ] https://www.hellowork.com/fr-fr/emplois/84106697.html | Astek | Chef de Projet Logiciel Aéronautique H/F | Paris 1er - 75 | 35000 EUR | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/84124710.html | Naval Group | Ingénieur Systèmes Embarqués Navals H/F | France | 43000-47000 EUR | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/84109124.html | DAVRICOURT | Ingénieur en Validation Fonctionnelle H/F | Paris - 75 | 35000-40000 EUR | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/82108642.html | Approach People Recruitment | Développeur Python - Paris H/F | Paris - 75 | 45000-90000 EUR
+- [ ] https://www.hellowork.com/fr-fr/emplois/84115436.html |  | Architecte Si et Expert Usine Logicielle - CI-CD H/F | Paris 1er - 75 | 60000-70000 EUR | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/84099054.html | Kaiman Services | Architecte Système Information - Chaîne CI - CD K163 H/F | Île-de-France | 58000-63000 EUR | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/84082178.html | Breakers Consulting | Chef de Projet MOA Data H/F | Paris - 75 | 48000-55000 EUR | posted: 2026-10-05
+- [ ] https://www.hellowork.com/fr-fr/emplois/83043167.html |  | Chargé·e de Missions Financières & Data H/F | Paris 12e - 75 | 50000-60000 EUR | posted: 2026-10-05
+- [ ] https://www.hellowork.com/fr-fr/emplois/82108585.html | Approach People Recruitment | Senior Backend Engineer H/F | Paris - 75 | 55000-65000 EUR
+- [ ] https://www.hellowork.com/fr-fr/emplois/82108486.html | Approach People Recruitment | Développeur Backend Java H/F | Paris - 75 | 40000-70000 EUR
+- [ ] https://www.hellowork.com/fr-fr/emplois/83036497.html | HOUSE OF ABY | Analyste Développeur COBOL Confirmé H/F | Paris 8e - 75 | 45000 EUR | posted: 2026-10-05
+- [ ] https://www.hellowork.com/fr-fr/emplois/62307235.html | Sopra Steria | Développeur Expert - Java Fullstack - Services Financiers - Ile de France H/F | Paris 16e - 75 | posted: 2026-10-05
+- [ ] https://www.hellowork.com/fr-fr/emplois/82054862.html | OCSI Group | Reconversion Professionnelle en IT - CDI Développeur Rpg - Ibm I H/F | Paris - 75 | 30000-32000 EUR | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/82985024.html | fortil group | Développeur C# H/F | Paris - 75 | 45000-55000 EUR | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/84076679.html | SEEKUBE | Développeur Logiciel - Software Engineer H/F | Paris 2e - 75 | 42000-50000 EUR | posted: 2026-10-05
+- [ ] https://www.hellowork.com/fr-fr/emplois/84128437.html | OVHCloud | Software Engineer C - C++ - N H/F | Paris 17e - 75 | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/84082875.html | Team.is | Founding Engineer - Machine Learning H/F | Paris 2e - 75 | 60000-75000 EUR | posted: 2026-10-05
+- [ ] https://www.hellowork.com/fr-fr/emplois/82108620.html | Approach People Recruitment | Ingénieur Développement Logiciel - Logiciel Industriel - Massy 91 H/F | Paris - 75 | 39000-45000 EUR
+- [ ] https://www.hellowork.com/fr-fr/emplois/82108646.html | Approach People Recruitment | Senior Software Engineer - Foodtech H/F | Paris - 75 | 55000-65000 EUR
+- [ ] https://www.hellowork.com/fr-fr/emplois/82108530.html | Approach People Recruitment | Geospatial Software Engineer Verhandlungssicheres Englisch Europa H/F | France | 70000-90000 EUR
+- [ ] https://www.hellowork.com/fr-fr/emplois/82054800.html | Hager | Customer Data & Analytics Specialist M H/F | Paris - 75 | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/84121808.html | Ekimetriks | Senior Business Data Scientist - Data & Transformation Services H/F | Paris - 75 | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/82031216.html |  | Data Scientist - Practice IA chez Margo Projets Marketing & Optimisation H/F | Paris - 75 | posted: 2026-10-05
+- [ ] https://www.hellowork.com/fr-fr/emplois/82031254.html |  | Data Scientist Machine Learning Engineer - Practice IA Margo H/F | Paris - 75 | posted: 2026-10-05
+- [ ] https://www.hellowork.com/fr-fr/emplois/82031250.html |  | Data Scientist Projets Pricing & Segmentation - Practice IA Margo H/F | Paris - 75 | posted: 2026-10-05
+- [ ] https://www.hellowork.com/fr-fr/emplois/78699613.html | Pathway | Benchmark & Datasets Engineer - Researcher H/F | Paris - 75 | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/78699646.html | DataGalaxy | Spontaneous Application H/F | Paris - 75 | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/84099732.html | Quandela | Quantum Information Scientist - Quantum Error Mitigation H/F | Paris - 75 | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/83069281.html | Doctrine | Confirmed Machine Learning Engineer Productivity H/F | Paris - 75 | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/82031251.html |  | Machine Learning Engineer - Practice IA Margo H/F | Paris - 75 | posted: 2026-10-05
+- [ ] https://www.hellowork.com/fr-fr/emplois/79857024.html | CNS Communications | Ingénieur Cloud & Réseau - Lyon H/F | Lyon 2e - 69 | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/84077775.html | Ippon Technologies | Business Developer H/F | Lyon - 69 | 50000-65000 EUR | posted: 2026-10-05
+- [ ] https://www.hellowork.com/fr-fr/emplois/79867396.html | Red Hot Talents | Business Manager IT - Lyon H/F | Lyon 1er - 69 | 53000-70000 EUR | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/84124500.html | HARA CONSULTING | Ingénieur DevOps H/F | Lyon - 69 | 42000-46000 EUR | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/84084525.html | Tuanis Conseil | Ingénieur de Production DevOps H/F | Lyon - 69 | 45000-50000 EUR | posted: 2026-10-05
+- [ ] https://www.hellowork.com/fr-fr/emplois/62306688.html | Sopra Steria | Ingénieur DevOps - Lyon H/F | Limonest - 69 | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/82848232.html | ITS Services | Intégrateur DevOps H/F | Lyon - 69
+- [ ] https://www.hellowork.com/fr-fr/emplois/84106817.html | Groupe Adenes | Développeur Confirmé H/F | Lyon 3e - 69 | 39000-50000 EUR | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/80755928.html | Niji | Ingénieur DevOps Cloud H/F | Lyon 2e - 69 | posted: 2026-09-29
+- [ ] https://www.hellowork.com/fr-fr/emplois/84127050.html | ITS Services | Ingénieur Infrastructure H/F | Lyon - 69 | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/83048145.html | Ocea Smart Building | Responsable Infrastructure et Support Informatique H/F | Lyon 9e - 69 | posted: 2026-10-05
+- [ ] https://www.hellowork.com/fr-fr/emplois/83987069.html | Ameg | Ingénieur Htb - Hta - Infrastructure & Génie Civil H/F | Villeurbanne - 69 | 42000-47000 EUR | posted: 2026-10-02
+- [ ] https://www.hellowork.com/fr-fr/emplois/84079001.html | HELPLINE | Ingénieur Système & Réseau H/F | Lyon - 69 | posted: 2026-10-05
+- [ ] https://www.hellowork.com/fr-fr/emplois/75353625.html | Orange Business | Data Engineer Databricks H/F | Lyon 2e - 69 | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/76491774.html | Devoteam | Consultant·e Senior Data Engineer Aws H/F | Lyon 3e - 69 | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/82055702.html | WINSIDE TECHNOLOGY | Développeur Databricks Confirmé H/F | Lyon - 69 | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/84097010.html | Smile Group | Ingénieur Devsecops Plateforme Data - Lyon H/F | Villeurbanne - 69 | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/82108529.html | Approach People Recruitment | Data Scientist H/F | Lyon - 69 | 50000-70000 EUR
+- [ ] https://www.hellowork.com/fr-fr/emplois/84081226.html | Prosol | Senior Data Scientist - Genai H/F | Chaponnay - 69 | posted: 2026-10-05
+- [ ] https://www.hellowork.com/fr-fr/emplois/82848240.html | ITS Services | Ingénieur Systèmes H/F | Lyon - 69
+- [ ] https://www.hellowork.com/fr-fr/emplois/82112565.html | Segula Technologies | Ingénieur Systèmes Adas H/F | Vénissieux - 69
+- [ ] https://www.hellowork.com/fr-fr/emplois/83980683.html | Batigère | Gestionnaire Financier en Operations Immobilieres H/F | Lyon 6e - 69 | posted: 2026-10-02
+- [ ] https://www.hellowork.com/fr-fr/emplois/84093154.html | Co-Efficience | Responsable Projets Plasturgie & Développement H/F | Lyon 6e - 69 | 50000-60000 EUR | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/82079453.html | Rheso.tech | Ingénieur Développement Embarqué Zephyr H/F | Lyon - 69 | 50000-60000 EUR
+- [ ] https://www.hellowork.com/fr-fr/emplois/84129632.html | Ikigaï | Testeur Fonctionnel H/F | Lyon - 69 | 35000-45000 EUR | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/84124648.html | Adod | Développeur Flutter H/F | Lyon 1er - 69 | 40000-45000 EUR | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/84091229.html | Les Colettes | Développeur ERP H/F | Ternay - 69 | 33000-38000 EUR | posted: 2026-10-05
+- [ ] https://www.hellowork.com/fr-fr/emplois/73291876.html | Qim info | Développeur Java H/F | Lyon - 69 | 37000-45000 EUR | posted: 2026-10-05
+- [ ] https://www.hellowork.com/fr-fr/emplois/84083977.html | Scalian | Développeur Java Sénior H/F | Lyon - 69 | posted: 2026-10-05
+- [ ] https://www.hellowork.com/fr-fr/emplois/84084560.html | B-Hive | Ingénieur Sénior QA - Qc H/F | Lyon - 69 | 40000-46000 EUR | posted: 2026-10-05
+- [ ] https://www.hellowork.com/fr-fr/emplois/79855440.html | Onepoint | Testeur QA Technico - Fonctionnel H/F | Lyon - 69
+- [ ] https://www.hellowork.com/fr-fr/emplois/84123666.html | KALI Group | Responsable de Maquette 3D H/F | Lyon - 69 | 45000-50000 EUR | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/84093787.html | Nyou | Cloud Software Engineer H/F | Saint-Cloud - 92 | 55000-65000 EUR | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/56252366.html | Talan | Ingénieur DevOps & Cloud H/F | Nantes - 44 | posted: 2026-10-05
+- [ ] https://www.hellowork.com/fr-fr/emplois/83036682.html | Astek | Ingénieur DevOps - Cloud H/F | Lorient - 56 | 35000 EUR | posted: 2026-10-05
+- [ ] https://www.hellowork.com/fr-fr/emplois/81013353.html | Meilleurtaux | Cloud Operations Engineer Modernisation & Move To Cloud H/F | Courbevoie - 92 | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/75193870.html | ALTEN | Cloud & Infrastructure Administrator H/F | Boulogne-Billancourt - 92 | posted: 2026-10-05
+- [ ] https://www.hellowork.com/fr-fr/emplois/81013324.html | Meilleurtaux | Cloud Security Engineer H/F | Courbevoie - 92 | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/84088487.html | Getinge France | Cloud Platform Engineer H/F | Ardon - 45 | posted: 2026-10-05
+- [ ] https://www.hellowork.com/fr-fr/emplois/84100321.html | ITS Services | DevOps Cloud Azure H/F | Nantes - 44 | 45000-50000 EUR | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/84115626.html | Nextep HR | Administrateur Systèmes & Cloud Linux H/F | Rouen - 76 | 30000-45000 EUR | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/84080633.html | Umake | Responsable Infrastructure Cloud & Sécurité H/F | Bordeaux - 33 | 60000-75000 EUR | posted: 2026-10-05
+- [ ] https://www.hellowork.com/fr-fr/emplois/83036586.html | Horoquartz | Ingénieur DevOps Cloud Azure H/F | Saint-Herblain - 44 | 47000-55000 EUR | posted: 2026-10-05
+- [ ] https://www.hellowork.com/fr-fr/emplois/84096649.html | Ingram Micro | Commercial Sedentairebtob Equipe Cloud H/F | Lesquin - 59 | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/83062567.html | Hilti France | DevOps H/F | Boulogne-Billancourt - 92 | posted: 2026-10-05
+- [ ] https://www.hellowork.com/fr-fr/emplois/82054666.html | STORK Groupe | DevOps H/F | Nancy - 54 | 36000-50000 EUR | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/79783713.html | Altim | Ingénieur DevOps H/F | Boulogne-Billancourt - 92 | 45000-55000 EUR | posted: 2026-10-05
+- [ ] https://www.hellowork.com/fr-fr/emplois/83042057.html | Guarani | Ingénieur DevOps H/F | Bordeaux - 33 | 50000-70000 EUR | posted: 2026-10-05
+- [ ] https://www.hellowork.com/fr-fr/emplois/84098609.html | Audensiel Technologies | Sre H/F | Lille - 59 | 45000-65000 EUR | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/81011167.html | Astek | Ingénieur Ops - Sre H/F | Niort - 79 | 35000 EUR
+- [ ] https://www.hellowork.com/fr-fr/emplois/82094134.html | IT Link | Développeur Backend Python & Kubernetes H/F | Nantes - 44 | 43000-48000 EUR
+- [ ] https://www.hellowork.com/fr-fr/emplois/84097023.html | Alfene | Administrateur·trice Cloud Azure - DevOps H/F | Saint-Étienne - 42 | 38000-48000 EUR | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/80829131.html | Sacem | Responsable System Team H/F | Puteaux - 92 | posted: 2026-10-01
+- [ ] https://www.hellowork.com/fr-fr/emplois/84125802.html | SAFETYKLEEN | Responsable Travaux & Infrastructures H/F | La Courneuve - 93 | 48000-50000 EUR | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/84101329.html | Geco Recrutement | Ingénieur Travaux Neufs & Infrastructures H/F | Ussel - 19 | 40000-60000 EUR | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/83988028.html | Manpower France | Responsable Informatique Infrastructure & Support H/F | Andouillé - 53 | 45000 EUR | posted: 2026-10-02
+- [ ] https://www.hellowork.com/fr-fr/emplois/84107384.html | REEL IT | Ingénieur Commercial Infrastructures - Occitanie H/F | Montpellier - 34 | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/84081782.html | AGH Consulting | Expert Cisco Prime Infrastructure H/F | Vélizy-Villacoublay - 78 | posted: 2026-10-05
+- [ ] https://www.hellowork.com/fr-fr/emplois/82056206.html | STORK Groupe | Référent Technique Infrastructure & DevOps H/F | Nancy - 54 | 37000-50000 EUR | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/84116610.html | Nextep HR | Agent de Maintenance Batiment - Infrastructure Hf H/F | Mûrs-Erigné - 49 | 25000-30000 EUR | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/83070665.html | Randstad Digital | Pilote Opérationnel d'Infrastructure Bigdata H/F | Rennes - 35 | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/63700064.html | Talan | Data Engineer H/F | Rennes - 35 | posted: 2026-10-05
+- [ ] https://www.hellowork.com/fr-fr/emplois/82026894.html | Oney | Data Engineer H/F | Croix - 59 | posted: 2026-10-05
+- [ ] https://www.hellowork.com/fr-fr/emplois/84078202.html | Akkodis | Data Engineer Gcp H/F | Niort - 79 | posted: 2026-10-05
+- [ ] https://www.hellowork.com/fr-fr/emplois/82037984.html | ArcelorMittal France | Data Engineer 276347 H/F | Dunkerque - 59 | posted: 2026-10-05
+- [ ] https://www.hellowork.com/fr-fr/emplois/84086378.html | VALEURIAD | Data Engineer Expérimenté·e H/F | Nantes - 44 | 40000-48000 EUR | posted: 2026-10-05
+- [ ] https://www.hellowork.com/fr-fr/emplois/84100594.html | IDEX | Ingénieur Data et Marchés H/F | Boulogne-Billancourt - 92 | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/62306552.html | Sopra Steria | Ingénieur Data Confirmé - Services Financiers - Bordeaux H/F | Mérignac - 33 | posted: 2026-10-05
+- [ ] https://www.hellowork.com/fr-fr/emplois/62306742.html | Sopra Steria | Data Engineer - Data Factory - Services Financiers - Nantes H/F | Nantes - 44 | posted: 2026-10-05
+- [ ] https://www.hellowork.com/fr-fr/emplois/84128192.html | Groupe ADSN | Data Engineer - Analytics Engineer H/F | Venelles - 13 | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/81011240.html | Astek | Architecte IA - Secteur Aéronautiqu H/F | Bordeaux - 33 | 35000 EUR
+- [ ] https://www.hellowork.com/fr-fr/emplois/76491772.html | Devoteam | Consultant·e Senior Ai - Machine Learning Aws H/F | Levallois-Perret - 92 | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/83045663.html | SOCASS - Société d'Assistance de Service et de Support | Ingénieur Système Refroidissement H/F | Guyancourt - 78 | 36000-38000 EUR | posted: 2026-10-05
+- [ ] https://www.hellowork.com/fr-fr/emplois/83025722.html | In Genium | Ingénieur Système Ferroviaires H/F | Grand Est | 35000-55000 EUR | posted: 2026-10-05
+- [ ] https://www.hellowork.com/fr-fr/emplois/84126734.html | Safran | Ingénieur·e Système Gnss H/F | Nantes - 44 | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/83045645.html | SOCASS - Société d'Assistance de Service et de Support | Ingénieur Systèmes Ihm H/F | Guyancourt - 78 | 34000-36000 EUR | posted: 2026-10-05
+- [ ] https://www.hellowork.com/fr-fr/emplois/79839098.html | Epsyl | Ingénieur Systèmes Optomécaniques H/F | Tarbes - 65 | 42000-55000 EUR | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/84115948.html | Consulting Technical Support | Ingénieur Systèmes Fluidiques H/F | Fismes - 51 | 40000-50000 EUR | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/83045691.html | PRESTANOVA | Ingénieur Systèmes - Architecte Systèmes H/F | Sandillon - 45 | 40000-60000 EUR | posted: 2026-10-05
+- [ ] https://www.hellowork.com/fr-fr/emplois/84001481.html | L'Industrie recrute | Ingénieur mes & Systèmes de Production H/F | Poitiers - 86 | posted: 2026-10-02
+- [ ] https://www.hellowork.com/fr-fr/emplois/84100975.html | MBDA | Technicien d'Essais Ivvq - Systèmes Terrestres H/F | Le Plessis-Robinson - 92 | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/82112510.html | Expleo | Ingénieur Electronique Ivvq H/F | Cholet - 49 | 38000 EUR
+- [ ] https://www.hellowork.com/fr-fr/emplois/83052908.html | EXENS SOLUTIONS | Ingénieur Ivvq Systeme H/F | Les Ulis - 91 | 53000-58000 EUR | posted: 2026-10-05
+- [ ] https://www.hellowork.com/fr-fr/emplois/82016817.html | Atexis | Technicien Ivvq - Aéronautique Défense H/F | Lorient - 56 | posted: 2026-10-05
+- [ ] https://www.hellowork.com/fr-fr/emplois/84109342.html | MBDA | Responsable Ivvq Capteurs Inertiels H/F | Le Plessis-Robinson - 92 | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/84092103.html | AGH Consulting | Expert Intégration Validation H/F | Neuville-sur-Oise - 95 | posted: 2026-10-05
+- [ ] https://www.hellowork.com/fr-fr/emplois/84075302.html | ALTEN | Ingénieur Ivvq Intégration Vérification Validation & Qualification Rf - Secteur Défense H/F | Cholet - 49 | posted: 2026-10-05
+- [ ] https://www.hellowork.com/fr-fr/emplois/84128405.html | HOUSE OF ABY | Ingénieur Systèmes Embarqués H/F | Lille - 59 | 35000 EUR | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/84109208.html | Genwaves | Ingénieur Intégration & Tests Automatisés H/F | Aix-en-Provence - 13 | 45000-50000 EUR | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/76496247.html | Sopra Steria | Ingénieur Ivvq Système de Communication Aéronautique - Défense et Sécurité - le Plessis Robinson H/F | Le Plessis-Robinson - 92 | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/83026995.html | fortil group | Ingénieur Sytème Embarqué H/F | Caen - 14 | 38000-43000 EUR | posted: 2026-10-05
+- [ ] https://www.hellowork.com/fr-fr/emplois/84100530.html | Akkodis | Ingénieur Développement Logiciel C++ Embarqué H/F | Bordeaux - 33 | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/81760317.html | Manpower France | Ingénieur Concepteur - Systèmes Embarqués H/F | Auray - 56 | 45000-50000 EUR | posted: 2026-09-27
+- [ ] https://www.hellowork.com/fr-fr/emplois/83912953.html | Manpower France | Ingénieur de Bureau d'Études en Systèmes Embarqués H/F | Saint-Dizier - 52 | 38000-45000 EUR | posted: 2026-09-30
+- [ ] https://www.hellowork.com/fr-fr/emplois/84099464.html | D.R.A Technologies | Chef de Projet Radiocommunication & Systèmes Embarqués H/F | Lens-Lestang - 26 | 45000-58000 EUR | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/83009106.html | CNP ASSURANCES | Tech Lead Python - IA H/F | Angers - 49 | posted: 2026-10-05
+- [ ] https://www.hellowork.com/fr-fr/emplois/83037552.html | Viveris. | Architecte Logiciel Python Confirmé H/F | Haute-Garonne - 31 | posted: 2026-10-05
+- [ ] https://www.hellowork.com/fr-fr/emplois/81023016.html | CGI | Développeur R - R Shiny - Python H/F | Grenoble - 38
+- [ ] https://www.hellowork.com/fr-fr/emplois/79487517.html | DR.VETO | Développeur Backend & Référent Performance Database H/F | Bordeaux - 33 | 40000-46000 EUR | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/84100403.html | HELPLINE | Développeur - Lead Développeur Java Backend - Cloud - DevOps H/F | Marcq-en-Barœul - 59 | 40000-45000 EUR | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/79739599.html | Baldwin Partners | Ingénieur Systèmes Embarqués Senior H/F | Nantes - 44 | 50000-60000 EUR | posted: 2026-10-05
+- [ ] https://www.hellowork.com/fr-fr/emplois/84082501.html | Isagri | Développeur H/F | Vendôme - 41 | 35000-45000 EUR | posted: 2026-10-05
+- [ ] https://www.hellowork.com/fr-fr/emplois/83042329.html | Ekkiden | Développeur Back-End H/F | Lille - 59 | 48000-53000 EUR | posted: 2026-10-05
+- [ ] https://www.hellowork.com/fr-fr/emplois/83028605.html | Simphonis | Développeur C#.Net H/F | Beaucouzé - 49 | 35000-43000 EUR | posted: 2026-10-05
+- [ ] https://www.hellowork.com/fr-fr/emplois/75353649.html | Orange Business | Développeur Salesforce H/F | Nanterre - 92 | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/81930764.html | Groupe Efire | Développeur ERP H/F | Chasse-sur-Rhône - 38 | posted: 2026-10-01
+- [ ] https://www.hellowork.com/fr-fr/emplois/84123827.html | SYNANTO | Développeur Keycloak H/F | Cagnes-sur-Mer - 06 | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/79769817.html | Gerflor | Developpeur ERP H/F | Tarare - 69 | posted: 2026-10-05
+- [ ] https://www.hellowork.com/fr-fr/emplois/84027401.html | Symbioz Recrutement | Analyste Programmeur As400 Développeur Informatique H/F | Montigny-le-Bretonneux - 78 | 70000-80000 EUR | posted: 2026-10-03
+- [ ] https://www.hellowork.com/fr-fr/emplois/83031844.html | GROUPE ATSI | Développeur Informatique Junior H/F | Châteauneuf-les-Martigues - 13 | posted: 2026-10-05
+- [ ] https://www.hellowork.com/fr-fr/emplois/84073065.html | Skaelia | Développeur - Problem Manager H/F | Nantes - 44 | 32000-38000 EUR | posted: 2026-10-05
+- [ ] https://www.hellowork.com/fr-fr/emplois/84096401.html | Akkodis | Ingénieur Développement Logiciel H/F | Brest - 29 | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/83028653.html | Safran | Ingénieur·e Logiciel Bancs de Test H/F | Réau - 77 | posted: 2026-10-05
+- [ ] https://www.hellowork.com/fr-fr/emplois/83028375.html | Consept Ingenierie | Ingénieur Développement Logiciel et Perception H/F | Nantes - 44 | 35000-40000 EUR | posted: 2026-10-05
+- [ ] https://www.hellowork.com/fr-fr/emplois/76424015.html | Maxiplan | Ingenieur Logiciels en Programmation Langage c H/F | Rungis - 94 | 45000-55000 EUR | posted: 2026-10-05
+- [ ] https://www.hellowork.com/fr-fr/emplois/84109742.html | Segula Technologies | Ingénieur Développement Logiciel & Outils Map H/F | Guyancourt - 78 | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/80865850.html | Scalian | Ingénieur Logiciel Embarqué H/F | Valence - 26 | posted: 2026-10-03
+- [ ] https://www.hellowork.com/fr-fr/emplois/84099997.html | Advenn | Data Scientist H/F | Morlaix - 29 | 35000-40000 EUR | posted: 2026-10-06
+- [ ] https://www.hellowork.com/fr-fr/emplois/78696943.html | Alpee | Senior Data Analytics H/F | Annecy - 74 | posted: 2026-10-05
+- [ ] https://www.hellowork.com/fr-fr/emplois/84092021.html | Externatic | Data Product Engineer - Analytics Engineer - Zootechnie H/F | Lamballe-Armor - 22 | 50000-65000 EUR | posted: 2026-10-05
+- [ ] https://www.hellowork.com/fr-fr/emplois/84098954.html | ECR Environnement | Chargé d'Affaires en Géomatique - Détection Réseaux H/F | Aix-en-Provence - 13 | 27600-43200 EUR | posted: 2026-10-06
+- [ ] https://www.linkedin.com/jobs/view/4473653456 | DECASOFT | DevOps Senior (Toulouse) (H/F) | Greater Toulouse Metropolitan Area | posted: 2026-10-05
+- [ ] https://www.linkedin.com/jobs/view/4471341633 | Delair | Ingénieur devops H/F | Toulouse, Occitanie, France | posted: 2026-09-28
+- [ ] https://www.linkedin.com/jobs/view/4476176639 | Fairyx / Hiring for Venture-Backed Startups | Senior Deployment Engineer (Edge / Release Infrastructure) | Toulouse, Occitanie, France | posted: 2026-10-06
+- [ ] https://www.linkedin.com/jobs/view/4461895403 | Experis France | Ingénieur Systèmes & Réseaux / DevOps (H/F) | Toulouse, Occitanie, France | posted: 2026-10-06
+- [ ] https://www.linkedin.com/jobs/view/4476162389 | GMV | Software and Platform Engineer | Toulouse, Occitanie, France | posted: 2026-10-06
+- [ ] https://www.linkedin.com/jobs/view/4472350492 |  | Ingénieur de production DEVOPS (H/F) | Toulouse, Occitanie, France | posted: 2026-09-24
+- [ ] https://www.linkedin.com/jobs/view/4463819925 | Neosoft | Expert Middleware H/F | Toulouse, Occitanie, France | posted: 2026-10-06
+- [ ] https://www.linkedin.com/jobs/view/4385368865 | Neosoft | Ingénieur de production informatique (H/F) | Greater Toulouse Metropolitan Area | posted: 2026-10-05
+- [ ] https://www.linkedin.com/jobs/view/4473623151 | HN Services | Ingénieur production/Ingénieure production | Toulouse, Occitanie, France | posted: 2026-10-05
+- [ ] https://www.linkedin.com/jobs/view/4475530784 | Q ENERGY | Performance and Data Engineer F/H - CDI - Toulouse, Montpellier, Paris | Toulouse, Occitanie, France | posted: 2026-10-05
+- [ ] https://www.linkedin.com/jobs/view/4474023650 | Airbus Aircraft | AI-Assisted compute resource optimization on big data platforms | Toulouse, Occitanie, France | posted: 2026-10-06
+- [ ] https://www.linkedin.com/jobs/view/4442783956 | KPMG France | Architecte Data & IA F/H | Labège, Occitanie, France | posted: 2026-09-22
+- [ ] https://www.linkedin.com/jobs/view/4476123837 | INRAE Occitanie-Toulouse | Ingénieur-e en analyse d’images et vision par ordinateur appliquées au comportement de la truite arc-en-ciel | Occitanie, France | posted: 2026-10-06
+- [ ] https://www.linkedin.com/jobs/view/4474031266 | Airbus Aircraft | Systems Business Quality Manager - Data Specialist (m/f) | Toulouse, Occitanie, France | posted: 2026-10-06
+- [ ] https://www.linkedin.com/jobs/view/4476176319 | Boehringer Ingelheim | Principal Expert en Analyse des procédés et Validation H/F - CDI | Toulouse, Occitanie, France | posted: 2026-10-06
+- [ ] https://www.linkedin.com/jobs/view/4475838445 | METEO FRANCE | Ingénieur de recherche au CNRM en Intelligence Artificielle pour la prévision du temps F/H | Toulouse, Occitanie, France | posted: 2026-10-05
+- [ ] https://www.linkedin.com/jobs/view/4461891399 | Experis France | Ingénieur Intégration Système Windows (H/F) | Toulouse, Occitanie, France | posted: 2026-10-06
+- [ ] https://www.linkedin.com/jobs/view/4474245929 | ALTEN | Ingénieur Systèmes FMS (Flight Management System) - Aéronautique (F/H) | Toulouse, Occitanie, France | posted: 2026-10-05
+- [ ] https://www.linkedin.com/jobs/view/4475549519 | AYES - Management & Technology Consulting | Ingénieur Système Satcom – E2E / Segment Sol H/F | Toulouse, Occitanie, France | posted: 2026-10-05
+- [ ] https://www.linkedin.com/jobs/view/4399672139 | LGM | Ingénieur Système Électronique – Qualification & Certification CEM - H/F | Toulouse, Occitanie, France | posted: 2026-10-04
+- [ ] https://www.linkedin.com/jobs/view/4473634165 | HEMERIA | Architecte Systèmes Electroniques Embarqués (F/H) | Greater Toulouse Metropolitan Area | posted: 2026-10-05
+- [ ] https://www.linkedin.com/jobs/view/4474243783 | Neosoft | Ingénieur Système Linux (H/F) | Toulouse, Occitanie, France | posted: 2026-10-05
+- [ ] https://www.linkedin.com/jobs/view/4474646051 | Accenture France | Consultant en transformation digitale - System Engineering F/H | Blagnac, Occitanie, France | posted: 2026-10-05
+- [ ] https://www.linkedin.com/jobs/view/4474268020 | ALTEN | Référent Technique en Ingénierie Systèmes Électriques - Aéronautique (F/H) | Toulouse, Occitanie, France | posted: 2026-10-05
+- [ ] https://www.linkedin.com/jobs/view/4476114858 | NXP Semiconductors | Automotive E/E System and Software architect | Toulouse, Occitanie, France | posted: 2026-10-06
+- [ ] https://www.linkedin.com/jobs/view/4474610858 | Exotrail | Embedded Software Engineer (F/H) | Toulouse, Occitanie, France | posted: 2026-10-05
+- [ ] https://www.linkedin.com/jobs/view/4471926135 | Renault Group | Architecte Logiciel Transverse – Connected Cockpit System (CCS) - (H/F) | Toulouse, Occitanie, France | posted: 2026-09-29
+- [ ] https://www.linkedin.com/jobs/view/4469678196 | UNIVITY | 5G Software Architect | Toulouse, Occitanie, France | posted: 2026-09-24
+- [ ] https://www.linkedin.com/jobs/view/4476139441 | We Invest France | Conseiller immobilier | Albi, Occitanie, France | posted: 2026-10-06
+- [ ] https://www.linkedin.com/jobs/view/4472358151 |  | EMPLOYE/E RELATION CLIENT - FORUM MURET 2026 (H/F) | Roques, Occitanie, France | posted: 2026-09-25
+- [ ] https://www.linkedin.com/jobs/view/4474683314 |  | Barman / Barmaid (H/F) | Portet-sur-Garonne, Occitanie, France | posted: 2026-10-05
+- [ ] https://www.linkedin.com/jobs/view/4474682294 |  | AGENT DE CONDITIONNEMENT VRAC HF (H/F) | L’Isle-Jourdain, Occitanie, France | posted: 2026-10-05
+- [ ] https://www.linkedin.com/jobs/view/4474680478 |  | Agent de transformation cuiseur (agroalimentaire) (H/F) | L’Isle-Jourdain, Occitanie, France | posted: 2026-10-05
+- [ ] https://www.linkedin.com/jobs/view/4472348483 |  | Intervenant/e Judo enfants (H/F) | Toulouse, Occitanie, France | posted: 2026-09-30
+- [ ] https://www.linkedin.com/jobs/view/4474009011 | Airbus Aircraft | Simulation Engineer (Integration platforms ) (f/m) | Toulouse, Occitanie, France | posted: 2026-10-06
+- [ ] https://www.linkedin.com/jobs/view/4476169866 | Labsoft Paris | Consultant AMOA Contrôle aérien IVS, intégration et validation de systèmes H/F | Toulouse, Occitanie, France | posted: 2026-10-06
+- [ ] https://www.linkedin.com/jobs/view/4471132719 | SOTREM SEO | Ingénieur Systèmes Électriques (H/F) | Colomiers, Occitanie, France | posted: 2026-09-23
+- [ ] https://www.linkedin.com/jobs/view/4473638103 | Ampleon | Ingénieur applications/Ingénieure applications | Toulouse, Occitanie, France | posted: 2026-10-05
+- [ ] https://www.linkedin.com/jobs/view/4474065196 | LabSoft | Développeur .NET WebForm H/F | Toulouse, Occitanie, France | posted: 2026-10-06
+- [ ] https://www.linkedin.com/jobs/view/4474290429 | PrintOclock | Lead Dev Symfony / Sylius H/F | Toulouse, Occitanie, France | posted: 2026-10-05
+- [ ] https://www.linkedin.com/jobs/view/4462230385 | BPCE Solutions informatiques | Tech Lead (F/H) | Balma, Occitanie, France | posted: 2026-09-29
+- [ ] https://www.linkedin.com/jobs/view/4473618822 | ADENTIS | Développeur web/Développeuse web | Toulouse, Occitanie, France | posted: 2026-10-05
+- [ ] https://www.linkedin.com/jobs/view/4472823862 |  | Développeur FULLSTACK JAVA FORUM NOUVEL ELAN (H/F) | Toulouse, Occitanie, France | posted: 2026-09-30
+- [ ] https://www.linkedin.com/jobs/view/4475835603 | METEO FRANCE | Research Engineer Position at CNRM in artificial intelligence for weather forecasting F/M | Toulouse, Occitanie, France | posted: 2026-10-05
+- [ ] https://www.linkedin.com/jobs/view/4461895385 | Experis France | Administrateur Systèmes & Réseaux N2 (H/F) | Toulouse, Occitanie, France | posted: 2026-10-06
+- [ ] https://www.linkedin.com/jobs/view/4475567353 | OUTSCALE | Ingénieur DevOps confirmé F/H | St.-Cloud, Île-de-France, France | posted: 2026-10-05
+- [ ] https://www.linkedin.com/jobs/view/4473726928 | URBAN LINKER | \[CDI\] DevSecOps / 70-80 k€ / MedTech / 5 jours de présentiel par mois | Paris, Île-de-France, France | posted: 2026-09-30
+- [ ] https://www.linkedin.com/jobs/view/4475894266 | fortil | Ingénieur DevOps/Cloud (H/F) | Paris, Île-de-France, France | posted: 2026-10-05
+- [ ] https://www.linkedin.com/jobs/view/4474033956 | Tyfali Consulting | Ingénieur Infrastructure & Cloud Hybride | Guyancourt, Île-de-France, France | posted: 2026-10-06
+- [ ] https://www.linkedin.com/jobs/view/4473651837 | Teolia | Azure Cloud & DevSecOps Engineer (H/F) | Paris, Île-de-France, France | posted: 2026-10-05
+- [ ] https://www.linkedin.com/jobs/view/4474612290 | TEAMWILL | Platform Engineer F/H/X | Courbevoie, Île-de-France, France | posted: 2026-10-05
+- [ ] https://www.linkedin.com/jobs/view/4475803107 | 42c | Platform Engineer H/F | Île-de-France, France | posted: 2026-10-05
+- [ ] https://www.linkedin.com/jobs/view/4474045422 | Capital Fund Management (CFM) | Senior platform Engineer | Paris, Île-de-France, France | posted: 2026-10-06
+- [ ] https://www.linkedin.com/jobs/view/4476153440 | Payplug | GCP Cloud Engineer / SRE | Paris, Île-de-France, France | posted: 2026-10-06
+- [ ] https://www.linkedin.com/jobs/view/4473627465 | TRANSATEL (an NTT company) | Ingénieur Système Linux/Kubernetes H/F | Courbevoie, Île-de-France, France | posted: 2026-10-05
+- [ ] https://www.linkedin.com/jobs/view/4474697179 | ThoughtLabs Belgium | Senior Kubernetes/Gardener Platform Engineer | Île-de-France, France | posted: 2026-10-06
+- [ ] https://www.linkedin.com/jobs/view/4463830312 | WeScale | Platform Engineer - AI Augmented | Paris, Île-de-France, France | posted: 2026-10-06
+- [ ] https://www.linkedin.com/jobs/view/4474053792 | Data Reply FR | Senior Data Engineer AWS ( H/F) | Paris, Île-de-France, France | posted: 2026-10-06
+- [ ] https://www.linkedin.com/jobs/view/4462226292 | PUR | Senior Data Engineer | Paris, Île-de-France, France | posted: 2026-10-05
+- [ ] https://www.linkedin.com/jobs/view/4475892319 | fortil | Data ingénieur (H/F) | Paris, Île-de-France, France | posted: 2026-10-05
+- [ ] https://www.linkedin.com/jobs/view/4475803808 | INVIVOO | Data Engineer | Île-de-France, France | posted: 2026-10-05
+- [ ] https://www.linkedin.com/jobs/view/4476169034 | AYOMI | Data Engineer Junior (CDI) — Azure / Databricks | Paris, Île-de-France, France | posted: 2026-10-06
+- [ ] https://www.linkedin.com/jobs/view/4473613721 | ACSSI | DATA Engineer AWS | Paris, Île-de-France, France | posted: 2026-10-05
+- [ ] https://www.linkedin.com/jobs/view/4475819638 | Jems Group | Data Engineer Microsoft Fabric H/F | Levallois-Perret, Île-de-France, France | posted: 2026-10-05
+- [ ] https://www.linkedin.com/jobs/view/4329006904 | Onepoint | Data Engineer - F/H | Paris, Île-de-France, France | posted: 2026-10-04
+- [ ] https://www.linkedin.com/jobs/view/4473338407 | Fives | Data Engineer H/F | Montévrain, Île-de-France, France | posted: 2026-10-02
+- [ ] https://www.linkedin.com/jobs/view/4476167028 | Avenir Ferro | Ingénieur Intégration & Validation Système – Mobilité (H/F) | Île-de-France, France | posted: 2026-10-06
+- [ ] https://www.linkedin.com/jobs/view/4464491794 | IKOS GROUP | Ingénieur Intégrateur systèmes ferroviaires | Île-de-France, France | posted: 2026-10-05
+- [ ] https://www.linkedin.com/jobs/view/4473790254 | Devoteam | Ingénieur Système et intégrateur progiciel | Villejuif, Île-de-France, France | posted: 2026-10-05
+- [ ] https://www.linkedin.com/jobs/view/4473666560 | MVG / Microwave Vision Group | Center of Excellence Software Engineer | Villejust, Île-de-France, France | posted: 2026-10-05
+- [ ] https://www.linkedin.com/jobs/view/4475589849 | IFF | Data Analyst Demand Planning | Neuilly-sur-Seine, Île-de-France, France | posted: 2026-10-05
+- [ ] https://www.linkedin.com/jobs/view/4416432141 | Ivalua | Senior Security Analyst - GRC | Massy, Île-de-France, France | posted: 2026-09-29
+- [ ] https://www.linkedin.com/jobs/view/4475873155 | Vocca | Business Development Representative (BDR) €45–50K + BSPCE | Paris, Île-de-France, France | posted: 2026-10-05
+- [ ] https://www.linkedin.com/jobs/view/4473625834 | Avizio / WEFY Group | Account Manager International | Paris, Île-de-France, France | posted: 2026-10-05
+- [ ] https://www.linkedin.com/jobs/view/4476161776 | IFAE | Chargé de Coaching/ Employabilité H/F | Île-de-France, France | posted: 2026-10-06
+- [ ] https://www.linkedin.com/jobs/view/4473666188 | Caviar Ultreïa | Assistante de Direction - CDI | Paris, Île-de-France, France | posted: 2026-10-05
+- [ ] https://www.linkedin.com/jobs/view/4431971559 | Virtuos France | Senior QA Lead | Cergy, Île-de-France, France | posted: 2026-09-25
+- [ ] https://www.linkedin.com/jobs/view/4475876133 | Vocca | Senior Software Engineer (TypeScript) - Integrations | Paris, Île-de-France, France | posted: 2026-10-05
+- [ ] https://www.linkedin.com/jobs/view/4475555850 | Kicklox | Ingénieur ivvq H/F | Paris, Île-de-France, France | posted: 2026-10-05
+- [ ] https://www.linkedin.com/jobs/view/4474031944 | AWAKE Group x INNOVATEAM | Ingénieur test et intégration robotique H/F | Yvelines, Île-de-France, France | posted: 2026-10-06
+- [ ] https://www.linkedin.com/jobs/view/4464617026 | Capgemini Engineering | Ingénieure/Ingénieur IVVQ | Paris, Île-de-France, France | posted: 2026-09-30
+- [ ] https://www.linkedin.com/jobs/view/4476176124 | Doctolib | Senior Software Engineer - Python (x/f/m) | Paris, Île-de-France, France | posted: 2026-10-06
+- [ ] https://www.linkedin.com/jobs/view/4476163403 | ALTEN | Développeur Python / IA | Boulogne-Billancourt, Île-de-France, France | posted: 2026-10-06
+- [ ] https://www.linkedin.com/jobs/view/4474693679 | Deepki | Software Engineer Full Stack – CDI - (F/H/X) | Paris, Île-de-France, France | posted: 2026-10-06
+- [ ] https://www.linkedin.com/jobs/view/4474692166 | URBAN LINKER | Software Engineer Full Stack | Paris, Île-de-France, France | posted: 2026-10-06
+- [ ] https://www.linkedin.com/jobs/view/4473144739 | Premi Homme | Ingénieur logiciel/Ingénieure logiciel | Massy, Île-de-France, France | posted: 2026-10-02
+- [ ] https://www.linkedin.com/jobs/view/4463822590 | URBAN LINKER | \[CDI\] Senior Founding Full Stack Engineer (Python/TypeScript/GCP) - 60-100 k€ - No remote | Paris, Île-de-France, France | posted: 2026-10-05
+- [ ] https://www.linkedin.com/jobs/view/4471719898 | Toyota Financial Services France | Développeur H/F | Vaucresson, Île-de-France, France | posted: 2026-09-29
+- [ ] https://www.linkedin.com/jobs/view/4473621982 | Tiime | Senior Backend developer - Typescript F/H | Paris, Île-de-France, France | posted: 2026-10-05
+- [ ] https://www.linkedin.com/jobs/view/4471942425 | Halian / Managed Services, Recruitment Agency & Contract Staffing | Développeur Java Backend Senior (m/f/d) | Paris, Île-de-France, France | posted: 2026-09-29
+- [ ] https://www.linkedin.com/jobs/view/4473658306 | IBM | Développeur C# .NET - IBM CIC - H/F | Bois-Colombes, Île-de-France, France | posted: 2026-10-05
+- [ ] https://www.linkedin.com/jobs/view/4475575886 | SOLENT SAS | Ingénieur.e logiciel C# - Secteur bancaire | La Garenne-Colombes, Île-de-France, France | posted: 2026-10-05
+- [ ] https://www.linkedin.com/jobs/view/4460606084 | URBAN LINKER | Software Engineer TS & IA / CDI / Paris / 60/75k fixe / 1 à 2 jours Remote/semaine | Paris, Île-de-France, France | posted: 2026-10-05
+- [ ] https://www.linkedin.com/jobs/view/4474256448 | Cegedim | Développeur Java Confirmé (H/F) - Boulogne-Billancourt | Boulogne-Billancourt, Île-de-France, France | posted: 2026-10-05
+- [ ] https://www.linkedin.com/jobs/view/4475897179 | fortil | Développeur C# (H/F) | Paris, Île-de-France, France | posted: 2026-10-05
+- [ ] https://www.linkedin.com/jobs/view/4473638693 | CAPFI Groupe | Développeur C# .Net H/F | Greater Paris Metropolitan Region | posted: 2026-10-05
+- [ ] https://www.linkedin.com/jobs/view/4472376251 |  | Ingénieur MLOps F/H | Greater Paris Metropolitan Region | posted: 2026-09-26
+- [ ] https://www.linkedin.com/jobs/view/4475599810 | LITY | Staff MLOps | Paris, Île-de-France, France | posted: 2026-10-05
+- [ ] https://www.linkedin.com/jobs/view/4474628245 | INSERM | Administrateur des systèmes d'information - H/F | Paris, Île-de-France, France | posted: 2026-10-05
+- [ ] https://www.linkedin.com/jobs/view/4444607585 | SAP | Expert DevOps Engineer - Sovereign Cloud Delivery (F/M) | Levallois-Perret, Île-de-France, France | posted: 2026-09-27
+- [ ] https://www.linkedin.com/jobs/view/4475858614 | ITS Services | Ingénieur DevOps | Nantes, Pays de la Loire, France | posted: 2026-10-05
+- [ ] https://www.linkedin.com/jobs/view/4456509787 | Alstom | Experienced DevOps Engineer (H/F) | Villeurbanne, Auvergne-Rhône-Alpes, France | posted: 2026-10-06
+- [ ] https://www.linkedin.com/jobs/view/4403763519 | Devoteam / AWS Partner | Cloud Engineer AWS H/F | Nantes, Pays de la Loire, France | posted: 2026-09-22
+- [ ] https://www.linkedin.com/jobs/view/4474956568 | Smart Santé Conseil | Ingénieur Cloud Azure – Croix | Croix, Hauts-de-France, France | posted: 2026-10-06
+- [ ] https://www.linkedin.com/jobs/view/4444096955 | Devoteam | Senior Cloud engineer | Marcq-en-Barœul, Hauts-de-France, France | posted: 2026-09-26
+- [ ] https://www.linkedin.com/jobs/view/4469761356 | Orange Business | Consultant DevOps / Platform Engineer F/H | Marseille, Provence-Alpes-Côte d'Azur, France | posted: 2026-09-24
+- [ ] https://www.linkedin.com/jobs/view/4475846195 | MAIF | OPS / Ingénieur RSE - Tribu Relations et Offres B2B F/H | Niort, Nouvelle-Aquitaine, France | posted: 2026-10-05
+- [ ] https://www.linkedin.com/jobs/view/4473634435 | Synchrone Fr | Ingénieur(e) Plateforme Kubernetes / DevOps (H/F) | Greater Bordeaux Metropolitan Area | posted: 2026-10-05
+- [ ] https://www.linkedin.com/jobs/view/4474653256 | NVIDIA | Senior Solution Architect, MLOps - AI Factory | France | posted: 2026-10-06
+- [ ] https://www.linkedin.com/jobs/view/4473680656 | Free-Work | Développeur DevOps / Platform Engineer - Clermont-Fd | Clermont-Ferrand, Auvergne-Rhône-Alpes, France | posted: 2026-10-05
+- [ ] https://www.linkedin.com/jobs/view/4476162463 | T&S (Technology & Strategy) | Data Engineer (H/F) | Bordeaux, Nouvelle-Aquitaine, France | posted: 2026-10-06
+- [ ] https://www.linkedin.com/jobs/view/4475808891 | Randstad Digital France | Ingénieur de données/Ingénieure de données | Bordeaux, Nouvelle-Aquitaine, France | posted: 2026-10-05
+- [ ] https://www.linkedin.com/jobs/view/4473662586 | Synchrone Fr | Data Engineer H/F - Databricks | Clermont-Ferrand, Auvergne-Rhône-Alpes, France | posted: 2026-10-05
+- [ ] https://www.linkedin.com/jobs/view/4463861691 | Würth France | Développeur ETL/ELT hf | Erstein, Grand Est, France | posted: 2026-10-05
+- [ ] https://www.linkedin.com/jobs/view/4474053650 | MERITIS | Data Ingénieur (H/F) | Sophia Antipolis, Provence-Alpes-Côte d'Azur, France | posted: 2026-10-06
+- [ ] https://www.linkedin.com/jobs/view/4474050306 | MERITIS | Ingénieur Système – VMware / Proxmox (H/F) | Valbonne, Provence-Alpes-Côte d'Azur, France | posted: 2026-10-06
+- [ ] https://www.linkedin.com/jobs/view/4464654477 | Expleo Group | Ingénieur Logiciel Embarqué – Model Based Design H/F | Lyon, Auvergne-Rhône-Alpes, France | posted: 2026-09-30
+- [ ] https://www.linkedin.com/jobs/view/4475541662 | Ikivia | Product Manager F/H | Greater Lille Metropolitan Area | posted: 2026-10-05
+- [ ] https://www.linkedin.com/jobs/view/4474766379 | Ikivia | CDI - QA / Testeur.se automaticien | Aix-en-Provence, Provence-Alpes-Côte d'Azur, France | posted: 2026-10-02
+- [ ] https://www.linkedin.com/jobs/view/4447013175 | Vishay Intertechnology, Inc. | Responsable Approvisionnement Planning H/F | Nice, Provence-Alpes-Côte d'Azur, France | posted: 2026-10-02
+- [ ] https://www.linkedin.com/jobs/view/4476168562 | IKIWAY / Cabinet de Recrutement | Médecin Vasculaire (H/F) | Douai, Hauts-de-France, France | posted: 2026-10-06
+- [ ] https://www.linkedin.com/jobs/view/4211753689 | Iunovet cabinet vétérinaire medico-chirurgical | Vétérinaire | Menton, Provence-Alpes-Côte d'Azur, France | posted: 2026-10-05
+- [ ] https://www.linkedin.com/jobs/view/4471887472 | IKIWAY / Cabinet de Recrutement | IDE nuit H/F | Le Creusot, Bourgogne-Franche-Comté, France | posted: 2026-09-25
+- [ ] https://www.linkedin.com/jobs/view/4472498731 | IVCH | Consultant indépendant – Auditeur IVCH® H/F – France entière | France | posted: 2026-10-06
+- [ ] https://www.linkedin.com/jobs/view/4473653724 | Avient Corporation | Technician, Quality | Auvergne-Rhône-Alpes, France | posted: 2026-10-05
+- [ ] https://www.linkedin.com/jobs/view/4474290565 | VITA Bourgogne | Assistant/e Cave et QHSE en CDI (H/F) | Chablis, Bourgogne-Franche-Comté, France | posted: 2026-10-05
+- [ ] https://www.linkedin.com/jobs/view/4475839019 | VIA DC | Consultant Datacenter | Lyon, Auvergne-Rhône-Alpes, France | posted: 2026-10-05
+- [ ] https://www.linkedin.com/jobs/view/4472555376 | VIF, Editeur Intégrateur de solutions logicielles ERP, Supply Chain Planning, MES | Architecte ERP | La Chapelle-sur-Erdre, Pays de la Loire, France | posted: 2026-10-01
+- [ ] https://www.linkedin.com/jobs/view/4474286186 | EFOR | Ingénieur EDI (F/H) | Moselle, Grand Est, France | posted: 2026-10-05
+- [ ] https://www.linkedin.com/jobs/view/4474695161 | URBAN LINKER | Développeur Python Django / Proptech | Rennes, Brittany, France | posted: 2026-10-06
+- [ ] https://www.linkedin.com/jobs/view/4475577982 | BAO | Software Engineer | Nantes, Pays de la Loire, France | posted: 2026-10-05
+- [ ] https://www.linkedin.com/jobs/view/4474675966 | Jobgether | Backend Engineer, PHP | France | posted: 2026-10-06
+- [ ] https://www.linkedin.com/jobs/view/4473655198 | TMC | Senior Java Back-End | Nice, Provence-Alpes-Côte d'Azur, France | posted: 2026-10-05
+- [ ] https://www.linkedin.com/jobs/view/4474689364 | Extia | Développeur Confirmé Java / Springboot Confirmé H/F | Aix-en-Provence, Provence-Alpes-Côte d'Azur, France | posted: 2026-10-06
+- [ ] https://www.linkedin.com/jobs/view/4475811947 | Jems Group | Tech Lead MLOps H/F | Levallois-Perret, Île-de-France, France | posted: 2026-10-05
+- [ ] https://www.linkedin.com/jobs/view/4474057017 | Orange Business | Administrateur Infrastructure en Virtualisation F/H | Cesson-Sévigné, Brittany, France | posted: 2026-10-06
+- [ ] https://www.linkedin.com/jobs/view/4473349932 | Société du canal de provence | RESPONSABLE DE POLE INFRASTRUCTURE SI (F/H) | Le Tholonet, Provence-Alpes-Côte d'Azur, France | posted: 2026-10-02
+
 ## Needs review
 
 <!-- Location reported as a bare count by the ATS; decide by hand, then move up to Pending. -->
