@@ -92,6 +92,11 @@ Une phrase.
   check('phone step', classifyResult({ text: 'Acme a besoin d\'une information complémentaire pour enregistrer votre candidature : Téléphone' }).kind, 'step2');
   check('employer site in a new tab', classifyResult({ text: '', url: 'https://www.hellowork.com/fr-fr/emplois/1.html', popupUrl: 'https://jobs.lever.co/acme/1' }), { kind: 'employer', employerUrl: 'https://jobs.lever.co/acme/1' });
   check('HelloWork\'s own redirect page is not the employer yet', classifyResult({ popupUrl: 'https://www.hellowork.com/fr-fr/emplois/redirectionexterne.html?offerId=1' }).kind, 'pending');
+  check('a quoted message (as agents wrote it in notes) still gives title and employer',
+    parseConfirmation('HelloWork: \'Félicitations ! Votre candidature au poste de Data Engineer H/F va être transmise à ALTEN.\''), { title: 'Data Engineer H/F', employer: 'ALTEN' });
+  const bounce = classifyResult({ text: 'Devenez visible des autres recruteurs', url: 'https://www.hellowork.com/fr-fr/bounce/cv?origin=ResponseOffer&offerId=83592336' });
+  check('the after-application page without the message: confirmed, but with no text (runJob then needs Mes candidatures)', [bounce.kind, bounce.text, !!bounce.bounce], ['confirmed', '', true]);
+  check('a bounce page without origin=ResponseOffer is not a confirmation', classifyResult({ url: 'https://www.hellowork.com/fr-fr/bounce/cv' }).kind, 'pending');
   check('nothing known yet', classifyResult({ text: 'Envoyez votre candidature', url: 'https://www.hellowork.com/fr-fr/emplois/1.html' }).kind, 'pending');
 }
 

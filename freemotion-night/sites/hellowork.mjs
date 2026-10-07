@@ -167,7 +167,7 @@ const fold = (s) => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').rep
 
 /** The posting title and employer from HelloWork's success message. */
 export function parseConfirmation(text) {
-  const m = String(text).match(/au poste de (.+?) va être transmise à (.+?)\.(\s|$)/);
+  const m = String(text).match(/au poste de (.+?) va être transmise à (.+?)\.(?=\s|$|['"»])/);
   return m ? { title: m[1].trim(), employer: m[2].trim() } : { title: '', employer: '' };
 }
 
@@ -198,6 +198,10 @@ export function classifyResult({ text = '', url = '', popupUrl = '' }) {
   if (ok) return { kind: 'confirmed', text: ok[0].trim() };
   const dup = t.match(/Vous avez déjà postulé à cette offre[^\n]*/);
   if (dup) return { kind: 'already-applied', text: dup[0].trim() };
+  // HelloWork's after-application pages ("Devenez visible…", "Candidatures multiples"). The message is a
+  // toast that can be gone by then (5 of ~240 agent jobs never saw it); this alone is never proof: runJob
+  // also needs "Mes candidatures".
+  if (/hellowork\.com\/fr-fr\/bounce\/[a-z]+\?origin=ResponseOffer/i.test(url)) return { kind: 'confirmed', text: '', bounce: url };
   if (popupUrl && !/hellowork\.com/i.test(new URL(popupUrl).hostname)) return { kind: 'employer', employerUrl: popupUrl };
   if (url && !/hellowork\.com/i.test(new URL(url).hostname)) return { kind: 'employer', employerUrl: url };
   if (/information complémentaire/i.test(t)) return { kind: 'step2' };
@@ -362,7 +366,7 @@ async function readResult(ctx, page, popup, ms = 25000) {
   const end = Date.now() + ms;
   let r = { kind: 'pending' };
   while (Date.now() < end) {
-    await page.waitForTimeout(1500);
+    await page.waitForTimeout(500); // often, so the success toast is caught before it fades
     const p = popup.page;
     if (p) {
       await p.waitForLoadState('domcontentloaded').catch(() => {});
@@ -458,6 +462,11 @@ export async function runJob(job, { root, dryRun = false, headful = false, sheet
       await shot(page, 'no-button');
       return done(0, { kind: 'stopped', why: 'no "Postuler" button on the posting' });
     }
+    // Title and employer as HelloWork shows them, to find the job in "Mes candidatures" without the message.
+    const posted = await page.evaluate(() => ({
+      title: document.querySelector('h1 [data-cy="jobTitle"]')?.innerText?.trim() || '',
+      employer: document.querySelector('h1 a')?.innerText?.trim() || '',
+    }));
     const external = /site du recruteur/i.test(await header.innerText());
     await header.click();
     const form = page.locator('#postuler select[name="JweHashResume"], #postuler input[name="upload"]').first();
@@ -505,7 +514,13 @@ export async function runJob(job, { root, dryRun = false, headful = false, sheet
       const s2 = await answerStep2(page, job);
       if (s2.stop) return done(0, { kind: 'step2', fields: s2.fields, why: s2.stop });
       did.push('phone typed in HelloWork\'s second step');
-      await page.locator('form:has([name^="sav2_"]) button[type="submit"], button:has-text("Postuler")').locator('visible=true').first().click();
+      // Step 1's "Postuler" is still on the page during step 2 (agents' saved layouts, 2026-09): only the
+      // button inside the box holding the step-2 fields may be clicked.
+      const step2 = page.locator('turbo-frame:has([id^="sav2_"]), form:has([id^="sav2_"])').last();
+      const go = step2.locator('button[type="submit"], button:has-text("Postuler")').locator('visible=true');
+      const buttons = await go.count();
+      if (buttons !== 1) return done(0, { kind: 'step2', fields: s2.fields, why: `${buttons} buttons in the step-2 box, not one` });
+      await go.click();
       did.push('"Postuler" of the second step clicked once');
       r = await readResult(ctx, page, popup);
       if (r.kind === 'step2') return done(0, { kind: 'unclear', why: 'the phone step was still on screen after "Postuler"' });
@@ -514,8 +529,14 @@ export async function runJob(job, { root, dryRun = false, headful = false, sheet
 
     switch (r.kind) {
       case 'confirmed': {
-        const conf = parseConfirmation(r.text);
+        const fromText = parseConfirmation(r.text);
+        const conf = fromText.employer ? fromText : posted;
         const history = await sentInHistory(page, conf);
+        if (!r.text) {
+          // Only the after-application page: the proof is "Mes candidatures", or there is none.
+          if (history !== 'listed') return done(0, { kind: 'unclear', why: `HelloWork moved to ${r.bounce} without its message, and Mes candidatures does not list it (${history})` });
+          r.text = `HelloWork: after Postuler, its after-application page (${r.bounce.replace(/^https:\/\/www\.hellowork\.com/, '')}); Mes candidatures lists "${conf.title}" at ${conf.employer} as sent on ${frDay(new Date())}.`;
+        }
         if (process.env.HW_SELF_RECORD === '1' && history === 'listed') {
           const rec = nodeRun(root, ['freemotion-night/record.mjs', job.run, job.num, job.slug, job.company, job.role, job.url, r.text]);
           if (rec.code === 0) return done(3, { ...r, ...conf, history, recorded: true });
