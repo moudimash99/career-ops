@@ -73,7 +73,7 @@ export function replyNotes(output) {
   const m = output.match(/PROPOSED CHANGES \((\d+)\)[^\n]*\n((?:\s*\d+\s+#.*\n?)*)/);
   if (m && Number(m[1]) > 0) {
     const lines = m[2].trim().split(/\r?\n/).map((l) => l.trim());
-    out.push({ text: `${m[1]} tracker change(s) proposed from employers' replies: review with \`python freemotion-night/inbox-replies.py\`, then \`--apply 1,2,…\``, key: `changes ${lines.join('|')}` });
+    out.push({ text: `${m[1]} tracker change(s) applied from employers' replies (rejections found in email; see data/status-log.tsv)`, key: `changes ${lines.join('|')}` });
   }
   return out;
 }
@@ -134,6 +134,8 @@ function main() {
     const pool = step(log, 'make-pool', NODE, ['freemotion-night/make-pool.mjs', '--apec-max', String(APEC_MAX)]);
     if (/CAPTCHA/i.test(`${pool.stdout}${pool.stderr}`)) note(`APEC showed its CAPTCHA during the 06:00 scan at --apec-max ${APEC_MAX} (#25): lower APEC_MAX in freemotion-night/scheduled.mjs.`, `apec captcha ${today()}`);
     const r = step(log, 'reply check', PYTHON, ['freemotion-night/inbox-replies.py']);
+    // Rejections found in email go into the tracker without asking (user, 2026-10-08).
+    if (/PROPOSED CHANGES \([1-9]/.test(r.stdout || '')) step(log, 'apply replies', PYTHON, ['freemotion-night/inbox-replies.py', '--apply', 'all']);
     for (const n of replyNotes(r.stdout || '')) note(n.text, n.key);
   } else if (cmd === 'loops') {
     startLoops(log);
