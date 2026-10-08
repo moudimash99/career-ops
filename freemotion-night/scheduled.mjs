@@ -40,8 +40,9 @@ const PYTHON = flag('--python', process.env.FM_PYTHON || 'python');
 const stamp = () => new Date().toLocaleString('sv-SE').slice(0, 16);
 const today = () => new Date().toLocaleDateString('sv-SE');
 
-// APEC route lookups at the daily scan (issue #25): 30 was the cap; testing 50.
-export const APEC_MAX = 50;
+// APEC route lookups at the daily scan (issue #25). Since APEC's bot check (2026-10-01) about 32 lookups a
+// day get through before its CAPTCHA (33 on 10-06, 32 on 10-07; 50 hit it on 10-07). 25 stays under that.
+export const APEC_MAX = 25;
 
 // The scoring loops, as in freemotion-night/README.md "Scoring all day".
 export const LOOPS = [

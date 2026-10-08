@@ -1,0 +1,40 @@
+# Fork-local user layer — files this checkout owns that upstream does not ship.
+#
+# Anything listed here is treated as USER_PATHS: `node update-system.mjs apply`
+# will never overwrite or delete it. Repo-relative, forward slashes, one per
+# line. This file is gitignored, so an update cannot clobber the declaration
+# itself.
+#
+# Written 2026-09-08 to close the SYSTEM_PATHS coverage gap. Every path below
+# was a TRACKED file in neither SYSTEM_PATHS nor USER_PATHS, which meant the
+# updater did not know who owned it — the exact ambiguity this file resolves.
+
+# Scripts written in this fork. Not upstream code, so upstream must not
+# replace them, and they are real tools rather than debris.
+daily_report.mjs
+prune-pipeline.mjs
+resolve-pipeline-urls.mjs
+scripts/backup.mjs
+
+# One-off browser debugging from the Capgemini auto-apply work. Kept because
+# they document what that ATS needed; harmless, and definitely not upstream's.
+debug-fail.js
+debug-fill.js
+debug-inputs.js
+fix-script.js
+full_script.js
+test-success.js
+
+# Run output and payloads from past sessions.
+apply_log.txt
+wmi_log.txt
+cv-payload.json
+batch/tracker-additions/capgemini-entry.json
+
+# Reserved report numbers from an interrupted parallel batch. These are
+# placeholders in the numbering sequence, so deleting them would let a later
+# run reuse a number that is already referenced.
+reports-archive/003-RESERVED.md
+reports-archive/006-RESERVED.md
+reports-archive/007-RESERVED.md
+reports-archive/008-RESERVED.md

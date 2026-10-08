@@ -404,9 +404,15 @@ async function answerStep2(page, job) {
 
 async function sentInHistory(page, conf) {
   try {
-    await page.goto(HISTORY_URL, { waitUntil: 'domcontentloaded', timeout: 45000 });
-    await page.waitForTimeout(3000);
-    return historyLists(await bodyText(page), conf) ? 'listed' : 'not-listed';
+    // HelloWork can take a few seconds to list a new application (job 2483, 2026-10-08: not listed at the
+    // first look, listed "En cours d'envoi" when agy looked a minute later): three looks, 3 s, 15 s, 30 s.
+    for (const wait of [3000, 12000, 15000]) {
+      if (wait !== 3000) await page.reload({ waitUntil: 'domcontentloaded', timeout: 45000 });
+      else await page.goto(HISTORY_URL, { waitUntil: 'domcontentloaded', timeout: 45000 });
+      await page.waitForTimeout(wait === 3000 ? 3000 : wait);
+      if (historyLists(await bodyText(page), conf)) return 'listed';
+    }
+    return 'not-listed';
   } catch (e) {
     return `unread: ${e.message.slice(0, 60)}`;
   }
@@ -551,6 +557,17 @@ export async function runJob(job, { root, dryRun = false, headful = false, sheet
       case 'captcha':
         return done(0, { kind: 'unclear', why: 'a CAPTCHA appeared after "Postuler"' });
       default: {
+        // Required questions HelloWork added to the form after "Postuler" ("Combien d'années d'expérience…",
+        // "Êtes-vous mobile sur Toulouse ?", job 2475 on 2026-10-08): the browser itself refuses to send a
+        // form with an empty required field, so nothing was sent. That is the second-step hand-off, not "unclear".
+        const asked = await page.evaluate(() => {
+          const root = document.querySelector('#postuler') || document;
+          const vis = (el) => { const r = el.getBoundingClientRect(); return r.width > 0 && r.height > 0; };
+          return [...root.querySelectorAll('input, select, textarea')]
+            .filter((el) => el.type !== 'hidden' && el.type !== 'file' && vis(el) && el.willValidate && !el.checkValidity())
+            .map((el) => (el.labels?.[0]?.innerText || el.getAttribute('aria-label') || el.name || '').trim().replace(/\s*\*$/, '').replace(/\s+/g, ' '));
+        });
+        if (asked.length) return done(0, { kind: 'step2', fields: asked, why: 'HelloWork added required questions; the browser did not send the form' });
         const errs = (await formErrors(page)).filter(Boolean);
         return done(0, { kind: 'unclear', why: errs.length ? `HelloWork shows: ${errs.join(' | ')}` : 'no answer from HelloWork within 25 s' });
       }
