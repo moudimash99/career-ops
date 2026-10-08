@@ -138,6 +138,30 @@ const SITE_NOTES = [
     before the next step.
   - A visible captcha challenge you cannot get past: finalize \`captcha\` and stop.`,
   },
+  {
+    host: /(^|\.)francetravail\.fr$/i,
+    text: `- France Travail: an account EXISTS (made by hand; flow mapped 2026-10-08). Cookie banner: accept it.
+  Click "Postuler" (\`#detail-apply\`). The panel that opens is one of two kinds:
+  - "Choisissez le partenaire :" (a partner such as Talentplug): click the partner, write the exact URL you
+    land on in your report, and apply there; that page is part of this job.
+  - "Rappel des critères principaux avant de postuler" with "Se connecter": France Travail's own form. Click
+    "Se connecter". Get the login with \`node lib/freemotion-credentials.mjs load --domain authentification-candidat.francetravail.fr\`:
+    its "email" field is the IDENTIFIANT (\`machaka.mohammad\`, not an email address). Fill "Identifiant" and
+    "Mot de passe", then "Se connecter". France Travail locks the account after a few wrong tries: if it says
+    "incorrect" once, finalize \`errored\` with the note "France Travail login refused" and stop; never retry.
+  - "Vérification d'identité": choose "Recevoir un code par e-mail", then run
+    \`PYTHONIOENCODING=utf-8 python freemotion-night/imap-link.py "france ?travail" --code 8\` and type the 8
+    digits it prints, one per box. Then click "Faire confiance à ce navigateur".
+  - After sign-in France Travail opens "Postuler en ligne". CV: "Télécharger un CV" with the CV file
+    above, then make sure that new CV is the one selected (not the older ones listed). Leave "Ne pas ajouter
+    mon profil" as it is. "Lettre de motivation" is REQUIRED and comes pre-filled with France Travail's
+    template: replace ALL of it with this job's letter (or the \`--required-letter\` one, as the CV and cover
+    letter section says); watch the "caractères restants" counter. The contact details shown must match the
+    data below; tick "Je confirme que mes coordonnées ci-dessus sont valides". Then "Envoyer".
+  - Record the result with the France Travail posting URL given above, even when you applied on a partner's site.
+  - After every click, check that the page really changed (new text, new URL, or the field now filled)
+    before the next step.`,
+  },
 ];
 
 mkdirSync(OUT, { recursive: true });
