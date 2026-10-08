@@ -169,7 +169,7 @@ function parseArgs(argv) {
   const o = {};
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
-    if (['--jd', '--arm', '--out', '--lang', '--render', '--context-only'].includes(a)) o[a.slice(2)] = argv[++i];
+    if (['--jd', '--arm', '--out', '--lang', '--render', '--context-only', '--report', '--site-link'].includes(a)) o[a.slice(2)] = argv[++i];
     else if (a === '--help' || a === '-h') o.help = true;
     else throw new Error(`unknown argument: ${a}`);
   }
@@ -179,7 +179,7 @@ function parseArgs(argv) {
 async function main() {
   let o;
   try { o = parseArgs(process.argv.slice(2)); } catch (e) { console.error(e.message); process.exitCode = 1; return; }
-  const usage = 'Usage: node cv-write.mjs --jd <posting.md> --arm strict|loose (--out <payload.json> [--render <cv.pdf>] | --context-only <context.md>) [--lang fr|en]';
+  const usage = 'Usage: node cv-write.mjs --jd <posting.md> --arm strict|loose (--out <payload.json> [--render <cv.pdf> [--report N] [--site-link <url>]] | --context-only <context.md>) [--lang fr|en]';
   if (o.help || !o.jd || !o.arm || (!o.out && !o['context-only'])) { console.error(usage); process.exitCode = o.help ? 0 : 1; return; }
   try {
     const root = getCareerOpsRoot();
@@ -199,6 +199,8 @@ async function main() {
     if (o.render) {
       const args = [join(CODE_ROOT, 'generate-cv-typst.mjs'), out, resolve(o.render)];
       if (o.arm === 'loose') args.push('--skip-fact-check');
+      if (o.report) args.push(`--report=${o.report}`);
+      if (o['site-link']) args.push(`--site-link=${o['site-link']}`);
       const g = await run(process.execPath, args, { cwd: root });
       try { result.render = JSON.parse(g.out); } catch { result.render = { status: 'error', exit: g.code, message: (g.err || g.out).trim().split('\n').slice(0, 3).join(' ') }; }
     }

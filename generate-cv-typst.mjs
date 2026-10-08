@@ -328,7 +328,9 @@ function parseArgs(argv) {
     else if (a === '--preview-steps') opts.preview = true;
     else if (a === '--stats') opts.stats = true;
     else if (a === '--help' || a === '-h') opts.help = true;
+    else if (a === '--no-site-link') opts.noSiteLink = true;
     else if (a.startsWith('--report=')) opts.report = a.slice(9);
+    else if (a.startsWith('--site-link=')) opts.siteLink = a.slice(12);
     else if (a.startsWith('--theme=')) opts.theme = a.slice(8);
     else if (a.startsWith('--format=')) opts.format = a.slice(9);
     else if (a.startsWith('--floor=')) opts.floor = a.slice(8);
@@ -393,6 +395,7 @@ async function main() {
   if (opts.help || opts.positional.length < 2) {
     console.error('Usage: node generate-cv-typst.mjs <payload.json|cv.yaml> <out.pdf> [--report=NNN] [--theme=X]');
     console.error('       [--format=a4|letter] [--floor=<step>] [--skip-fact-check] [--preview-steps]');
+    console.error('       [--site-link=<tracked url> | --no-site-link]   (default with --report: that report\'s tracked link, lib/site-links.mjs)');
     console.error('       node generate-cv-typst.mjs --stats   (share of recent CVs that hit the floor)');
     console.error(`Steps: ${FIT_STEPS.map(s => s.name).join(' → ')}`);
     process.exit(opts.help ? 0 : 1);
@@ -431,6 +434,30 @@ async function main() {
   } catch (err) {
     console.error(err.message);
     process.exit(1);
+  }
+
+  // The header's site link: the given tracked link, else this report's own
+  // (lib/site-links.mjs). It still reads "machaka.net"; only the link changes.
+  let siteLink = null;
+  if (base.payload && !opts.noSiteLink) {
+    siteLink = opts.siteLink || null;
+    if (!siteLink && opts.report) {
+      try {
+        const { getSiteLink } = await import('./lib/site-links.mjs');
+        const { loadTrackerRows } = await import('./lib/cv-experiment.mjs');
+        const n = String(opts.report).replace(/^0+(?=\d)/, '');
+        const row = loadTrackerRows(root).find(r => r.reportNum !== null && String(r.reportNum).replace(/^0+(?=\d)/, '') === n);
+        const r = await getSiteLink({ report: opts.report, company: row?.company || '', role: row?.role || '', root });
+        if (r?.tracked) siteLink = r.url;
+      } catch (err) {
+        console.error(`Warning: no tracked site link (${err.message}); the CV keeps the plain one.`);
+      }
+    }
+    if (siteLink) {
+      const { displayOf } = await import('./lib/site-links.mjs');
+      base.payload.candidate = { ...base.payload.candidate, portfolio: { url: siteLink, display: displayOf(siteLink) } };
+      base.doc = buildRenderCvDocument(base.payload, { theme });
+    }
   }
 
   const work = mkdtempSync(join(tmpdir(), 'cv-typst-'));
@@ -490,11 +517,12 @@ async function main() {
     const outYaml = outPdf.replace(/\.pdf$/i, '') + '.yaml';
     copyFileSync(outcome.result.yamlPath, outYaml);
     if (opts.report) updatePDFManifest(opts.report, outPdf, outYaml, base.format);
+    if (siteLink) await (await import('./lib/site-links.mjs')).markUsed(siteLink, 'cv', { root }).catch(() => {});
     logFit(outcome.step.name === floor && outcome.tried.length > 1 ? 'floor' : 'fit');
 
     console.log(JSON.stringify({
       status: 'ok', pdf: outPdf, yaml: outYaml, pages: 1, theme,
-      step: outcome.step.name, floor, tried, dropped, factCheck, report: opts.report || null,
+      step: outcome.step.name, floor, tried, dropped, factCheck, report: opts.report || null, siteLink,
     }, null, 2));
   } catch (err) {
     console.error(`❌ ${err.message}`);

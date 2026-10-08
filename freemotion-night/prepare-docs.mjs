@@ -45,6 +45,7 @@ import { appendLetterLog, openingOf } from '../lib/letter-check.mjs';
 import { chainWriter, isOut, writerOrder, WRITER_ORDER } from '../lib/doc-writers.mjs';
 import { buildCvContext, loadContextInputs } from '../cv-write.mjs';
 import { loadLetterInputs, renderLetterPdf, writeLetter } from '../letter-write.mjs';
+import { getSiteLink, markUsed, replaceSiteMentions } from '../lib/site-links.mjs';
 
 const REPO = join(dirname(fileURLToPath(import.meta.url)), '..');
 export const DOCS_START = '<!-- docs:start -->';
@@ -112,9 +113,10 @@ export function patchSheet(sheet, { cvPath, block }) {
 }
 
 /** Render a CV payload to a one-page PDF. @returns {Promise<{ok: boolean, reason?: string, factCheck?: string}>} */
-export function renderCv(payloadPath, pdfPath, { skipFactCheck, root }) {
+export function renderCv(payloadPath, pdfPath, { skipFactCheck, root, siteLink }) {
   return new Promise((res) => {
-    const args = [join(REPO, 'generate-cv-typst.mjs'), payloadPath, pdfPath, ...(skipFactCheck ? ['--skip-fact-check'] : [])];
+    const args = [join(REPO, 'generate-cv-typst.mjs'), payloadPath, pdfPath, ...(skipFactCheck ? ['--skip-fact-check'] : []),
+      ...(siteLink ? [`--site-link=${siteLink}`] : [])];
     const p = spawn(process.execPath, args, { cwd: root });
     let out = '';
     let err = '';
@@ -130,7 +132,7 @@ export function renderCv(payloadPath, pdfPath, { skipFactCheck, root }) {
   });
 }
 
-async function makeCv({ arm, jdPath, lang, dir, generic, root, write, render }) {
+async function makeCv({ arm, jdPath, lang, dir, generic, root, write, render, siteLink }) {
   if (arm === 'generic') return { arm, path: generic, tailored: false };
   try {
     if (!jdPath) throw new Error('no posting text saved for this job');
@@ -144,7 +146,7 @@ async function makeCv({ arm, jdPath, lang, dir, generic, root, write, render }) 
     for (let attempt = 0; ; attempt++) {
       const { payload } = await write(buildCvContext({ ...inputs, arm, lang, retry }));
       writeFileSync(payloadPath, JSON.stringify(payload, null, 2));
-      const r = await render(payloadPath, pdf, { skipFactCheck: arm === 'loose', root });
+      const r = await render(payloadPath, pdf, { skipFactCheck: arm === 'loose', root, siteLink });
       if (r.ok) return { arm, path: pdf, tailored: true, writer: write.used.at(-1) ?? null, factCheck: r.factCheck ?? null, attempts: attempt + 1 };
       if (attempt >= CV_REVISIONS) throw new Error(`render: ${r.reason}`);
       retry = r.reason;
@@ -211,12 +213,27 @@ export async function prepareDocs(job, { root = getCareerOpsRoot(), driver, forc
     writeFileSync(jdPath, `# ${job.title} — ${job.co}\n${job.url}\n\n${text}\n`);
   }
 
-  const cv = await makeCv({ arm: cvArm, jdPath, lang, dir, generic, root, write: writer, render });
+  // This application's own machaka.net/r/<code> link (issue #11, lib/site-links.mjs): in the tailored CV's
+  // header (it still reads "machaka.net"), in the letter, and on the sheet's Website line for forms. The
+  // generic CV is a fixed file and keeps the plain link. Any failure: the plain link, never a stop.
+  let siteLink = null;
+  try {
+    const s = await getSiteLink({ url: job.url, company: job.co, role: job.title, root });
+    if (s?.tracked) siteLink = s.url;
+  } catch {}
+
+  const cv = await makeCv({ arm: cvArm, jdPath, lang, dir, generic, root, write: writer, render, siteLink });
   const letter = await makeLetter({ arm: letterArm, versions: { none: [], short: ['short'], full: ['full', 'short'] }[letterArm], jdPath, lang, dir, job, root, write: writer });
   if (cv.fallback) { try { await markFallback(job.url, cv.fallback, { root }); } catch {} }
   if (letter.fallback) { try { await markLetterFallback(job.url, letter.fallback, { root }); } catch {} }
+  if (siteLink && cv.tailored) { try { await markUsed(siteLink, 'cv', { root }); } catch {} }
+  if (siteLink && letter.path) {
+    const before = readFileSync(letter.path, 'utf8');
+    const after = replaceSiteMentions(before, siteLink);
+    if (after !== before) { writeFileSync(letter.path, after); try { await markUsed(siteLink, 'letter', { root }); } catch {} }
+  }
 
-  const state = { num: job.num, run: job.run ?? null, url: job.url, company: job.co, role: job.title, lang, dir, cv, letter, at: new Date().toISOString(), sent: null };
+  const state = { num: job.num, run: job.run ?? null, url: job.url, company: job.co, role: job.title, lang, dir, cv, letter, siteLink, at: new Date().toISOString(), sent: null };
   writeFileSync(statePath, JSON.stringify(state, null, 1));
   return state;
 }
@@ -231,11 +248,19 @@ export function summary(state) {
   return `docs for job ${state.num}: CV ${cv} · letter ${letter}${state.reused ? ' · reused' : ''}`;
 }
 
+/** The sheet with its "Website <url>" data line pointing at the tracked link (once; the rest unchanged). */
+export function withSheetSiteLink(sheet, link) {
+  return sheet.replace(/(\bWebsite\s+)(?:https?:\/\/)?(?:www\.)?machaka\.net(?:\/r\/\w+)?\/?(?=\s|$)/m, `$1${link}`);
+}
+
 /** Put the documents into the job sheet and leave a copy of the state next to it. */
 export function applyToSheet(state, nightDir) {
   const sheetPath = join(nightDir, `job-${state.num}.md`);
   const text = state.letter.path ? readFileSync(state.letter.path, 'utf8') : '';
-  writeFileSync(sheetPath, patchSheet(readFileSync(sheetPath, 'utf8'), { cvPath: state.cv.path, block: docsBlock(state.num, { text }) }));
+  let sheet = patchSheet(readFileSync(sheetPath, 'utf8'), { cvPath: state.cv.path, block: docsBlock(state.num, { text }) });
+  // The Data line's "Website https://machaka.net": this application's tracked link, for website/portfolio fields.
+  if (state.siteLink) sheet = withSheetSiteLink(sheet, state.siteLink);
+  writeFileSync(sheetPath, sheet);
   writeFileSync(join(nightDir, `docs-${state.num}.json`), JSON.stringify(state, null, 1));
 }
 

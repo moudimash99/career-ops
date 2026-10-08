@@ -159,3 +159,20 @@ try {
 } finally {
   rmSync(root, { recursive: true, force: true });
 }
+
+// ── the tracked site link (issue #11) ───────────────────────────────────
+{
+  const { withSheetSiteLink } = await import('../freemotion-night/prepare-docs.mjs');
+  const { replaceSiteMentions, getSiteLink } = await import('../lib/site-links.mjs');
+  const link = 'https://machaka.net/r/k3m9xq';
+  const sheet = 'LinkedIn https://www.linkedin.com/in/x · Website https://machaka.net\nCV: C:/x.pdf\n';
+  const out = withSheetSiteLink(sheet, link);
+  check('the sheet\'s Website line gets this application\'s link, the rest stays', [out.includes(`Website ${link}\n`), out.includes('linkedin.com/in/x'), out.includes('CV: C:/x.pdf')], [true, true, true]);
+  check('written again with another link: replaced, not appended', withSheetSiteLink(out, 'https://machaka.net/r/zz11aa').includes('Website https://machaka.net/r/zz11aa\n'), true);
+  check('a letter\'s bare machaka.net becomes the tracked link', replaceSiteMentions('Mon site : machaka.net. Merci.', link), `Mon site : ${link}. Merci.`);
+  check('a letter without the site is unchanged', replaceSiteMentions('Bonjour,\nMerci.', link), 'Bonjour,\nMerci.');
+  const tmp = mkdtempSync(join(tmpdir(), 'site-'));
+  const plain = await getSiteLink({ url: 'https://example.com/job/1', company: 'Acme', role: 'R', root: tmp, env: { SITE_URL: 'https://machaka.net' } });
+  check('no site key: the plain link, untracked, nothing registered', [plain?.url, plain?.tracked], ['https://machaka.net', false]);
+  rmSync(tmp, { recursive: true, force: true });
+}
