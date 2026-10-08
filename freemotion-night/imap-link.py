@@ -15,8 +15,16 @@ if not user or not pw:
     sys.exit('GMAIL_MACHAKA_USER and GMAIL_MACHAKA_APP_PASSWORD must be set in .env')
 subj_pat, host_pat = re.compile(sys.argv[1], re.I), re.compile(sys.argv[2], re.I)
 since = (datetime.date.today() - datetime.timedelta(days=3)).strftime('%d-%b-%Y')
-M = imaplib.IMAP4_SSL('imap.gmail.com'); M.login(user, pw); M.select('INBOX', readonly=True)
+M = imaplib.IMAP4_SSL('imap.gmail.com'); M.login(user, pw); M.select(all_mail(M), readonly=True)
 ids = M.search(None, f'(SINCE "{since}")')[1][0].split()[-25:]
+def all_mail(M):
+    """Gmail's All Mail folder (name depends on the account's language): archived and filtered mail too.
+    Reading the Inbox alone missed 109 of 501 application emails since 2026-10-01. Not spam, not bin."""
+    for line in M.list()[1]:
+        line = line.decode('utf-8', 'replace')
+        if '\\All' in line: return line.rsplit(' "/" ', 1)[-1].strip()
+    return 'INBOX'
+
 def dec(s):
     return ''.join(p.decode(e or 'utf-8', 'replace') if isinstance(p, bytes) else p for p, e in decode_header(s or ''))
 for i in reversed(ids):
