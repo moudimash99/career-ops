@@ -298,10 +298,10 @@ node letter-write.mjs --sample 3 --since "$RUN_START" || true
 # only: `python freemotion-night/check-sent.py --fix` corrects the records.
 sleep 120   # the last confirmation emails take a minute or two
 python freemotion-night/check-sent.py --days 1 --run "$RUN" 2>&1 | tee "tmp/fm/night/check-sent-$RUN.txt" || true
-# Always: what employers answered in the last 30 days (rejections, a recruiter who wants to talk),
-# matched to the tracker. Proposals only: `python freemotion-night/inbox-replies.py --apply 1,2`
-# applies the ones you pick.
-python freemotion-night/inbox-replies.py || true
+# Always: what employers answered in the last 30 days (rejections, a recruiter who wants to talk), read
+# from All Mail (archived mail included), matched to the tracker and APPLIED at once: the user asked not
+# to be asked first (2026-10-08). Emails that name no single row are only listed.
+python freemotion-night/inbox-replies.py && python freemotion-night/inbox-replies.py --apply all || true
 # Always: follow-up drafts in Gmail's Drafts folder for applications 7+ days old with an acknowledgement to
 # reply to (at most 20 a week, one per company), and the ones the user sent since logged in data/follow-ups.md.
 # Nothing is sent: he reads and sends each draft from Gmail (followups.mjs; issue #19). NO_FOLLOWUPS=1 skips it.
