@@ -82,7 +82,7 @@ try {
   else fail(`partner = ${JSON.stringify(partner)}`);
   if ('drop' in r('apec', APEC, { gone: true })) pass('a gone APEC posting is dropped');
   else fail('gone APEC posting must drop');
-  if (JSON.stringify([...SCHEDULED].sort()) === JSON.stringify(['apec-account', 'apply-here', 'freework-account'])) pass('only apply-here, apec-account and freework-account are scheduled');
+  if (JSON.stringify([...SCHEDULED].sort()) === JSON.stringify(['apec-account', 'apply-here', 'francetravail-page', 'freework-account'])) pass('scheduled: apply-here, apec-account, freework-account and francetravail-page (#20)');
   else fail(`scheduled set = ${JSON.stringify([...SCHEDULED])}`);
 
   // ---- merge -------------------------------------------------------------
