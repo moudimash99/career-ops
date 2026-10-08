@@ -302,6 +302,10 @@ python freemotion-night/check-sent.py --days 1 --run "$RUN" 2>&1 | tee "tmp/fm/n
 # matched to the tracker. Proposals only: `python freemotion-night/inbox-replies.py --apply 1,2`
 # applies the ones you pick.
 python freemotion-night/inbox-replies.py || true
+# Always: follow-up drafts in Gmail's Drafts folder for applications 7+ days old with an acknowledgement to
+# reply to (at most 20 a week, one per company), and the ones the user sent since logged in data/follow-ups.md.
+# Nothing is sent: he reads and sends each draft from Gmail (followups.mjs; issue #19). NO_FOLLOWUPS=1 skips it.
+[ -z "$NO_FOLLOWUPS" ] && { node freemotion-night/followups.mjs || true; }
 # Always: what went wrong in this run, filed as lessons (data/lessons-learned.md) by one tool-free
 # Claude Code call on the second account (lessons.mjs; issue #27). Never agy or a browser runner.
 CLAUDE_CONFIG_DIR="${LESSONS_CLAUDE_DIR:-$CLAUDE1_DIR}" node freemotion-night/lessons.mjs review --run "$RUN" || true

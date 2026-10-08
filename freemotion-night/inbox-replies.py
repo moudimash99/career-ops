@@ -64,7 +64,8 @@ REJECTION = [
     r'poste (a ete|est) (deja )?pourvu', r'a la recherche d un profil (disposant|ayant|plus)', r'experience plus (significative|importante)',
     r'not (been )?(selected|retained|successful)', r'not (be )?(moving|proceeding|progressing) forward',
     r'will not be (moving|proceeding|progressing)', r'decided (not to|to (focus on|move forward with|pursue|proceed with|go with))',
-    r'other candidates whose', r'unable to offer you', r'do not feel (like|that)', r'not (a|the) (right |best )?(fit|match)',
+    r'other candidates whose', r'(unable|not able) to offer you', r'do not feel (like|that)', r'not (a|the) (right |best )?(fit|match)',
+    r'(wasn t|was not|isn t|is not) (a |the )?(good |right |best |strong )?(fit|match)',
     r'regret to inform', r'no longer under consideration', r'position has been filled',
 ]
 # A refusal or an invitation that follows one of these IN THE SAME SENTENCE is conditional
