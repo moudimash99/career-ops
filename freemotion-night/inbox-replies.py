@@ -144,6 +144,14 @@ def answerable(addr):
     """An address a person may read: not a no-reply box and not an applicant-tracking system."""
     return bool(addr) and not re.search(AUTOMATED, addr.split('@')[0]) and not re.search(ATS_DOMAINS, addr.split('@')[-1])
 
+def all_mail(M):
+    """Gmail's All Mail folder (name depends on the account's language): archived and filtered mail too.
+    Reading the Inbox alone missed 109 of 501 application emails since 2026-10-01. Not spam, not bin."""
+    for line in M.list()[1]:
+        line = line.decode('utf-8', 'replace')
+        if '\\All' in line: return line.rsplit(' "/" ', 1)[-1].strip()
+    return 'INBOX'
+
 def read_inbox():
     """-> (mails about an application, how many emails the inbox held, the skipped ones' sender and subject)."""
     env = {}
@@ -159,7 +167,7 @@ def read_inbox():
     def connect():
         try: conn['M'].logout()
         except Exception: pass
-        conn['M'] = imaplib.IMAP4_SSL('imap.gmail.com'); conn['M'].login(user, pw); conn['M'].select('INBOX', readonly=True)
+        conn['M'] = imaplib.IMAP4_SSL('imap.gmail.com'); conn['M'].login(user, pw); conn['M'].select(all_mail(conn['M']), readonly=True)
     def fetch(ids, part):
         """-> {id: raw bytes} for these message ids."""
         for attempt in range(4):

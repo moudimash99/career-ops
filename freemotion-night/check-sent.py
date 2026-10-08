@@ -82,16 +82,27 @@ def body_text(msg):
     out = re.sub(r'<style.*?</style>', ' ', out, flags=re.S | re.I)
     return re.sub(r'\s+', ' ', html.unescape(re.sub(r'<[^>]+>', ' ', out))).replace('‌', '')
 
-M = imaplib.IMAP4_SSL('imap.gmail.com'); M.login(user, pw); M.select('INBOX', readonly=True)
+def all_mail(M):
+    """Gmail's All Mail folder (name depends on the account's language): archived and filtered mail too.
+    Reading the Inbox alone missed 109 of 501 application emails since 2026-10-01. Not spam, not bin."""
+    for line in M.list()[1]:
+        line = line.decode('utf-8', 'replace')
+        if '\\All' in line: return line.rsplit(' "/" ', 1)[-1].strip()
+    return 'INBOX'
+M = imaplib.IMAP4_SSL('imap.gmail.com'); M.login(user, pw); M.select(all_mail(M), readonly=True)
 ids = M.search(None, f'(SINCE "{(since - datetime.timedelta(days=1)).strftime("%d-%b-%Y")}")')[1][0].split()
 mails = []
 for i in ids:
     h = email.message_from_bytes(M.fetch(i, '(BODY.PEEK[HEADER.FIELDS (SUBJECT FROM DATE)])')[1][0][1])
     subj, frm = dec(h['Subject']), dec(h['From'])
+    if user.lower() in frm.lower(): continue                          # our own mail (All Mail holds Sent too)
     hw = 'hellowork' in frm.lower()
     if not (hw or re.search(r'candidature|application|postul|applying|votre profil', subj, re.I)): continue
     try: date = parsedate_to_datetime(h['Date'])
     except Exception: continue
+    # A Date header without a time zone gives a naive datetime, which cannot be compared with the run's
+    # times (crash after run fm-2026-10-08-night): read it as UTC.
+    if date.tzinfo is None: date = date.replace(tzinfo=datetime.timezone.utc)
     msg = email.message_from_bytes(M.fetch(i, '(BODY.PEEK[])')[1][0][1])
     text = body_text(msg)
     kind, co, title = 'employer', '', ''

@@ -18,6 +18,14 @@ for line in open(os.path.join(root, '.env'), encoding='utf-8'):
 user, pw = env.get('GMAIL_MACHAKA_USER'), env.get('GMAIL_MACHAKA_APP_PASSWORD')
 if not user or not pw:
     sys.exit('GMAIL_MACHAKA_USER and GMAIL_MACHAKA_APP_PASSWORD must be set in .env')
+def all_mail(M):
+    """Gmail's All Mail folder (name depends on the account's language): archived and filtered mail too.
+    Reading the Inbox alone missed 109 of 501 application emails since 2026-10-01. Not spam, not bin."""
+    for line in M.list()[1]:
+        line = line.decode('utf-8', 'replace')
+        if '\\All' in line: return line.rsplit(' "/" ', 1)[-1].strip()
+    return 'INBOX'
+
 def dec(s):
     return ''.join(p.decode(e or 'utf-8', 'replace') if isinstance(p, bytes) else p for p, e in decode_header(s or ''))
 since = (datetime.date.today() - datetime.timedelta(days=3)).strftime('%d-%b-%Y')
@@ -28,7 +36,7 @@ if '--code' in sys.argv:
     code_re = re.compile(r'(?<!\d)(\d(?:[  -]?\d){%d})(?!\d)' % (digits - 1))
     fresh = time.time() - 15 * 60
     for attempt in range(12):
-        M = imaplib.IMAP4_SSL('imap.gmail.com'); M.login(user, pw); M.select('INBOX', readonly=True)
+        M = imaplib.IMAP4_SSL('imap.gmail.com'); M.login(user, pw); M.select(all_mail(M), readonly=True)
         for i in reversed(M.search(None, f'(SINCE "{since}")')[1][0].split()[-25:]):
             msg = email.message_from_bytes(M.fetch(i, '(RFC822)')[1][0][1])
             subj, frm = dec(msg['Subject']), dec(msg['From'])
@@ -50,7 +58,7 @@ if '--code' in sys.argv:
     sys.exit(f'no {digits}-digit code from a matching email in the last 15 minutes')
 
 subj_pat, host_pat = re.compile(sys.argv[1], re.I), re.compile(sys.argv[2], re.I)
-M = imaplib.IMAP4_SSL('imap.gmail.com'); M.login(user, pw); M.select('INBOX', readonly=True)
+M = imaplib.IMAP4_SSL('imap.gmail.com'); M.login(user, pw); M.select(all_mail(M), readonly=True)
 ids = M.search(None, f'(SINCE "{since}")')[1][0].split()[-25:]
 for i in reversed(ids):
     msg = email.message_from_bytes(M.fetch(i, '(RFC822)')[1][0][1])
