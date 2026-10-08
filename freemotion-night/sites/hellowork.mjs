@@ -404,9 +404,15 @@ async function answerStep2(page, job) {
 
 async function sentInHistory(page, conf) {
   try {
-    await page.goto(HISTORY_URL, { waitUntil: 'domcontentloaded', timeout: 45000 });
-    await page.waitForTimeout(3000);
-    return historyLists(await bodyText(page), conf) ? 'listed' : 'not-listed';
+    // HelloWork can take a few seconds to list a new application (job 2483, 2026-10-08: not listed at the
+    // first look, listed "En cours d'envoi" when agy looked a minute later): three looks, 3 s, 15 s, 30 s.
+    for (const wait of [3000, 12000, 15000]) {
+      if (wait !== 3000) await page.reload({ waitUntil: 'domcontentloaded', timeout: 45000 });
+      else await page.goto(HISTORY_URL, { waitUntil: 'domcontentloaded', timeout: 45000 });
+      await page.waitForTimeout(wait === 3000 ? 3000 : wait);
+      if (historyLists(await bodyText(page), conf)) return 'listed';
+    }
+    return 'not-listed';
   } catch (e) {
     return `unread: ${e.message.slice(0, 60)}`;
   }
