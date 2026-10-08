@@ -551,6 +551,17 @@ export async function runJob(job, { root, dryRun = false, headful = false, sheet
       case 'captcha':
         return done(0, { kind: 'unclear', why: 'a CAPTCHA appeared after "Postuler"' });
       default: {
+        // Required questions HelloWork added to the form after "Postuler" ("Combien d'années d'expérience…",
+        // "Êtes-vous mobile sur Toulouse ?", job 2475 on 2026-10-08): the browser itself refuses to send a
+        // form with an empty required field, so nothing was sent. That is the second-step hand-off, not "unclear".
+        const asked = await page.evaluate(() => {
+          const root = document.querySelector('#postuler') || document;
+          const vis = (el) => { const r = el.getBoundingClientRect(); return r.width > 0 && r.height > 0; };
+          return [...root.querySelectorAll('input, select, textarea')]
+            .filter((el) => el.type !== 'hidden' && el.type !== 'file' && vis(el) && el.willValidate && !el.checkValidity())
+            .map((el) => (el.labels?.[0]?.innerText || el.getAttribute('aria-label') || el.name || '').trim().replace(/\s*\*$/, '').replace(/\s+/g, ' '));
+        });
+        if (asked.length) return done(0, { kind: 'step2', fields: asked, why: 'HelloWork added required questions; the browser did not send the form' });
         const errs = (await formErrors(page)).filter(Boolean);
         return done(0, { kind: 'unclear', why: errs.length ? `HelloWork shows: ${errs.join(' | ')}` : 'no answer from HelloWork within 25 s' });
       }
