@@ -92,6 +92,9 @@ for i in ids:
     if not (hw or re.search(r'candidature|application|postul|applying|votre profil', subj, re.I)): continue
     try: date = parsedate_to_datetime(h['Date'])
     except Exception: continue
+    # A Date header without a time zone gives a naive datetime, which cannot be compared with the run's
+    # times (crash after run fm-2026-10-08-night): read it as UTC.
+    if date.tzinfo is None: date = date.replace(tzinfo=datetime.timezone.utc)
     msg = email.message_from_bytes(M.fetch(i, '(BODY.PEEK[])')[1][0][1])
     text = body_text(msg)
     kind, co, title = 'employer', '', ''
