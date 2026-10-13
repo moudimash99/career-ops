@@ -144,12 +144,14 @@ try {
     // completed, and a deliberate no-submit dry run. Both used to be recorded
     // as failures of the run, which they are not.
     'already-applied', 'rehearsal',
+    // Added 2026-10-13 (fork): a job never attempted because its site was benched (lib/site-bench.mjs).
+    'skipped',
   ]);
 
   // Neither new outcome may bar a later real attempt — only `submitted` does.
   // A rehearsal exists in order to be redone for real, and an already-applied
   // posting can reopen as a new requisition.
-  for (const outcome of ['already-applied', 'rehearsal']) {
+  for (const outcome of ['already-applied', 'rehearsal', 'skipped']) {
     const url = `https://x.com/jobs/reopen-${outcome}`;
     await claimSubmission(url, { runId: 'r1', company: 'C', role: 'R', reportNum: null, logPath });
     await finalizeSubmission(url, outcome, { runId: 'r1', reportNum: null, notes: '', logPath });
