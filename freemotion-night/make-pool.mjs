@@ -94,6 +94,7 @@ import { AGY_SCORE_MODEL, CLAUDE_SCORE_MODEL, DEFAULT_MODEL, FACTORS, GATE_SCHEM
 import normalizeUrl from '../url-key.mjs';
 import { readCurrentState } from '../lib/freemotion-submissions.mjs';
 import { ineligibleReason } from '../lib/posting-requirements.mjs';
+import { benchState, benchedFor, readOutcomes } from '../lib/site-bench.mjs';
 import { DEFAULT_CAP, WINDOW_DAYS, checkCompany, countByCompany, matchBlacklist } from '../lib/company-cap.mjs';
 import { resolveColumns, parseTrackerRow } from '../tracker-parse.mjs';
 import { isMainModule } from '../lib/is-main-module.mjs';
@@ -113,6 +114,8 @@ const APEC_CACHE = join(ROOT, 'data/apec-routes.json');
 const DAY_MS = 86_400_000;
 
 const SITE_BLACKLIST = join(ROOT, 'data/site-blacklist.md');
+// Outcomes that are not an attempt: a practice run, and a job skipped because its site was benched.
+const NOT_TRIED = new Set(['rehearsal', 'skipped']);
 const EMPLOYER_NAMES = join(ROOT, 'data/employer-names.json');
 
 export const ROUTE_RANK = { 'apply-here': 0, 'apec-account': 1, 'freework-account': 2, 'francetravail-page': 2, 'apec-unrouted': 2, 'blocked-site': 2, 'linkedin-lead': 3 };
@@ -441,7 +444,7 @@ export async function selectCandidates({ days = MAX_AGE_DAYS, drop = () => {} } 
   const candidates = [];
   for (const x of rows) {
     const logged = runLog.get(normalizeUrl(x.url));
-    if (logged && logged.outcome !== 'rehearsal') { drop('already tried (run log)'); continue; }
+    if (logged && !NOT_TRIED.has(logged.outcome)) { drop('already tried (run log)'); continue; }
     if (x.co && trackerKeys.has(`${companyKey(x.co)}|${titleKey(x.title)}`)) { drop('already in tracker'); continue; }
     if (x.co && matchBlacklist(blacklist, x.co)) { drop('blacklisted company'); continue; }
     if (!inFrance(x.loc || '', x.url, x.title)) { drop('outside France (location filter)'); continue; }
@@ -621,14 +624,16 @@ async function main() {
   // failed came back every night (W42 review: the same Astek job 6 times, an expired Cadremploi
   // job 4 times, 12 repeat attempts in a week).
   const runLogNow = readCurrentState();
+  const bench = benchState(readOutcomes(ROOT));
   for (const x of candidates) {
     const rt = routeOf(x, x.source === 'apec' ? apecCache[apecIdOf(x.url)] : undefined);
     if ('drop' in rt) { drop(rt.drop); continue; }
     if (rt.url !== x.url) {
       const logged = runLogNow.get(normalizeUrl(rt.url));
-      if (logged && logged.outcome !== 'rehearsal') { drop('already tried (run log, at its apply link)'); continue; }
+      if (logged && !NOT_TRIED.has(logged.outcome)) { drop('already tried (run log, at its apply link)'); continue; }
     }
-    const route = SCHEDULED.has(rt.route) && isBlockedSite(rt.url, blockedSites) ? 'blocked-site' : rt.route;
+    // A site on the blacklist, or on the bench for now (lib/site-bench.mjs), is kept apart.
+    const route = SCHEDULED.has(rt.route) && (isBlockedSite(rt.url, blockedSites) || benchedFor(bench, rt.url)) ? 'blocked-site' : rt.route;
     routed.push({ ...x, origUrl: x.url, url: rt.url, apecUrl: rt.apecUrl, route, seenOn: [x.source] });
   }
 
