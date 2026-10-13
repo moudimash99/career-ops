@@ -48,7 +48,7 @@ const siteOf = (u) => {
 export function tallySites(rows, sinceMs) {
   const sites = new Map();
   for (const r of rows) {
-    if (!r || r.outcome === 'rehearsal' || r.outcome === 'in-progress') continue;
+    if (!r || r.outcome === 'rehearsal' || r.outcome === 'skipped' || r.outcome === 'in-progress') continue;
     const at = Date.parse(r.timestamp);
     if (!Number.isFinite(at) || at < sinceMs) continue;
     const site = siteOf(r.rawUrl);

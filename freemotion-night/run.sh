@@ -126,6 +126,20 @@ timeout 600 python freemotion-night/check-sent.py --days 2 --fix 2>/dev/null | g
 url_of() { grep -m1 -oE '^   https?://\S+' "tmp/fm/night/job-$1.md" | tr -d ' '; }
 result_of() { awk -F'\t' -v u="$1" -v r="$RUN" '$2==u && $8==r {o=$6} END {print o}' data/freemotion-submissions.tsv; }
 close_open() { node lib/freemotion-submissions.mjs finalize --url "$1" --outcome errored --run-id $RUN --notes "$2" > /dev/null 2>&1; }
+# A site on the bench (lib/site-bench.mjs: CAPTCHAs, bot blocks, two-step verification, an employer's limit):
+# the job is recorded "skipped" (not an attempt; the posting may come back once the bench ends) and no agent
+# starts. <num> <posting url>. Returns 0 when it skipped the job. Checked on the posting before its documents
+# are made, and again on the employer's page once the HelloWork script has passed the job on.
+bench_skip() {
+  local at why rc
+  at=$(grep -oE "Start at the employer's page: \S+" "tmp/fm/night/job-$1.md" 2>/dev/null | head -1 | cut -d' ' -f6)
+  at=${at:-$2}
+  why=$(node lib/site-bench.mjs check "$at"); rc=$?
+  [ $rc = 3 ] || return 1
+  node lib/freemotion-submissions.mjs finalize --url "$2" --outcome skipped --run-id $RUN --notes "site benched ($(echo "$at" | cut -d/ -f3)): $why" > /dev/null 2>&1
+  echo "note: job $1 skipped, $(echo "$at" | cut -d/ -f3) is $why"
+  return 0
+}
 
 # ── driver availability ─────────────────────────────────────────────────
 out_until() { cat "$OUT/$1" 2>/dev/null || echo 0; }
@@ -268,6 +282,7 @@ for n in "$@"; do
     # This posting's CV and letter (drawn arms, written and checked), put into the sheet, before the job's
     # clock and its live log start (the writers are agy sessions too). Made once per
     # posting and reused on a retry. A failure costs nothing: the sheet keeps the generic CV and no letter.
+    if bench_skip $n "$u"; then d=bench; break; fi
     CLAUDE1_DIR="$CLAUDE1_DIR" node freemotion-night/prepare-docs.mjs $n --driver $d || echo "note: no documents made for job $n: generic CV, no letter"
     # HelloWork's own form, without a model. Exit 2 (claim refused / company cap) or 3 (finalized by the
     # script): nothing left for an agent. 0: the sheet says what it did, the agent continues. 1: the agent does it all.
@@ -275,6 +290,7 @@ for n in "$@"; do
       hw_ran=1
       node freemotion-night/sites/hellowork.mjs $n ${HEADFUL:+--headful}; hw=$?
       if [ $hw = 2 ] || [ $hw = 3 ]; then d=hellowork; break; fi
+      if bench_skip $n "$u"; then d=bench; break; fi
     fi
     start=$(date -u +%Y-%m-%dT%H:%M:%SZ)
     # agy's steps, live, from its own transcript (also kept in tmp/fm/night/actions-<num>.log).
@@ -327,6 +343,8 @@ for n in "$@"; do
   [ "$(result_of "$u")" = in-progress ] && node freemotion-night/report-outcome.mjs $n $RUN
   [ "$(result_of "$u")" = in-progress ] && close_open "$u" "run ended without recording a result; check before any retry"
   echo "job $n ($d): $(result_of "$u")"
+  # Where the form really was and how it ended, for the bench rules (lib/site-bench.mjs).
+  node lib/site-bench.mjs log $n $RUN 2>/dev/null || true
   # Only sent applications count in the CV and letter experiments.
   [ "$(result_of "$u")" = submitted ] && node freemotion-night/prepare-docs.mjs --sync > /dev/null
 done

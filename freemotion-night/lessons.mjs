@@ -48,7 +48,7 @@ export const OCCURRENCES = 'data/lessons-occurrences.tsv';
 const OCC_COLUMNS = ['lesson', 'run', 'job', 'date', 'site', 'outcome', 'note'];
 export const CATEGORIES = ['captcha', 'login', 'driver', 'quota', 'network', 'upload', 'form', 'validation', 'page-changed', 'posting-gone', 'agent-mistake', 'record', 'letter', 'other'];
 export const STATUSES = ['open', 'fix proposed', 'fixed', 'verified', 'came back', 'known'];
-const OK_OUTCOMES = new Set(['submitted', 'already-applied', 'rehearsal']);
+const OK_OUTCOMES = new Set(['submitted', 'already-applied', 'rehearsal', 'skipped']);
 const VERIFY_AFTER_JOBS = 10;
 
 const read = (root, p) => { try { return readFileSync(join(root, p), 'utf8'); } catch { return ''; } };
@@ -368,7 +368,7 @@ function renderWeekly(w, sites) {
 function attemptsOf(root) {
   const latest = new Map();
   for (const r of readSubmissions(root)) {
-    if (!r.timestamp || r.outcome === 'in-progress' || r.outcome === 'rehearsal') continue;
+    if (!r.timestamp || r.outcome === 'in-progress' || r.outcome === 'rehearsal' || r.outcome === 'skipped') continue;
     latest.set(`${r.url_key}|${r.run_id}`, { date: r.timestamp.slice(0, 10), site: siteOf(r.raw_url) });
   }
   return [...latest.values()];
