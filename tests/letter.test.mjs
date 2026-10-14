@@ -46,6 +46,8 @@ check('"as an AI Pipeline Developer" is a job title, not a finding', chk.checkLe
 const customMd = '# c\n\n## House Rules\nnope\n\n## Letter writing (x)\nLETTER RULES HERE\n\n## Application language (y)\nFR when French\n';
 const parts = lw.promptParts({ customMd, voiceDna: 'VOICE GUIDE', essaysYml: 'essays:\n  - match: a\n    answer: TONE ONE\n  - match: b\n    answer: TONE TWO\n  - match: c\n    answer: TONE THREE\n' });
 check('prompt parts: letter rules, voice guide, first 2 tone examples', [parts.rules.length, parts.voiceDna, parts.examples], [2, 'VOICE GUIDE', ['TONE ONE', 'TONE TWO']]);
+check('approved letters, when present, are the tone examples (up to 3)',
+  lw.toneExamples('letter_examples:\n  - L1\n  - L2\n  - L3\n  - L4\nessays:\n  - match: a\n    answer: TONE ONE\n'), ['L1', 'L2', 'L3']);
 const ctx = lw.buildLetterContext({ parts, cvMd: 'MY CV', jdText: 'THE JOB', version: 'short', format: 'form', lang: 'fr' });
 check('context holds rules, guide, tone, CV and posting, not other sections',
   ['LETTER RULES HERE', 'FR when French', 'VOICE GUIDE', 'TONE ONE', 'MY CV', 'THE JOB', 'nope'].map((x) => ctx.includes(x)), [true, true, true, true, true, true, false]);

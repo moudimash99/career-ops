@@ -55,10 +55,16 @@ export function letterRuleSections(customMd) {
     .map(({ body }) => body);
 }
 
-/** The first `n` hand-tuned essay answers, as tone examples. */
+/**
+ * Tone examples: the approved letters (`letter_examples`, up to 3), else the first `n` hand-tuned essay
+ * answers. Letters came in 2026-10-15: the user wants letters in the voice of his own (interested,
+ * confident), and essay answers taught a flatter register.
+ */
 export function toneExamples(essaysYml, n = 2) {
   try {
     const doc = yaml.load(essaysYml) || {};
+    const letters = (doc.letter_examples || []).map((t) => String(t || '').trim()).filter(Boolean);
+    if (letters.length) return letters.slice(0, 3);
     return (doc.essays || []).slice(0, n).map((e) => String(e.answer || '').trim()).filter(Boolean);
   } catch {
     return [];
@@ -85,7 +91,7 @@ export function buildLetterContext({ parts, cvMd, jdText, version = 'full', form
     ? 'It goes into an application form text field (plain text).'
     : 'It becomes a one-page PDF letter.';
   const examples = parts.examples.length
-    ? `=== TONE EXAMPLES (approved answers in the right register: match how they SOUND; take no facts from them, their content may be outdated) ===\n${parts.examples.map((e, i) => `--- example ${i + 1} ---\n${e}`).join('\n\n')}\n\n`
+    ? `=== TONE EXAMPLES (approved texts in the right register: match how they SOUND; take no facts from them, their content may be outdated, and don't copy their sentences or openings) ===\n${parts.examples.map((e, i) => `--- example ${i + 1} ---\n${e}`).join('\n\n')}\n\n`
     : '';
   const retryBlock = retry
     ? `=== YOUR LAST DRAFT FAILED THESE CHECKS — WRITE A NEW ONE THAT PASSES ===\n${retry.problems.map((x) => `- ${x}`).join('\n')}\n\nLast draft (do not reuse its sentences):\n${retry.text}\n\n`
