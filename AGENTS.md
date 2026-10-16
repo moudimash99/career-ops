@@ -425,7 +425,7 @@ A single-string `modes_dir` (today's default, ~90% of users) behaves exactly as 
 
   It starts `full-night.sh` and `night-mail.py` (progress emails) with this shell's PATH and Claude account. It refuses when a night is already running. If it says the task is not installed, run `node freemotion-night/scheduled.mjs install` once.
 
-  `night-mail.py` reads the night's log and emails `NIGHT_MAIL_TO` (in `.env`) at the start, every 10 jobs, at the end of each round and at the end of the night.
+  `night-mail.py` reads the night's log and emails `NIGHT_MAIL_TO` (in `.env`) at the start, every 50 jobs (`--mail-every N`), at the end of each round and at the end of the night. Each email is a full report: how long the run has gone and how much of it was applying, jobs done of about how many planned, applications sent, pace and when the round should end, a line per round, jobs per driver, every job since the last email, notes and allowances. `python freemotion-night/night-mail.py --once` prints one report from the log now.
 
   It scans once, then repeats the "apply" steps with `--top 50`. A round starts 5 hours after the one before started; rounds start as long as it is before 09:00, and the first 5-hour mark at or after 09:00 still starts one last round. Drivers, in order: agy, agy-sonnet, codex, copilot, the second Claude account (`sonnet1`), then this session's own Claude account (`sonnet`) with no cap, until it reports its limit. So say at the start that this session may have no allowance left by the morning, and that the log is `tmp/fm/night/full-night.log`. `touch tmp/fm/night/stop-night` ends it after the round in hand.
 

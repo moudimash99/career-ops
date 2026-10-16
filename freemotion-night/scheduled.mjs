@@ -8,7 +8,9 @@
  *   node freemotion-night/scheduled.mjs loops     start the three scoring loops if they are not running
  *   node freemotion-night/scheduled.mjs weekly    the weekly lessons report (lessons.mjs weekly)
  *   node freemotion-night/scheduled.mjs start-night [--jobs 50] [--end 09:00] [--every 5] [--no-scan] [--no-mail]
- *                                                 start a full night run through the "FreeMotion night" task (#41)
+ *                                                 [--mail-every 50]
+ *                                                 start a full night run through the "FreeMotion night" task (#41);
+ *                                                 --mail-every: a progress email every N jobs (night-mail.py --every)
  *   node freemotion-night/scheduled.mjs night     what that task runs: full-night.sh, then night-mail.py beside it
  *   node freemotion-night/scheduled.mjs install   create the Windows tasks below (needs no admin rights)
  *   node freemotion-night/scheduled.mjs uninstall remove them
@@ -176,10 +178,13 @@ function startNight() {
   let env;
   try { env = nightEnv(args.slice(1)); } catch (e) { console.error(e.message); process.exit(1); }
   mkdirSync(dirname(NIGHT_START), { recursive: true });
-  writeFileSync(NIGHT_START, JSON.stringify({ at: new Date().toISOString(), mail: !args.includes('--no-mail'), env }, null, 2));
+  const mi = args.indexOf('--mail-every');
+  const mailEvery = mi >= 0 ? args[mi + 1] : undefined;
+  if (mailEvery !== undefined && !/^\d+$/.test(mailEvery)) { console.error(`--mail-every must be a number, not ${mailEvery}`); process.exit(1); }
+  writeFileSync(NIGHT_START, JSON.stringify({ at: new Date().toISOString(), mail: !args.includes('--no-mail'), mailEvery, env }, null, 2));
   const r = ps(`Start-ScheduledTask -TaskPath '\\career-ops\\' -TaskName '${NIGHT_TASK}' -ErrorAction Stop; 'ok'`);
   if ((r.stdout || '').trim() !== 'ok') { console.error(`could not start the task: ${(r.stderr || r.stdout).trim().slice(0, 300)}`); process.exit(1); }
-  console.log(`Night started in the "${NIGHT_TASK}" task, outside this session: ${env.ROUND_JOBS || 50} jobs a round, every ${env.EVERY_HOURS || 5} h, last round from ${env.END_AT || '09:00'}${env.NO_SCAN ? ', no scan' : ''}${args.includes('--no-mail') ? ', no emails' : ''}.`);
+  console.log(`Night started in the "${NIGHT_TASK}" task, outside this session: ${env.ROUND_JOBS || 50} jobs a round, every ${env.EVERY_HOURS || 5} h, last round from ${env.END_AT || '09:00'}${env.NO_SCAN ? ', no scan' : ''}${args.includes('--no-mail') ? ', no emails' : `, an email every ${mailEvery || 50} jobs and after each round`}.`);
   console.log('Log: tmp/fm/night/full-night.log · task log: tmp/fm/scheduled/night-<date>.log · stop after the round in hand: touch tmp/fm/night/stop-night');
 }
 
@@ -196,7 +201,7 @@ async function runNight(log) {
     // night-mail.py starts at the log's last "##### full night run" line, so it waits for this night's.
     for (let i = 0; i < 120 && !mailer; i++) {
       const fresh = existsSync(NIGHT_LOG) && readFileSync(NIGHT_LOG).subarray(size).includes('##### full night run');
-      if (fresh) mailer = spawn(PYTHON, ['-u', 'freemotion-night/night-mail.py'], { cwd: ROOT, env, stdio: ['ignore', 'pipe', 'pipe'], windowsHide: true });
+      if (fresh) mailer = spawn(PYTHON, ['-u', 'freemotion-night/night-mail.py', ...(start.mailEvery ? ['--every', String(start.mailEvery)] : [])], { cwd: ROOT, env, stdio: ['ignore', 'pipe', 'pipe'], windowsHide: true });
       else if (night.exitCode !== null) break;
       else await new Promise((r) => setTimeout(r, 1000));
     }
