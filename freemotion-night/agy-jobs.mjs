@@ -9,9 +9,12 @@
  * `asked` is the model run.sh passed with --model ('' = agy's default); `model` is the one the
  * conversation says it ran on. A tool call is a step of type 132; status 7 means it failed.
  *
- * The test: `arm` draws the model for one job, by default Gemini 3.8 Flash High or Medium, 50/50.
- * AGY_MODELS="gemini-3.8-flash-high:50,gemini-3.8-flash-medium:50" changes the arms and weights;
- * AGY_MODELS=off draws nothing (agy's default).
+ * The test: `arm` draws the model for one job, by default the newest Gemini Flash Medium or Low, 50/50
+ * (High and Medium did the same, 2026-10-25). AGY_MODELS="flash-high:50,gemini-3.8-flash-medium:50" changes
+ * the arms and weights: a family name is the newest Gemini of that family (`agy models`, read once a day),
+ * a full name is kept. AGY_MODELS=off draws nothing (agy's default).
+ * The cost: `weekCost` sets the Gemini week's % between agy's readings against the jobs each model ran
+ * in between (least squares), so the report says what a job costs of the week, per model.
  *
  * Usage:
  *   node freemotion-night/agy-jobs.mjs arm                          # prints the model for the next job
@@ -19,9 +22,10 @@
  *   node freemotion-night/agy-jobs.mjs backfill                     # every job agy still remembers
  *   node freemotion-night/agy-jobs.mjs report [--summary] [--since YYYY-MM-DD]
  */
-import { appendFileSync, existsSync, readFileSync, readdirSync } from 'fs';
-import { homedir } from 'os';
-import { join } from 'path';
+import { spawnSync } from 'child_process';
+import { appendFileSync, existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'fs';
+import { homedir, tmpdir } from 'os';
+import { dirname, join } from 'path';
 import { DatabaseSync } from 'node:sqlite';
 
 import { isMainModule } from '../lib/is-main-module.mjs';
@@ -30,13 +34,34 @@ import { getCareerOpsRoot } from '../path-resolver.mjs';
 export const LEDGER = 'data/agy-jobs.tsv';
 export const HEADER = ['num', 'driver', 'asked', 'model', 'conversation', 'secs', 'tools', 'tool_fails', 'tokens_in', 'tokens_out', 'at'];
 const CONV = join(homedir(), '.gemini', 'antigravity-cli', 'conversations');
-const DEFAULT_ARMS = 'gemini-3.8-flash-high:50,gemini-3.8-flash-medium:50';
+// Flash High and Medium did the same (2026-10-25: 84% and 85% sent, 5 min each), so the cheaper pair is next.
+const DEFAULT_ARMS = 'flash-medium:50,flash-low:50';
 const MODEL_RE = /gemini-\d+(?:\.\d+)?-(?:flash|pro)(?:-lite)?-(?:high|medium|low)|claude-(?:sonnet|opus|haiku)-[\d-]+(?:-thinking)?|gpt-oss-[\w-]+/g;
 
-/** The arms from AGY_MODELS: [[model, weight], ...]; [] when the test is off. */
-export function arms(spec = process.env.AGY_MODELS ?? DEFAULT_ARMS) {
+/** The arms from AGY_MODELS: [[model, weight], ...]; [] when the test is off. A family name ("flash-medium")
+ *  stands for the newest Gemini of that family agy offers, so a new Gemini is tested without a change here. */
+export function arms(spec = process.env.AGY_MODELS ?? DEFAULT_ARMS, list = null) {
   if (!spec || spec === 'off') return [];
-  return spec.split(',').map((p) => p.trim().split(':')).filter(([m]) => m).map(([m, w]) => [m, Number(w ?? 1) || 0]).filter(([, w]) => w > 0);
+  return spec.split(',').map((p) => p.trim().split(':')).filter(([m]) => m).map(([m, w]) => [newest(m, list), Number(w ?? 1) || 0]).filter(([m, w]) => m && w > 0);
+}
+
+/** The newest model of a family ("flash-medium" -> "gemini-3.8-flash-medium") among agy's models; a full
+ *  name is kept as it is. `list` defaults to `agy models`, read at most once a day (MODELS_CACHE). */
+export function newest(name, list = null) {
+  if (/^(gemini|claude|gpt)-/.test(name)) return name;
+  const all = list || agyModels();
+  const fam = new RegExp(`^gemini-(\\d+(?:\\.\\d+)?)-${name.replace(/[^\w-]/g, '')}$`);
+  const hits = all.map((m) => [m, fam.exec(m)]).filter(([, x]) => x).sort((a, b) => Number(b[1][1]) - Number(a[1][1]));
+  return hits[0]?.[0] || '';
+}
+const MODELS_CACHE = 'tmp/fm/usage/agy-models.json';
+function agyModels(root = getCareerOpsRoot()) {
+  const p = join(root, MODELS_CACHE);
+  try { const c = JSON.parse(readFileSync(p, 'utf8')); if (Date.now() - c.at < 864e5 && c.models.length) return c.models; } catch { /* none yet */ }
+  const r = spawnSync('agy', ['models'], { cwd: tmpdir(), encoding: 'utf8', timeout: 60_000, windowsHide: true });
+  const models = String(r.stdout || '').split(/\r?\n/).map((l) => l.split('\t')[0].trim()).filter((m) => /^[a-z]+-[\w.-]+$/.test(m));
+  if (models.length) { mkdirSync(dirname(p), { recursive: true }); writeFileSync(p, JSON.stringify({ at: Date.now(), models })); return models; }
+  try { return JSON.parse(readFileSync(p, 'utf8')).models; } catch { return []; }
 }
 export function drawArm(list = arms(), rng = Math.random) {
   const total = list.reduce((s, [, w]) => s + w, 0);
@@ -110,6 +135,45 @@ function backfill(root) {
   return rows.length;
 }
 
+/**
+ * What an agy job costs of agy's Gemini week, per model: the week's % between two readings
+ * (tmp/fm/usage/agy-quota.tsv, read every 30 minutes by burn.mjs) set against the jobs each model ran in
+ * between, by least squares: used_i = sum over models of cost_m * jobs_im. Only intervals inside one
+ * week, whose jobs all ran under the test. The readings are whole %, so a model needs some 20 intervals
+ * before its figure means much. Includes any CV or letter agy wrote in between.
+ */
+export function weekCost(root = getCareerOpsRoot()) {
+  let q = [];
+  try { q = readFileSync(join(root, 'tmp/fm/usage/agy-quota.tsv'), 'utf8').trim().split('\n').map((l) => l.split('\t')); } catch { return []; }
+  const reads = q.filter((r) => /gemini/i.test(r[1]) && r[2] === 'week' && r[3] !== '').map((r) => ({ t: Date.parse(r[0]), left: Number(r[3]), reset: r[4] }));
+  const jobs = [...readLedger(root).values()].filter((r) => r.driver === 'agy').map((r) => ({ model: r.asked ? r.model || r.asked : '', at: Date.parse(r.at) }));
+  const rows = [];
+  for (let i = 1; i < reads.length; i++) {
+    const a = reads[i - 1], b = reads[i];
+    if (a.reset !== b.reset || b.left > a.left) continue;
+    const js = jobs.filter((j) => j.at > a.t && j.at <= b.t);
+    if (!js.length || js.some((j) => !j.model)) continue;
+    const n = {};
+    for (const j of js) n[j.model] = (n[j.model] || 0) + 1;
+    rows.push({ used: a.left - b.left, n });
+  }
+  const models = [...new Set(rows.flatMap((r) => Object.keys(r.n)))].sort();
+  if (!models.length) return [];
+  // Normal equations (X'X) c = X'y, solved by Gaussian elimination.
+  const k = models.length, A = models.map(() => Array(k + 1).fill(0));
+  for (const r of rows) {
+    const x = models.map((m) => r.n[m] || 0);
+    for (let i = 0; i < k; i++) { for (let j = 0; j < k; j++) A[i][j] += x[i] * x[j]; A[i][k] += x[i] * r.used; }
+  }
+  for (let c = 0; c < k; c++) {
+    const p = A.slice(c).reduce((best, row, i) => (Math.abs(row[c]) > Math.abs(A[best][c]) ? i + c : best), c);
+    [A[c], A[p]] = [A[p], A[c]];
+    if (Math.abs(A[c][c]) < 1e-9) return models.map((m) => ({ model: m, perJob: null, jobs: rows.reduce((s, r) => s + (r.n[m] || 0), 0), intervals: rows.length }));
+    for (let i = 0; i < k; i++) if (i !== c) { const f = A[i][c] / A[c][c]; for (let j = c; j <= k; j++) A[i][j] -= f * A[c][j]; }
+  }
+  return models.map((m, i) => ({ model: m, perJob: A[i][k] / A[i][i], jobs: rows.reduce((s, r) => s + (r.n[m] || 0), 0), intervals: rows.length }));
+}
+
 const median = (a) => { if (!a.length) return null; const b = a.slice().sort((x, y) => x - y), h = b.length >> 1; return b.length % 2 ? b[h] : (b[h - 1] + b[h]) / 2; };
 /** Per model: jobs, sent, minutes and tool calls per sent job, and failed tool calls over all jobs. */
 export async function report(root = getCareerOpsRoot(), since = null) {
@@ -149,10 +213,12 @@ async function main() {
   } else if (cmd === 'report') {
     const i = a.indexOf('--since'), since = i >= 0 ? Date.parse(a[i + 1]) : null;
     const g = await report(root, since);
+    const cost = new Map(weekCost(root).map((c) => [c.model, c]));
+    for (const r of g) { const c = cost.get(r.group.replace(/^(test|before): /, '')); r.weekPerJob = r.group.startsWith('test: ') && c ? c.perJob : null; }
     if (!a.includes('--summary')) { console.log(JSON.stringify(g, null, 2)); return; }
     const pct = (x) => (x == null ? '—' : (100 * x).toFixed(1) + '%'), n = (x, d = 1) => (x == null ? '—' : x.toFixed(d));
-    console.log(['group', 'jobs', 'sent', 'sent %', 'min/sent', 'tools/sent', 'failed tools'].join('\t'));
-    for (const r of g) console.log([r.group, r.jobs, r.sent, pct(r.sentRate), n(r.minPerSent), n(r.toolsPerSent, 0), pct(r.failRate)].join('\t'));
+    console.log(['group', 'jobs', 'sent', 'sent %', 'min/sent', 'tools/sent', 'failed tools', 'week %/job'].join('\t'));
+    for (const r of g) console.log([r.group, r.jobs, r.sent, pct(r.sentRate), n(r.minPerSent), n(r.toolsPerSent, 0), pct(r.failRate), r.weekPerJob == null ? '—' : r.weekPerJob.toFixed(2)].join('\t'));
   } else {
     console.error(usage);
     process.exitCode = 1;

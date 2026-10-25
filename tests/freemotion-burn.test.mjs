@@ -88,3 +88,26 @@ if (!early.allow && early.until === at('2026-10-21T13:00')) pass('account2 kept 
 if (B.reserveGate({ now: at('2026-10-21T14:00'), limits: { ...lim(0, 20), fiveReset: at('2026-10-21T18:00') }, reserve: end }).allow) pass('account2 burns in its last 24 h'); else fail('account2 near the end');
 if (!B.reserveGate({ now: at('2026-10-21T14:00'), limits: { ...lim(0, 100), fiveReset: at('2026-10-21T18:00') }, reserve: end }).allow) pass('account2 stops at a full week'); else fail('account2 full week');
 if (!B.reserveGate({ now: at('2026-10-22T14:00'), limits: lim(0, 20), reserve: end }).allow) pass('account2 after its week reset: read again first'); else fail('account2 after reset');
+
+// Burn (user, 2026-10-25): kept for CVs and letters, and only what would go unused is applied with, so the
+// week ends near 100% at its reset. 60% left at 6 min per % plus 60 min = 7 h before the reset.
+const burnRule = { minutes_per_pct: 6, margin_minutes: 60 };
+const wk = (used, resetIso) => ({ weekPct: used, weekReset: at(resetIso), fivePct: 0, fiveReset: at('2026-10-27T10:00') });
+const kept = B.burnGate({ now: at('2026-10-27T05:00'), limits: wk(40, '2026-10-27T13:00'), rule: burnRule });
+if (!kept.allow && kept.until === at('2026-10-27T06:00')) pass('burn: kept for writing until the rest just fits before the reset');
+else fail(`burn early: ${JSON.stringify(kept)}`);
+check('burn: in its last hours, applies', B.burnGate({ now: at('2026-10-27T06:30'), limits: wk(40, '2026-10-27T13:00'), rule: burnRule }), true);
+check('burn: CVs used more of the week, so it starts later', B.burnGate({ now: at('2026-10-27T06:30'), limits: wk(80, '2026-10-27T13:00'), rule: burnRule }), false);
+check('burn: a used-up week waits for the reset', B.burnGate({ now: at('2026-10-27T12:00'), limits: wk(100, '2026-10-27T13:00'), rule: burnRule }), false);
+check('burn: no reading, not used', B.burnGate({ now: at('2026-10-27T12:00'), limits: null, rule: burnRule }), false);
+
+// One rule per driver; the old lists are read as rules.
+const R = await import(pathToFileURL(join(ROOT, 'lib/driver-rules.mjs')).href);
+const old = { drivers: ['sonnet1', 'agy', 'codex', 'copilot', 'sonnet'], scheduled: { sonnet1: { until: '2026-10-20T16:00:00+02:00' } }, monthly: ['copilot'], last_resort: ['codex', 'sonnet'], reserve: { codex: { week: 50, five_hour: 30 }, sonnet: { week: 0, five_hour: 0, last_hours: 24 } } };
+const m = R.migrate(old);
+const kinds = m.drivers.map((d) => m.rules[d].kind).join(' ');
+if (kinds === 'schedule full reserve monthly burn' && !m.last_resort && !m.scheduled) pass('old settings become one rule per driver'); else fail(`migrate: ${kinds}`);
+if (R.checkRule({ kind: 'burn', minutes_per_pct: 0, margin_minutes: 10 }).error && R.checkRule({ kind: 'reserve', week: 20, five_hour: 10 }).rule) pass('rules from the dashboard are checked');
+else fail('checkRule');
+const ruled = { ...s, drivers: ['agy', 'codex', 'copilot'], rules: { agy: { kind: 'burn' }, codex: { kind: 'full' }, copilot: { kind: 'monthly' } } };
+if (B.roundPlan(ruled, at('2026-10-26T10:00'), {}).drivers.join(' ') === 'codex copilot agy') pass('a burn driver comes after the others, whatever its name'); else fail(`rule order: ${B.roundPlan(ruled, at('2026-10-26T10:00'), {}).drivers.join(' ')}`);

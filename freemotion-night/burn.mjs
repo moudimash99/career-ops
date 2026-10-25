@@ -1,45 +1,47 @@
 #!/usr/bin/env node
 /**
- * freemotion-night/burn.mjs — applications nonstop, on every driver's allowance, without eating into the
- * Claude account the user works on (user, 2026-10-19).
+ * freemotion-night/burn.mjs — auto-apply: applications nonstop, a round whenever none is going, each driver
+ * by its own rule (user, 2026-10-19; rules 2026-10-25). The file and the "FreeMotion burn" task keep their
+ * old name; "burn" is now one of the rules, below.
  *
  *   node freemotion-night/burn.mjs tick      what the "FreeMotion burn" task runs every 10 minutes
- *   node freemotion-night/burn.mjs on|off    turn it on or off (off also lifts its driver pauses)
- *   node freemotion-night/burn.mjs status    settings, driver order, and what each driver may do now
+ *   node freemotion-night/burn.mjs on|off    turn auto-apply on or off (off also lifts its driver pauses)
+ *   node freemotion-night/burn.mjs status    settings, driver order, rules, and what each driver may do now
  *   node freemotion-night/burn.mjs install   keep this shell's PATH for the task, then create the task
- *   node freemotion-night/burn.mjs round [--jobs N]     start one round now, by hand, with the timer's drivers
+ *   node freemotion-night/burn.mjs round [--jobs N]     start one round now, by hand, with these drivers
  *   node freemotion-night/burn.mjs driver <id> on|off   let a driver take jobs, or keep it out until turned on
+ *   node freemotion-night/burn.mjs migrate   write the old settings (scheduled, monthly, last_resort,
+ *                                            reserve) out as one rule per driver
  *
  * Rounds: whenever no run is going, one round (full-night.sh with MAX_ROUNDS=1, `round_jobs` jobs, no
  * scan) in the "FreeMotion night" task. Its drivers are `drivers`, the one whose week resets soonest
- * first, so the allowance lost soonest is used first (readings: tmp/fm/usage/claude-windows.tsv and
- * agy-quota.tsv, which every run refreshes; no reading = after the known ones). run.sh moves to the next
- * driver at a limit, as always. Settings: data/burn-settings.json (DEFAULTS below).
+ * first, so the allowance lost soonest is used first; burn and reserve drivers after all others.
+ * run.sh moves to the next driver at a limit, as always. Settings: data/burn-settings.json (DEFAULTS below).
+ *
+ * Each driver has one rule (`rules`, lib/driver-rules.mjs, set from the dashboard's driver panel):
+ *  - full: takes jobs until its own limit.
+ *  - burn: kept for writing CVs and letters; applies only with what would go unused, starting late enough
+ *    that the rest of its week is used just by the reset (burnGate). Codex: it writes about half the CVs.
+ *  - reserve: takes jobs while it keeps a share of its week and 5 hours (reserveGate).
+ *  - monthly (copilot): spreads its monthly credits evenly over the month (monthlyGate).
+ *  - schedule: a Claude account the user also works on, until its `until`. Nothing watches the user: the
+ *    window's % says it all. In working hours (`work`) it applies only on schedule, so the window reaches
+ *    100 - `buffer`% just at its reset (`minutes_per_pct` per %, plus `margin_minutes`); when the user works
+ *    too, the % climbs faster, it gets ahead of schedule and pauses (`pause_ahead_minutes`). Outside working
+ *    hours: at once. `week_keep`% of the week stays the user's, except in the last `week_free_hours`. After
+ *    `until` the account is left out altogether, also as the CV/letter writers' second Claude account.
+ *    Measured on sonnet1 (night of 2026-10-19): a full 5-hour window is about 27 applications in about
+ *    3 hours, about 8% of the week.
+ * Besides its rule: `not_before` drivers are left alone until a date (paused, and not the CV/letter writers'
+ * Claude account), `off` drivers are paused until turned on again, whatever their rule says. A burn or
+ * reserve Claude account never writes CVs and letters.
  *
  * A driver is paused through run.sh's own out file (tmp/fm/night/out/<driver>), which run.sh reads before
  * every job: the other drivers go on. Only pauses this script wrote are lifted by it.
- *  - `scheduled` drivers are Claude accounts the user also works on, until their `until` date. Nothing
- *    watches the user: the window's % says it all. In working hours (`work`) they apply only on schedule,
- *    so the window reaches 100 - `buffer`% just at its reset (`minutes_per_pct` per %, plus
- *    `margin_minutes`); when the user works too, the % climbs faster, the driver gets ahead of schedule and
- *    pauses (`pause_ahead_minutes`) until the schedule catches up. Outside working hours: at once, up to
- *    100% (a window still open when work starts keeps the buffer). `week_keep`% of the week stays the
- *    user's, except in the last `week_free_hours` before it resets. After `until` the account is left out
- *    altogether, also as the CV/letter writers' second Claude account (CLAUDE1_DIR).
- *    Measured on sonnet1 (night of 2026-10-19): a full 5-hour window is about 27 applications in about
- *    3 hours, about 8% of the week.
- *  - `monthly` drivers (copilot) spread their monthly credits evenly over the month (`credits_per_job`).
- *  - `last_resort` drivers (codex: it writes about half the CVs, user 2026-10-19) come after all others,
- *    and only while their windows keep `reserve`% left (codex: read from its newest session log in
- *    ~/.codex/sessions, which the user's own Codex sessions write too). Account2 (`sonnet`) comes last
- *    of all and only in the last `reserve.sonnet.last_hours` before its week resets (user, 2026-10-23);
- *    a last-resort Claude account never writes CVs and letters.
- *  - `not_before` drivers are left alone until a date: paused, no allowance check on their account, and
- *    not the CV/letter writers' Claude account (DOCS_WRITERS without sonnet1 when no Claude account may be used).
- *  - `off` drivers are ones the user turned off (the dashboard, or `burn.mjs driver <id> off`): paused
- *    until turned on again, whatever the other rules say.
- * Reading a Claude account's windows is claude-usage.mjs's tiny call; right after a reset it opens the next
- * 5-hour window, so no time is lost between windows. Log: tmp/fm/burn/burn.log.
+ * Readings: every `read_every_minutes` (30) the tick reads agy's windows (agy -p /usage, no model call) and
+ * each Claude account still in use (claude-usage.mjs's tiny call; right after a reset it opens the next
+ * 5-hour window), so the dashboard's usage is never hours old. Codex's come from its own session logs.
+ * Log: tmp/fm/burn/burn.log.
  */
 
 import { appendFileSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'fs';
@@ -50,6 +52,7 @@ import { fileURLToPath } from 'url';
 import { isMainModule } from '../lib/is-main-module.mjs';
 import { probe, logWindows } from './claude-usage.mjs';
 import { WRITER_ORDER } from '../lib/doc-writers.mjs';
+import { ruleOf, comesLast, migrate } from '../lib/driver-rules.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const SETTINGS = join(ROOT, 'data/burn-settings.json');
@@ -66,12 +69,10 @@ export const DEFAULTS = {
   enabled: true,
   drivers: ['sonnet1', 'agy', 'agy-sonnet', 'sonnet', 'copilot', 'codex'],
   accounts: { sonnet1: '.claude-account1', sonnet: '.claude-account2' },
-  scheduled: { sonnet1: { until: '2026-10-20T16:00:00+02:00' } },
-  monthly: ['copilot'],
+  rules: { sonnet1: { kind: 'schedule', until: '2026-10-20T16:00:00+02:00' }, copilot: { kind: 'monthly' }, codex: { kind: 'burn' } },
   not_before: {},
-  last_resort: ['codex'],
   off: [],
-  reserve: { codex: { week: 50, five_hour: 30 } },
+  read_every_minutes: 30,
   round_jobs: 50,
   min_round_gap_minutes: 30,
   work: { days: [1, 2, 3, 4, 5], from: '09:00', to: '18:00' },
@@ -160,10 +161,25 @@ export function reserveGate({ now, limits, reserve }) {
   return { allow: true, why: `last resort: week at ${week}%, 5 hours at ${five}%, above its reserve` };
 }
 
+/**
+ * May a burn driver take a job: would the rest of its week otherwise go unused? It starts when the rest,
+ * at rule.minutes_per_pct minutes of applying per %, plus rule.margin_minutes, just fits before the week
+ * resets; until then the week stays for writing CVs and letters.
+ */
+export function burnGate({ now, limits, rule }) {
+  if (!limits) return { allow: false, why: 'no reading of its windows yet', until: now + 60 * MIN };
+  if (now >= limits.weekReset) return { allow: false, why: 'its week reset: reading it again', until: now + 10 * MIN };
+  const week = Math.round(limits.weekPct), left = 100 - week;
+  if (left <= 0) return { allow: false, why: 'its week is used up', until: limits.weekReset };
+  const start = limits.weekReset - (left * rule.minutes_per_pct + rule.margin_minutes) * MIN;
+  if (now < start) return { allow: false, why: `kept for CVs and letters: week at ${week}%; burns the rest from ${when(start)}, so it is used up by the reset (${when(limits.weekReset)})`, until: start };
+  return { allow: true, why: `burning what is left before its week resets (${when(limits.weekReset)}): week at ${week}%` };
+}
+
 /** May driver `d` be used at all at `now`: listed, not past its `scheduled.until`, not before its `not_before`. */
 export function usableAt(d, now, s) {
   if (!s.drivers.includes(d)) return false;
-  const until = s.scheduled?.[d]?.until;
+  const r = ruleOf(s, d), until = r.kind === 'schedule' && r.until;
   if (until && now >= Date.parse(until)) return false;
   const from = s.not_before?.[d];
   return !(from && now < Date.parse(from));
@@ -172,10 +188,10 @@ export function usableAt(d, now, s) {
 /** A round's drivers and Claude accounts. A driver waiting for its `not_before` stays in the order: its
  *  pause (run.sh's out file) lifts by itself on the day, even in the middle of a round. */
 export function roundPlan(s, now, resets) {
-  const expired = (d) => s.scheduled?.[d]?.until && now >= Date.parse(s.scheduled[d].until);
-  const last = s.last_resort || [];
-  const drivers = order(s.drivers.filter((d) => !expired(d) && !last.includes(d)), resets).concat(s.drivers.filter((d) => last.includes(d)));
-  const writes = (d) => usableAt(d, now, s) && !last.includes(d);   // a last-resort account never writes CVs
+  const expired = (d) => { const r = ruleOf(s, d); return r.kind === 'schedule' && r.until && now >= Date.parse(r.until); };
+  const last = (d) => comesLast(s, d);
+  const drivers = order(s.drivers.filter((d) => !expired(d) && !last(d)), resets).concat(s.drivers.filter(last));
+  const writes = (d) => usableAt(d, now, s) && !last(d);   // a burn or reserve account never writes CVs
   const second = writes('sonnet1') ? s.accounts.sonnet1 : s.accounts.sonnet;
   const writer = writes('sonnet1') || writes('sonnet');
   return { drivers, second, docsWriters: writer ? null : WRITER_ORDER.filter((w) => w !== 'sonnet1') };
@@ -206,6 +222,15 @@ function weekResets(s) {
     if (driver && Date.parse(r[4])) out[driver] = Date.parse(r[4]);
   }
   return out;
+}
+
+/** agy's windows (one group: Gemini for agy, Claude/GPT for agy-sonnet) from the newest readings. */
+function readAgy(d) {
+  const g = d === 'agy' ? /gemini/i : /claude|gpt/i, rows = lines(join(ROOT, 'tmp/fm/usage/agy-quota.tsv')).filter((r) => g.test(r[1]) && r[3] !== '');
+  const last = (w) => rows.filter((r) => r[2] === w).pop();
+  const wk = last('week'), fv = last('5h');
+  if (!wk) return null;
+  return { at: Date.parse(wk[0]), weekPct: 100 - Number(wk[3]), weekReset: Date.parse(wk[4]), fivePct: fv ? 100 - Number(fv[3]) : 0, fiveReset: fv ? Date.parse(fv[4]) : 0 };
 }
 
 async function readClaude(folder) {
@@ -267,7 +292,26 @@ function resume(st, d, why) {
 const OFF_WHY = 'you turned it off';
 
 function liftAll(st) {
-  for (const d of Object.keys(st.paused || {})) resume(st, d, 'burn is off');
+  for (const d of Object.keys(st.paused || {})) resume(st, d, 'auto-apply is off');
+}
+
+/** Fresh readings for the dashboard and the rules: agy's windows and each Claude account still in use,
+ *  at most every read_every_minutes. */
+async function refreshReadings(s, st, now, waiting, off) {
+  const every = (s.read_every_minutes || 30) * MIN;
+  const inUse = (d) => s.drivers.includes(d) && !off.has(d) && !waiting(d) && usableAt(d, now, s);
+  const agyAt = Math.max(0, ...lines(join(ROOT, 'tmp/fm/usage/agy-quota.tsv')).map((r) => Date.parse(r[0]) || 0));
+  if ((inUse('agy') || inUse('agy-sonnet')) && now - agyAt >= every) {
+    try { execFileSync(process.execPath, [join(ROOT, 'freemotion-night/agy-usage.mjs')], { cwd: ROOT, stdio: 'ignore', timeout: 180_000, windowsHide: true }); } catch { /* the next tick tries again */ }
+  }
+  for (const [d, folder] of Object.entries(s.accounts || {})) {
+    if (!inUse(d) || ruleOf(s, d).kind === 'schedule') continue;   // the schedule reads its own
+    const w = st.win[d];
+    if (w && now - w.at < every) continue;
+    if (st.noRead?.[d] && now - st.noRead[d] < every) continue;
+    const r = await readClaude(folder);
+    if (r) { st.win[d] = r; if (st.noRead) delete st.noRead[d]; } else st.noRead = { ...st.noRead, [d]: now };
+  }
 }
 
 export async function tick() {
@@ -280,22 +324,45 @@ export async function tick() {
   const now = Date.now();
   st.win = st.win || {};
   st.active = st.active || {};
-  const expired = Object.entries(s.scheduled || {}).filter(([, v]) => v.until && now >= Date.parse(v.until)).map(([d]) => d);
   const off = new Set(s.off || []);
   for (const d of Object.keys(st.paused || {})) if (st.why?.[d] === OFF_WHY && !off.has(d)) resume(st, d, 'you turned it back on');
+  const waiting = (d) => s.not_before?.[d] && now < Date.parse(s.not_before[d]);
+  await refreshReadings(s, st, now, waiting, off);
 
-  // Accounts the user works on: on schedule only, and nothing after their `until`.
-  for (const [d] of Object.entries(s.scheduled || {})) {
-    if (!s.drivers.includes(d) || off.has(d)) continue;
-    if (expired.includes(d)) { pause(st, d, now + FOREVER, `its time with the timer ended (${s.scheduled[d].until}); it is yours again`); st.active[d] = false; continue; }
-    const w = st.win[d];
-    const stale = !w || now >= w.fiveReset || st.active[d] || (st.until?.[d] && now >= st.until[d] - MIN) || now - w.at > 60 * MIN;
-    if (stale) st.win[d] = (await readClaude(s.accounts[d])) || w;
-    let r = decide({ now: Date.now(), win: st.win[d], s, active: st.active[d] });
-    if (r.read && st.win[d]?.at < now - MIN) { st.win[d] = (await readClaude(s.accounts[d])) || st.win[d]; r = decide({ now: Date.now(), win: st.win[d], s, active: st.active[d] }); }
-    st.until = { ...st.until, [d]: r.until || null };
-    st.active[d] = r.allow;
-    if (r.allow) resume(st, d, r.why); else pause(st, d, r.until || now + 10 * MIN, r.why);
+  // A driver's windows for its rule: codex from its session logs, agy from its readings, a Claude account
+  // from the readings above.
+  const limitsOf = (d) => (d === 'codex' ? readCodex() : d.startsWith('agy') ? readAgy(d) : st.win[d] || null);
+
+  for (const d of s.drivers) {
+    if (off.has(d) || waiting(d)) continue;
+    const rule = ruleOf(s, d);
+    if (rule.kind === 'full') {
+      // A pause from a rule it no longer has is lifted; run.sh's own limit marks stay.
+      if (st.paused?.[d]) resume(st, d, 'full allowance');
+      else if (st.why?.[d] !== 'full allowance') st.why = { ...st.why, [d]: 'full allowance' };
+    } else if (rule.kind === 'schedule') {
+      // An account the user works on: on schedule only, and nothing after its until.
+      if (rule.until && now >= Date.parse(rule.until)) { pause(st, d, now + FOREVER, `its time with the timer ended (${rule.until}); it is yours again`); st.active[d] = false; continue; }
+      const w = st.win[d];
+      const stale = !w || now >= w.fiveReset || st.active[d] || (st.until?.[d] && now >= st.until[d] - MIN) || now - w.at > 60 * MIN;
+      if (stale) st.win[d] = (await readClaude(s.accounts[d])) || w;
+      let r = decide({ now: Date.now(), win: st.win[d], s, active: st.active[d] });
+      if (r.read && st.win[d]?.at < now - MIN) { st.win[d] = (await readClaude(s.accounts[d])) || st.win[d]; r = decide({ now: Date.now(), win: st.win[d], s, active: st.active[d] }); }
+      st.until = { ...st.until, [d]: r.until || null };
+      st.active[d] = r.allow;
+      if (r.allow) resume(st, d, r.why); else pause(st, d, r.until || now + 10 * MIN, r.why);
+    } else if (rule.kind === 'monthly') {
+      // Monthly credits, spread over the month (looked up once an hour).
+      if (!st.month?.[d] || now - st.month[d].at > 60 * MIN) st.month = { ...st.month, [d]: readCopilot() || st.month?.[d] };
+      const m = st.month?.[d];
+      if (!m) { pause(st, d, now + 60 * MIN, 'its monthly credits could not be read (gh auth login?)'); continue; }
+      const r = monthlyGate({ now, used: m.used, entitlement: m.entitlement, resetMs: m.resetMs, perJob: rule.credits_per_job });
+      if (r.allow) resume(st, d, r.why); else pause(st, d, r.until, r.why);
+    } else {
+      const limits = limitsOf(d);
+      const r = rule.kind === 'burn' ? burnGate({ now, limits, rule }) : reserveGate({ now, limits, reserve: rule });
+      if (r.allow) resume(st, d, r.why); else pause(st, d, r.until, r.why);
+    }
   }
 
   // Left alone until a date.
@@ -304,35 +371,6 @@ export async function tick() {
     const ms = Date.parse(from);
     if (now < ms) pause(st, d, ms, `left alone until ${when(ms)}`);
     else if (st.paused?.[d] === Math.ceil(ms / 1000)) resume(st, d, `its date (${when(ms)}) came`);
-  }
-
-  // Monthly credits, spread over the month (looked up once an hour).
-  for (const d of s.monthly || []) {
-    if (!s.drivers.includes(d) || off.has(d)) continue;
-    if (!st.month?.[d] || now - st.month[d].at > 60 * MIN) st.month = { ...st.month, [d]: readCopilot() || st.month?.[d] };
-    const m = st.month?.[d];
-    if (!m) { pause(st, d, now + 60 * MIN, 'its monthly credits could not be read (gh auth login?)'); continue; }
-    const r = monthlyGate({ now, used: m.used, entitlement: m.entitlement, resetMs: m.resetMs, perJob: s.credits_per_job });
-    if (r.allow) resume(st, d, r.why); else pause(st, d, r.until, r.why);
-  }
-
-  // Last resort, with a reserve. A Claude account is read at most once an hour, and not at all before
-  // its last hours open; a failed reading waits an hour too.
-  const lastResortLimits = async (d) => {
-    if (d === 'codex') return readCodex();
-    if (!s.accounts[d]) return null;
-    const w = st.win[d];
-    const opens = w && w.weekReset - (s.reserve[d].last_hours || 0) * 60 * MIN;
-    if (w && now < w.weekReset && (now < opens || now - w.at < 60 * MIN)) return w;
-    if (st.noRead?.[d] && now - st.noRead[d] < 60 * MIN) return null;
-    const r = await readClaude(s.accounts[d]);
-    if (r) { st.win[d] = r; if (st.noRead) delete st.noRead[d]; } else st.noRead = { ...st.noRead, [d]: now };
-    return r;
-  };
-  for (const d of s.last_resort || []) {
-    if (!s.drivers.includes(d) || off.has(d) || !s.reserve?.[d]) continue;
-    const r = reserveGate({ now, limits: await lastResortLimits(d), reserve: s.reserve[d] });
-    if (r.allow) resume(st, d, r.why); else pause(st, d, r.until, r.why);
   }
 
   // Turned off by the user: out, whatever the rules above said.
@@ -376,9 +414,9 @@ function startRound(s, st, env, by, jobs) {
 function status() {
   const s = settings();
   const st = readJson(STATE, {});
-  console.log(`burn ${s.enabled ? 'on' : 'off'}: rounds of ${s.round_jobs} jobs; work ${s.work.from}-${s.work.to} (days ${s.work.days.join(',')}), buffer ${s.buffer}%`);
+  console.log(`auto-apply ${s.enabled ? 'on' : 'off'}: rounds of ${s.round_jobs} jobs; work ${s.work.from}-${s.work.to} (days ${s.work.days.join(',')}), buffer ${s.buffer}%`);
   console.log(`drivers, in today's order: ${roundPlan(s, Date.now(), weekResets(s)).drivers.join(' ')}`);
-  for (const [d, v] of Object.entries(s.scheduled || {})) console.log(`  ${d}: your account (${s.accounts[d]}), on schedule until ${v.until}`);
+  for (const d of s.drivers) console.log(`  ${d}: rule ${JSON.stringify(ruleOf(s, d))}`);
   for (const [d, v] of Object.entries(s.not_before || {})) console.log(`  ${d}: left alone until ${v}`);
   for (const d of s.drivers) if (st.why?.[d]) console.log(`  ${d}: ${st.paused?.[d] ? 'paused' : 'may apply'}, ${st.why[d]}`);
   if (st.lastRound) console.log(`last round started ${new Date(st.lastRound).toLocaleString('sv-SE').slice(0, 16)}`);
@@ -391,7 +429,7 @@ async function main() {
     const s = readJson(SETTINGS, {});
     writeFileSync(SETTINGS, JSON.stringify({ ...s, enabled: cmd === 'on' }, null, 2) + '\n');
     if (cmd === 'off') { const st = readJson(STATE, {}); liftAll(st); writeFileSync(STATE, JSON.stringify(st, null, 2)); }
-    console.log(`burn ${cmd}`);
+    console.log(`auto-apply ${cmd}`);
   } else if (cmd === 'status') status();
   else if (cmd === 'round') {
     // A round now, by hand (the dashboard's "Start a round"): the timer's drivers, refused while one runs.
@@ -417,6 +455,11 @@ async function main() {
     else if (st.why?.[d] === OFF_WHY) resume(st, d, 'you turned it back on');
     writeFileSync(STATE, JSON.stringify(st, null, 2));
   }
+  else if (cmd === 'migrate') {
+    const raw = readJson(SETTINGS, {});
+    writeFileSync(SETTINGS, JSON.stringify(migrate({ ...raw, drivers: raw.drivers || DEFAULTS.drivers }), null, 2) + '\n');
+    console.log('rules written to data/burn-settings.json');
+  }
   else if (cmd === 'install') {
     mkdirSync(DIR, { recursive: true });
     writeFileSync(ENV_FILE, JSON.stringify({ PATH: process.env.PATH }, null, 2));
@@ -424,7 +467,7 @@ async function main() {
     const sched = await import('./scheduled.mjs');
     sched.install({ only: 'burn' });
   } else {
-    console.log('Usage: node freemotion-night/burn.mjs tick|on|off|status|install|round [--jobs N]|driver <id> on|off');
+    console.log('Usage: node freemotion-night/burn.mjs tick|on|off|status|install|migrate|round [--jobs N]|driver <id> on|off');
     if (cmd && cmd !== '--help' && cmd !== '-h') process.exit(1);
   }
 }

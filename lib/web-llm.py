@@ -134,10 +134,19 @@ def started(p, before, seconds):
 
 def ask_chatgpt(prompt):
     with browser() as ctx:
+        # Signed out, the page never shows the box: that was a 60 s timeout per call, reported as an error
+        # (so never marked out) for 665 calls in a row on 2026-10-24/25.
+        if not signed_in(ctx.cookies())['chatgpt']:
+            raise Fail('chatgpt: signed out (no session cookie)', SIGNED_OUT)
         p = ctx.pages[0] if ctx.pages else ctx.new_page()
         p.goto('https://chatgpt.com/?temporary-chat=true', wait_until='domcontentloaded')
         box = p.locator('[contenteditable="true"]').first
-        box.wait_for(timeout=60000)
+        try:
+            box.wait_for(timeout=60000)
+        except Exception:
+            if p.get_by_role('button', name='Log in').count() or not signed_in(ctx.cookies())['chatgpt']:
+                raise Fail('chatgpt: signed out', SIGNED_OUT)
+            raise
         p.wait_for_timeout(1500)
         if p.get_by_role('button', name='Log in').count():
             raise Fail('chatgpt: signed out', SIGNED_OUT)

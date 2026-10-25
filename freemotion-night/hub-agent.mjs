@@ -16,6 +16,7 @@
  * Settings (.env): HUB_URL (e.g. http://100.111.127.103:8791), HUB_MACHINE (this machine's name, e.g.
  * pc), HUB_KEY (its secret, also in the hub's AGENT_KEYS). Log: tmp/fm/hub/agent.log.
  */
+import { checkRule, migrate, KINDS } from '../lib/driver-rules.mjs';
 import { appendFileSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'fs';
 import { execFile, spawn } from 'child_process';
 import { createHash } from 'crypto';
@@ -172,7 +173,7 @@ async function execute(c, report) {
   switch (c.action) {
     case 'burn': {
       const r = await node('freemotion-night/burn.mjs', [a.on ? 'on' : 'off']);
-      return r.ok ? { ok: true, message: a.on ? 'Burn timer on' : 'Burn timer off' } : { ok: false, message: r.err || r.out };
+      return r.ok ? { ok: true, message: a.on ? 'Auto-apply on' : 'Auto-apply off' } : { ok: false, message: r.err || r.out };
     }
     case 'stop-after-job': {
       for (const f of ['stop', 'stop-night']) { const p = join(NIGHT, f); if (a.on) writeFileSync(p, ''); else rmSync(p, { force: true }); }
@@ -201,12 +202,22 @@ async function execute(c, report) {
         if (!Array.isArray(days) || !days.length || days.some((d) => !Number.isInteger(d) || d < 0 || d > 6) || !t.test(from) || !t.test(to) || from >= to) return { ok: false, message: 'Working hours are not valid' };
         s.work = { days: [...new Set(days)].sort(), from, to }; ch.push(`working hours ${from}–${to}`);
       }
-      if (a.reserve) {
-        if (!DRIVER_ID.test(a.reserve.id || '')) return { ok: false, message: 'Unknown driver' };
-        const w = Number(a.reserve.week), f = Number(a.reserve.five_hour);
-        if (![w, f].every((x) => Number.isInteger(x) && x >= 0 && x <= 90)) return { ok: false, message: 'Reserves: 0 to 90%' };
-        s.reserve = { ...s.reserve, [a.reserve.id]: { ...(s.reserve?.[a.reserve.id] || {}), week: w, five_hour: f } };
-        ch.push(`${a.reserve.id} keeps ${w}% of its week and ${f}% of its 5 hours`);
+      if (a.rule) {
+        // One driver's rule (lib/driver-rules.mjs), and the date it waits for (null: none).
+        const id = a.rule.id;
+        if (!DRIVER_ID.test(id || '') || !(s.drivers || []).includes(id)) return { ok: false, message: 'Unknown driver' };
+        const r = checkRule(a.rule);
+        if (r.error) return { ok: false, message: r.error };
+        Object.assign(s, migrate(s));
+        s.rules[id] = r.rule;
+        ch.push(`${id}: ${KINDS[r.rule.kind].toLowerCase()}`);
+        if ('from' in a.rule) {
+          if (a.rule.from && Number.isNaN(Date.parse(a.rule.from))) return { ok: false, message: 'The start date is not valid' };
+          const nb = { ...(s.not_before || {}) };
+          if (a.rule.from) nb[id] = new Date(a.rule.from).toISOString(); else delete nb[id];
+          s.not_before = nb;
+          if (a.rule.from) ch.push(`waits until ${a.rule.from}`);
+        }
       }
       if (!ch.length) return { ok: true, message: 'Nothing changed' };
       writeFileSync(p, JSON.stringify(s, null, 2) + '\n');
