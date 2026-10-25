@@ -11,6 +11,8 @@
 #   interview    an interview with the team, a manager or the client
 #   offer        an offer
 #   rejected     a definite no (kept apart from the levels: a call then a no stays "reached call")
+#   screening    not a reaction: an automatic test or questionnaire within a week of applying (refine()),
+#                kept to show it is still to do; the tracker does not move
 #
 # Each reaction is one row in data/reactions.tsv (the dashboard and the CV/letter experiments read
 # it), and the tracker status follows by itself through set-status.mjs: contacted and call ->
@@ -278,10 +280,11 @@ def title_score(role, mail):
 # never matched by company (2026-10-06).
 BOARDS = {'hellowork', 'cadremploi', 'apec', 'france travail', 'meteojob', 'free work', 'jobteaser', 'indeed', 'linkedin', 'welcome to the jungle',
           'entreprise anonyme', 'confidentiel', 'confidential'}
-STATUS_ORDER = {'Applied': 0, 'Responded': 1, 'Assessment': 2, 'Interview': 3, 'Offer': 4}
+# An employer's reaction proves a row marked Evaluated was sent after all (Capgemini 2026-10-13).
+STATUS_ORDER = {'Evaluated': -1, 'Applied': 0, 'Responded': 1, 'Assessment': 2, 'Interview': 3, 'Offer': 4}
 def needs(row, to):
     """Does this row still need the change? Forward only: a row already there, or past it, is left alone."""
-    if to == 'Rejected': return row['status'] in ('Applied', 'Responded', 'Assessment', 'Interview')
+    if to == 'Rejected': return row['status'] in ('Evaluated', 'Applied', 'Responded', 'Assessment', 'Interview')
     return row['status'] in STATUS_ORDER and STATUS_ORDER[row['status']] < STATUS_ORDER[to]
 
 def match(mail, rows):
@@ -302,7 +305,7 @@ def match(mail, rows):
 # ── levels: the model's reading of each email ───────────────────────────
 LEVELS = ['none', 'viewed', 'contacted', 'call', 'assessment', 'interview', 'offer']
 STATUS_OF = {'contacted': 'Responded', 'call': 'Responded', 'assessment': 'Assessment', 'interview': 'Interview', 'offer': 'Offer', 'rejected': 'Rejected'}
-LEVEL_WORDS = {'viewed': 'Application viewed', 'contacted': 'Recruiter wrote', 'call': 'Call with a recruiter', 'assessment': 'Assessment invitation',
+LEVEL_WORDS = {'screening': 'Automatic screening to complete', 'viewed': 'Application viewed', 'contacted': 'Recruiter wrote', 'call': 'Call with a recruiter', 'assessment': 'Assessment invitation',
                'interview': 'Interview invitation', 'offer': 'Offer', 'rejected': 'Rejected by email'}
 LEDGER_COLS = ['ref', 'num', 'date', 'level', 'company', 'role', 'source', 'who', 'summary', 'evidence', 'reply_needed', 'by', 'at']
 # Each model has its own daily quota: at one's limit the next one reads. REPLY_MODELS changes the list.
@@ -416,7 +419,7 @@ def verdict(a, mail, cands, rows, by):
     if num is None and level != 'none': num = row_by_name(a.get('company') or '', mail, rows)
     return {'ref': mail['message_id'], 'date': mail['date'], 'from': one(mail['from']), 'subject': one(mail['subject']), 'level': level,
             'nums': [num] if num else [], 'who': one(a.get('who'))[:80], 'company': one(a.get('company'))[:60], 'summary': one(a.get('summary'))[:240],
-            'evidence': ev[:240] if level != 'none' else '', 'reply_needed': bool(a.get('reply_needed')) and level not in ('none', 'rejected'),
+            'evidence': ev[:240] if level != 'none' else '', 'reply_needed': bool(a.get('reply_needed')) and level not in ('none', 'rejected'), 'by_person': bool(a.get('by_person')),
             'why': why, 'by': by, 'at': datetime.datetime.now().isoformat(timespec='seconds')}
 
 def judge(mails, rows):
@@ -452,6 +455,18 @@ def judge(mails, rows):
         if k + BATCH < len(todo): time.sleep(PAUSE)
     return out, '' if len(todo) == len(mails) else f'{len(mails) - len(todo)} emails left for the next run (--max-judge {MAX_JUDGE})'
 
+def refine(v, rows):
+    """A test or questionnaire that arrives within a week of applying, not written by a person, is part of
+    applying: level "screening", flagged to do, the tracker left as it is. The model is told about two days,
+    but the smaller ones miss it (2026-10-25: 50 Thales Workday questionnaires read as assessments), and the
+    reminders come 4 to 6 days after. Run on every verdict, the kept ones too, so a change here needs no
+    new reading."""
+    if v['level'] != 'assessment' or not v['nums'] or v.get('by_person'): return v
+    row = next((r for r in rows if r['num'] == v['nums'][0]), None)
+    try: gap = (datetime.date.fromisoformat(v['date'][:10]) - datetime.date.fromisoformat(row['date'])).days
+    except (TypeError, ValueError): return v
+    return {**v, 'level': 'screening', 'reply_needed': True} if gap <= 7 else v
+
 def rules_verdict(mail, rows):
     """Without the model: the wording rules, rejected and contacted only, on the rows the email names."""
     level = {'rejection': 'rejected', 'interview': 'contacted'}.get(mail['kind'], 'none')
@@ -474,13 +489,14 @@ def effective(rows):
     return [r for r in rows if r['at'] == last[r['ref']] and r['level'] != 'none']
 
 def ledger_rows(v, rows):
+    """The ledger rows of one verdict, stamped now: a reading written later must win over the one before."""
     by_num = {r['num']: r for r in rows}
-    out = []
+    now, out = datetime.datetime.now().isoformat(timespec='seconds'), []
     for n in (v['nums'] or [None]):
         r = by_num.get(n, {})
         out.append({k: one(x) for k, x in {'ref': v['ref'], 'num': n or '', 'date': v['date'][:10], 'level': v['level'], 'company': r.get('company') or v['company'],
             'role': r.get('role', ''), 'source': v.get('source', 'email'), 'who': v['who'] or re.sub(r'<.*>', '', v['from']).replace('"', '').strip()[:60],
-            'summary': v['summary'], 'evidence': v['evidence'], 'reply_needed': 'yes' if v['reply_needed'] else '', 'by': v['by'], 'at': v['at']}.items()})
+            'summary': v['summary'], 'evidence': v['evidence'], 'reply_needed': 'yes' if v['reply_needed'] else '', 'by': v['by'], 'at': now}.items()})
     return out
 
 def write_ledger(new):
@@ -587,6 +603,12 @@ def self_test():
         ('a template is not contacted', verdict({**ans, 'by_person': False}, mail, [], [], 'm')['level'] == 'none'),
         ('a row not offered is dropped', verdict({**ans, 'row': 99}, mail, [{'num': 1}], [], 'm')['nums'] == []),
     ]
+    sv = {'level': 'assessment', 'nums': [5], 'date': '2026-09-02T09:00:00', 'reply_needed': False}
+    checks += [
+        ('a questionnaire the day after applying is screening', refine(sv, [{'num': 5, 'date': '2026-09-01'}])['level'] == 'screening'),
+        ('a test a week later stays an assessment', refine(sv, [{'num': 5, 'date': '2026-08-25'}])['level'] == 'assessment'),
+        ('a test a person sent stays an assessment', refine({**sv, 'by_person': True}, [{'num': 5, 'date': '2026-09-01'}])['level'] == 'assessment'),
+    ]
     led = [{'ref': 'a', 'at': '1', 'level': 'rejected'}, {'ref': 'a', 'at': '2', 'level': 'none'}, {'ref': 'b', 'at': '1', 'level': 'call'}]
     checks.append(('the latest reading wins', [r['ref'] for r in effective(led)] == ['b']))
     for name, ok in checks:
@@ -652,7 +674,7 @@ def run():
         if r['at'] == latest[r['ref']]['at']: latest[r['ref']]['rows'].append(r)
     new, unsure = [], []
     for m in mails:
-        v = got.get(m['message_id']) or judged.get(m['message_id']) or rules_verdict(m, rows)
+        v = refine(got.get(m['message_id']) or judged.get(m['message_id']) or rules_verdict(m, rows), rows)
         if v.get('why') and m['message_id'] in got: unsure.append((m, v))
         cur = latest.get(m['message_id'], {}).get('rows')
         if cur:
@@ -666,7 +688,11 @@ def run():
         print(f'\nNEW REACTIONS ({len(seen)})')
         for x in sorted(seen, key=lambda x: x['date']):
             print(f"   {x['date']}  {x['level']:10} {('#' + x['num']) if x['num'] else 'no row':>7} {x['company'][:28]} | {x['who'][:30]} | {x['summary'][:90]}" + ('  [answer needed]' if x['reply_needed'] else ''))
-    talk = [x for x in seen if x['reply_needed']]
+    todo = [x for x in seen if x['level'] == 'screening']
+    if todo:
+        print(f'\nSCREENINGS TO COMPLETE ({len(todo)}): automatic questionnaires or tests sent right after applying')
+        for x in todo: print(f"   {x['date']}  #{x['num'] or '-'} {x['company'][:30]} | {x['role'][:50]}")
+    talk = [x for x in seen if x['reply_needed'] and x['level'] != 'screening']
     if talk:
         print(f'\nA RECRUITER WANTS TO TALK ({len(talk)}): answer these yourself')
         for x in talk: print(f"   {x['date']}  {x['company'][:30]} | {x['who'][:30]} | {x['summary'][:100]}")

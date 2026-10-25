@@ -51,6 +51,9 @@
     ['interview', 'Interview', 'ok', 'An interview with the team, a manager or the client'], ['offer', 'Offer', 'ok', 'An offer']];
   const LEVEL = Object.fromEntries(LEVELS.map(([k, label, tone, tip], i) => [k, { label, tone, tip, rank: i + 1 }]));
   LEVEL.rejected = { label: 'Rejected', tone: 'neutral', tip: 'A definite no', rank: 0 };
+  // Not a reaction: an automatic test or questionnaire sent right after applying. Shown because it is still to do.
+  LEVEL.screening = { label: 'Screening to do', tone: 'warn', tip: 'An automatic test or questionnaire sent within a week of applying, the same for everyone. Part of applying, not a reaction.', rank: 0 };
+  const NOT_ANSWER = { viewed: 1, screening: 1 };
   const lrank = (l) => (LEVEL[l] ? LEVEL[l].rank : 0);
   const lpill = (l) => pill((LEVEL[l] || LEVEL.rejected).tone, (LEVEL[l] || { label: l }).label, (LEVEL[l] || {}).tip);
   // One key per company, so "JEMS", "Jems SAS" and "JEMS Group" meet in one place.
@@ -60,7 +63,7 @@
     const r = j.reply;
     if (!r) return { level: '', rejected: false, first: null, firstPos: null };
     const evs = r.history.filter((h) => h.to !== 'Applied').map((h) => ({ at: h.at, pos: !!POSITIVE[h.to], rej: h.to === 'Rejected' }))
-      .concat(r.reactions.filter((x) => x.level !== 'viewed').map((x) => ({ at: new Date(x.date + 'T12:00').getTime(), pos: lrank(x.level) >= lrank('contacted'), rej: x.level === 'rejected' })));
+      .concat(r.reactions.filter((x) => !NOT_ANSWER[x.level]).map((x) => ({ at: new Date(x.date + 'T12:00').getTime(), pos: lrank(x.level) >= lrank('contacted'), rej: x.level === 'rejected' })));
     const first = evs.length ? Math.min(...evs.map((e) => e.at)) : null, pos = evs.filter((e) => e.pos);
     return { level: r.level, rejected: evs.some((e) => e.rej), first, firstPos: pos.length ? Math.min(...pos.map((e) => e.at)) : null };
   }
@@ -1171,7 +1174,7 @@
     const jobFor = (url) => (url ? S.jobs.find((j) => j.url === url) : null);
     const who = (x) => (x.source === 'you' ? 'you told' : 'email') + (x.by && x.by !== 'you' ? ' · read by ' + (x.by === 'rules' ? 'the wording rules' : x.by) : '');
     const posting = (x) => { const j = jobFor(x.url), co = x.company || (j && j.company) || ''; return (co ? coLink(co) : '<b>Unknown company</b>') + (x.role ? (j ? ` · <button type="button" class="link sub" data-act="openJob" data-arg="${j.uid}" data-tip="Open this application">${esc(x.role)}</button>` : `<span class="muted"> · ${esc(x.role)}</span>`) : x.num ? '' : '<span class="muted"> · no application found</span>'); };
-    const recent = S.reactions.filter((x) => x.level !== 'viewed').slice(0, 8);
+    const recent = S.reactions.filter((x) => !NOT_ANSWER[x.level]).slice(0, 8);
     const repBody = recent.length ? `<ul class="props">${recent.map((x) => `<li>
       <div class="pr-h"><span class="pr-k">${lpill(x.level)}${x.replyNeeded ? pill('warn', 'Answer needed') : ''}</span><span class="muted">${esc(dayLabel(new Date(x.date + 'T12:00').getTime()))}</span></div>
       <div class="pr-f"><span>${posting(x)}</span></div>${x.summary ? `<span class="muted">${esc(x.summary)}</span>` : ''}</li>`).join('')}</ul>` : empty('mail', 'No answers yet', 'Answers show here after the reply check that ends each round.');
@@ -1204,7 +1207,7 @@
     return pageHead('Results', 'What employers did with the applications. Only applications at least 2 days old count, so each one had time for an answer.', seg('f.results.range', f.range, [['7d', '7 days'], ['30d', '30 days'], ['all', 'All']], 'Time range')) +
       `<div class="tiles small">${tileStatic('Sent', num(sentAll), num(st.n) + ' old enough to judge')}${tileStatic('Got an answer', pct(st.answered, st.n), num(st.answered) + ' answers')}${tileStatic('Positive answers', pct(st.positive, st.n, 1), num(st.positive) + ' replies or interviews')}${tileStatic('Time to an answer', fmtDays(median(dFirst)), 'median; a positive one: ' + fmtDays(median(dPos)))}</div>
       <div class="grid g-3">${card('From sent to offer', funnel, { sub: 'Each bar counts applications whose furthest step is that one or a later one. A rejection after a call still counts the call.', cls: 'span-2' })}${card('Latest answers', repBody, { sub: 'Read from the employers’ emails by the model, or told by you' })}</div>
-      ${card('Replies from employers', reactTable, { sub: 'The model reads each application email once and quotes the words it went by (hover the text). The tracker status follows by itself.', right: seg('f.results.lv', f.lv, [['positive', 'Positive'], ['seen', 'With viewed'], ['all', 'All']], 'Which replies: positive only, with viewed, or all with rejections'), flush: !!shown.length })}
+      ${card('Replies from employers', reactTable, { sub: 'The model reads each application email once and quotes the words it went by (hover the text). The tracker status follows by itself.', right: seg('f.results.lv', f.lv, [['positive', 'Positive'], ['seen', 'No rejections'], ['all', 'All']], 'Which replies: positive only, everything but rejections, or all'), flush: !!shown.length })}
       <div class="grid g-2">${card('By week sent', cohortTable(weeks, 'Sent in'), { sub: 'Each week’s applications and what came back from them so far. Recent weeks have had less time.', flush: true })}
       ${card('By fit score', cohortTable(fits, 'Fit score'), { sub: 'Does the score the pool gave a posting predict an answer? Higher bands should answer more.', flush: true })}</div>
       <div class="grid g-2">${card('Positive answers by CV', armChart('cv', by('cv', ['generic', 'loose', 'strict'])), { sub: 'The bar is the rate; the line is its 90% range. Overlapping lines can be chance.' })}
