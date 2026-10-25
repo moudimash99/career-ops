@@ -333,7 +333,7 @@ try {
 }
 
 try {
-  const bareOut = execFileSync('node', [scriptPath], { encoding: 'utf-8', timeout: 10000, cwd: dirname(scriptPath) });
+  const bareOut = execFileSync('node', [scriptPath], { encoding: 'utf-8', timeout: 10000, cwd: dirname(scriptPath), maxBuffer: 64 * 1024 * 1024 });
   const bareJson = JSON.parse(bareOut);
   ok('bare run produces valid JSON', typeof bareJson === 'object' && bareJson !== null);
   ok('bare run JSON has metadata key', 'metadata' in bareJson);
@@ -344,7 +344,7 @@ try {
 }
 
 try {
-  execFileSync('node', [scriptPath, '--bogus-flag-xyz'], { encoding: 'utf-8', timeout: 10000, cwd: dirname(scriptPath) });
+  execFileSync('node', [scriptPath, '--bogus-flag-xyz'], { encoding: 'utf-8', timeout: 10000, cwd: dirname(scriptPath), maxBuffer: 64 * 1024 * 1024 });
   ok('unknown flag exits 1', false);
 } catch (e) {
   ok('unknown flag exits 1', e.status === 1);
@@ -355,7 +355,7 @@ try {
 // letting it pass as "known" while never turning emission on.
 for (const bad of ['--emit-signal=true', '--emit-signal=1', '--emit-signal=']) {
   try {
-    execFileSync('node', [scriptPath, '--summary', bad], { encoding: 'utf-8', timeout: 10000, cwd: dirname(scriptPath) });
+    execFileSync('node', [scriptPath, '--summary', bad], { encoding: 'utf-8', timeout: 10000, cwd: dirname(scriptPath), maxBuffer: 64 * 1024 * 1024 });
     ok(`"${bad}" exits 1`, false);
   } catch (e) {
     ok(`"${bad}" exits 1`, e.status === 1 && /unrecognized flag/.test(String(e.stderr)));
@@ -365,14 +365,14 @@ for (const bad of ['--emit-signal=true', '--emit-signal=1', '--emit-signal=']) {
 // Unknown flags are rejected BEFORE --help is answered: `--help --bogus` must
 // fail, not print usage and exit 0 having never looked at `--bogus`.
 try {
-  execFileSync('node', [scriptPath, '--help', '--bogus-flag-xyz'], { encoding: 'utf-8', timeout: 10000, cwd: dirname(scriptPath) });
+  execFileSync('node', [scriptPath, '--help', '--bogus-flag-xyz'], { encoding: 'utf-8', timeout: 10000, cwd: dirname(scriptPath), maxBuffer: 64 * 1024 * 1024 });
   ok('--help with an unknown flag exits 1', false);
 } catch (e) {
   ok('--help with an unknown flag exits 1', e.status === 1 && /unrecognized flag/.test(String(e.stderr)));
 }
 
 try {
-  const helpOut = execFileSync('node', [scriptPath, '--help'], { encoding: 'utf-8', timeout: 10000, cwd: dirname(scriptPath) });
+  const helpOut = execFileSync('node', [scriptPath, '--help'], { encoding: 'utf-8', timeout: 10000, cwd: dirname(scriptPath), maxBuffer: 64 * 1024 * 1024 });
   ok('--help alone prints usage and exits 0', /^Usage:/.test(helpOut));
 } catch (e) {
   ok('--help alone prints usage and exits 0', false);
@@ -383,7 +383,7 @@ try {
 for (const bad of ['abc', '0', '--silence-window=-5']) {
   const flagArgs = bad.startsWith('--') ? [bad] : ['--silence-window', bad];
   try {
-    execFileSync('node', [scriptPath, ...flagArgs], { encoding: 'utf-8', timeout: 10000, cwd: dirname(scriptPath) });
+    execFileSync('node', [scriptPath, ...flagArgs], { encoding: 'utf-8', timeout: 10000, cwd: dirname(scriptPath), maxBuffer: 64 * 1024 * 1024 });
     ok(`--silence-window rejects "${bad}" with exit 1`, false);
   } catch (e) {
     ok(`--silence-window rejects "${bad}" with exit 1`,
@@ -392,7 +392,7 @@ for (const bad of ['abc', '0', '--silence-window=-5']) {
 }
 
 try {
-  const winOut = execFileSync('node', [scriptPath, '--silence-window', '21'], { encoding: 'utf-8', timeout: 10000, cwd: dirname(scriptPath) });
+  const winOut = execFileSync('node', [scriptPath, '--silence-window', '21'], { encoding: 'utf-8', timeout: 10000, cwd: dirname(scriptPath), maxBuffer: 64 * 1024 * 1024 });
   ok('--silence-window accepts a positive integer', JSON.parse(winOut).metadata.silenceWindowDays === 21);
 } catch (e) {
   ok('--silence-window accepts a positive integer', false);
@@ -404,7 +404,7 @@ try {
 for (const flagArgs of [['--company', '--summary'], ['--company'], ['--scan-history', '--summary'], ['--followups='], ['--company='], ['--company', ''], ['--scan-history', ''], ['--followups', '']]) {
   const label = flagArgs.join(' ');
   try {
-    execFileSync('node', [scriptPath, ...flagArgs], { encoding: 'utf-8', timeout: 10000, cwd: dirname(scriptPath) });
+    execFileSync('node', [scriptPath, ...flagArgs], { encoding: 'utf-8', timeout: 10000, cwd: dirname(scriptPath), maxBuffer: 64 * 1024 * 1024 });
     ok(`value flag without a value ("${label}") exits 1`, false);
   } catch (e) {
     ok(`value flag without a value ("${label}") exits 1`,

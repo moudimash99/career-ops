@@ -14,7 +14,8 @@
 # that started the night may be out of allowance by the morning. Everything printed is also kept in
 # tmp/fm/night/full-night.log.
 #
-# ROUND_JOBS=50, EVERY_HOURS=5, END_AT=09:00, DRIVER_ORDER="..." change the defaults; NO_SCAN=1 skips the scan.
+# ROUND_JOBS=50, EVERY_HOURS=5, END_AT=09:00, DRIVER_ORDER="..." change the defaults; NO_SCAN=1 skips the scan;
+# MAX_ROUNDS=N ends the night after N rounds (burn.mjs starts one round at a time).
 # touch tmp/fm/night/stop-night: no further round starts (the round in hand finishes). With
 # tmp/fm/night/stop as well, that round stops before its next job (run.sh).
 # Only the first round asks APEC for routes: a second batch the same day meets its CAPTCHA (issue #25).
@@ -35,6 +36,7 @@ round=0
 while :; do
   round=$(( round + 1 )); t0=$(date +%s); last=
   [ "$t0" -ge "$end" ] && last=1
+  [ -n "$MAX_ROUNDS" ] && [ "$round" -ge "$MAX_ROUNDS" ] && last=1
   echo; echo "===== round $round, $(date '+%a %H:%M')${last:+ (the last one)}"
   apec=; [ $round -gt 1 ] && apec=--no-apec
   if node freemotion-night/make-pool.mjs --top "$ROUND_JOBS" $apec; then

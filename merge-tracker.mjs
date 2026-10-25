@@ -23,7 +23,7 @@
  *   --backfill-urls  fill empty URL cells from each row's linked report
  */
 
-import { readFileSync, readdirSync, mkdirSync, renameSync, existsSync, statSync } from 'fs';
+import { readFileSync, readdirSync, mkdirSync, renameSync, existsSync, statSync, copyFileSync, unlinkSync } from 'fs';
 import { join, basename, dirname, resolve, sep } from 'path';
 import { fileURLToPath } from 'url';
 import { execFileSync } from 'child_process';
@@ -2300,7 +2300,12 @@ export async function mergeTracker(options = {}) {
       if (!existsSync(MERGED_DIR)) mkdirSync(MERGED_DIR, { recursive: true });
       const archivable = tsvFiles.filter(f => !failedAdditions.includes(f));
       for (const file of archivable) {
-        renameSync(join(ADDITIONS_DIR, file), join(MERGED_DIR, file));
+        try {
+          renameSync(join(ADDITIONS_DIR, file), join(MERGED_DIR, file));
+        } catch {
+          copyFileSync(join(ADDITIONS_DIR, file), join(MERGED_DIR, file));
+          unlinkSync(join(ADDITIONS_DIR, file));
+        }
       }
       console.log(`\n✅ Moved ${archivable.length} TSVs to merged/`);
     }

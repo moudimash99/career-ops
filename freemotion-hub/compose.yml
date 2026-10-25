@@ -1,0 +1,25 @@
+# The Free Motion dashboard on the laptop.
+#   page   :8790 on proxy_net only, for cloudflared (route freemotion.machaka.net → http://freemotion:8790)
+#   agents :8791 published on the host; each agent needs its own key (it connects over Tailscale). AGENT_FROM
+#          cannot filter here: Docker's port proxy hides the agent's address from the container.
+# Secrets live in .env next to this file (never committed): AGENT_KEYS, CF_TEAM, CF_AUD, ALLOWED_EMAILS.
+services:
+  freemotion:
+    build: .
+    container_name: freemotion
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      - "8791:8791"
+    volumes:
+      - freemotion-data:/data
+    networks:
+      - proxy_net
+    mem_limit: 256m
+
+volumes:
+  freemotion-data:
+
+networks:
+  proxy_net:
+    external: true

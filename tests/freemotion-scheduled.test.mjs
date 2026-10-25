@@ -16,16 +16,16 @@ const out = [
   'A RECRUITER WANTS TO TALK (1): answer these yourself',
   '   2026-09-09  A Person | Echange opportunité  <a.person@example.com>',
   '',
-  'PROPOSED CHANGES (2): nothing is changed until you run --apply',
-  '  1  #12 Acme | DevOps: Applied -> Rejected   [2026-10-01, "n allons pas y donner suite"]',
-  '  2  #13 Beta | Data: Applied -> Rejected   [2026-10-02, "not selected"]',
+  'STATUS CHANGES MADE (2)',
+  '   #12 Acme | DevOps: Applied -> Rejected',
+  '   #13 Beta | Data: Applied -> Responded',
   '',
-  'NO ROW IN THE TRACKER (0): nothing to update',
+  'NO APPLICATION FOUND (0): recorded without a tracker row',
 ].join('\n');
 const notes = S.replyNotes(out);
-if (notes.length === 2 && /Recruiter wrote/.test(notes[0].text) && /^2 tracker change/.test(notes[1].text)) pass('a recruiter message and the proposed changes become notes');
+if (notes.length === 2 && /Recruiter wrote/.test(notes[0].text) && /^2 tracker change/.test(notes[1].text)) pass('a recruiter message and the changes made become notes');
 else fail(`reply notes: ${JSON.stringify(notes)}`);
-if (S.replyNotes('PROPOSED CHANGES (0): nothing is changed until you run --apply\n').length === 0) pass('nothing to do means no note'); else fail('a note for nothing');
+if (S.replyNotes('STATUS CHANGES MADE (0)\n').length === 0) pass('nothing to do means no note'); else fail('a note for nothing');
 
 const dir = mkdtempSync(join(tmpdir(), 'fm-sched-'));
 try {

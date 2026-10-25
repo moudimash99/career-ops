@@ -8,11 +8,12 @@
  *   node freemotion-night/scheduled.mjs loops     start the three scoring loops if they are not running
  *   node freemotion-night/scheduled.mjs weekly    the weekly lessons report (lessons.mjs weekly)
  *   node freemotion-night/scheduled.mjs start-night [--jobs 50] [--end 09:00] [--every 5] [--no-scan] [--no-mail]
- *                                                 [--mail-every 50]
+ *                                                 [--mail-every 50] [--drivers "..."] [--rounds N]
  *                                                 start a full night run through the "FreeMotion night" task (#41);
  *                                                 --mail-every: a progress email every N jobs (night-mail.py --every)
  *   node freemotion-night/scheduled.mjs night     what that task runs: full-night.sh, then night-mail.py beside it
- *   node freemotion-night/scheduled.mjs install   create the Windows tasks below (needs no admin rights)
+ *   node freemotion-night/scheduled.mjs burn      burn.mjs's tick: applications in what is left of a 5-hour window
+ *   node freemotion-night/scheduled.mjs install   create the Windows tasks below (needs no admin rights); --only <job>
  *   node freemotion-night/scheduled.mjs uninstall remove them
  *   node freemotion-night/scheduled.mjs status    the tasks and their last result
  *
@@ -20,9 +21,13 @@
  *   FreeMotion scan     every day 06:00
  *   FreeMotion loops    at log-on and every day 06:00 (a loop already running is left alone)
  *   FreeMotion weekly   Mondays 09:00
- *   FreeMotion night    no schedule: only `start-night` starts it
- * They run hidden (conhost --headless). "apply" is never scheduled: it spends the drivers' allowances
- * and sends real applications, so a person starts it.
+ *   FreeMotion night    no schedule: only `start-night` (or burn.mjs) starts it
+ *   FreeMotion burn     every 10 minutes: burn.mjs (installed by `node freemotion-night/burn.mjs install`)
+ *   FreeMotion agent    at log-on, and every 5 minutes if it is not running: hub-agent.mjs, this PC's side of
+ *                       the dashboard (installed by `node freemotion-night/scheduled.mjs install --only agent`)
+ * They run hidden (conhost --headless). "apply" is otherwise never scheduled: it spends the drivers'
+ * allowances and sends real applications, so a person starts it. The one exception is burn.mjs, which the
+ * user asked for (2026-10-19): it uses only what is left of one Claude account's 5-hour windows.
  *
  * The night task is there so that a night started from a Claude Code session no longer belongs to that
  * session: on 2026-10-10 Claude Code killed full-night.sh and the mailer when the PC ran low on memory
@@ -57,7 +62,7 @@ const BASH = flag('--bash', process.env.FM_BASH || (existsSync(GIT_BASH) ? GIT_B
 const NIGHT_START = join(ROOT, 'tmp/fm/night/night-start.json');
 const NIGHT_LOG = join(ROOT, 'tmp/fm/night/full-night.log');
 // What start-night hands to the night task: full-night.sh's settings, and what the drivers need.
-export const NIGHT_ENV = ['PATH', 'CLAUDE_CONFIG_DIR', 'CLAUDE1_DIR', 'DRIVER_ORDER', 'ROUND_JOBS', 'EVERY_HOURS', 'END_AT', 'NO_SCAN', 'SONNET_MAX_PER_WINDOW', 'HEADFUL'];
+export const NIGHT_ENV = ['PATH', 'CLAUDE_CONFIG_DIR', 'CLAUDE1_DIR', 'DRIVER_ORDER', 'ROUND_JOBS', 'EVERY_HOURS', 'END_AT', 'NO_SCAN', 'MAX_ROUNDS', 'SONNET_MAX_PER_WINDOW', 'HEADFUL'];
 const stamp = () => new Date().toLocaleString('sv-SE').slice(0, 16);
 const today = () => new Date().toLocaleDateString('sv-SE');
 
@@ -83,7 +88,7 @@ export function note(text, key = text, { inbox = join(ROOT, 'data/agent-inbox.md
   return true;
 }
 
-/** What the reply check printed that needs a person: recruiters who want to talk, proposed changes. */
+/** What the reply check printed that needs a person: recruiters who want to talk, and the status changes it made. */
 export function replyNotes(output) {
   const out = [];
   const talk = output.split(/A RECRUITER WANTS TO TALK[^\n]*\n/)[1];
@@ -91,10 +96,10 @@ export function replyNotes(output) {
     if (!/^\s{3}\d{4}-\d{2}-\d{2}\s/.test(line)) break;
     out.push({ text: `Recruiter wrote and wants to talk (answer by hand): ${line.trim()}`, key: `talk ${line.trim()}` });
   }
-  const m = output.match(/PROPOSED CHANGES \((\d+)\)[^\n]*\n((?:\s*\d+\s+#.*\n?)*)/);
+  const m = output.match(/STATUS CHANGES MADE \((\d+)\)[^\n]*\n((?:\s*#\d+.*\n?)*)/);
   if (m && Number(m[1]) > 0) {
     const lines = m[2].trim().split(/\r?\n/).map((l) => l.trim());
-    out.push({ text: `${m[1]} tracker change(s) applied from employers' replies (rejections found in email; see data/status-log.tsv)`, key: `changes ${lines.join('|')}` });
+    out.push({ text: `${m[1]} tracker change(s) made from employers' replies (data/reactions.tsv, data/status-log.tsv)`, key: `changes ${lines.join('|')}` });
   }
   return out;
 }
@@ -124,20 +129,24 @@ const TASKS = [
   { name: 'FreeMotion weekly', job: 'weekly', triggers: ['New-ScheduledTaskTrigger -Weekly -DaysOfWeek Monday -At 09:00'] },
   // No trigger: only start-night starts it. A night whose last round starts after 09:00 can pass 14 hours.
   { name: 'FreeMotion night', job: 'night', triggers: [], hours: 30 },
+  // Only with --only burn (burn.mjs install): it starts applications by itself.
+  { name: 'FreeMotion burn', job: 'burn', triggers: ['New-ScheduledTaskTrigger -Once -At (Get-Date).Date -RepetitionInterval (New-TimeSpan -Minutes 10)'], hours: 1, optIn: true },
+  // The dashboard's agent runs for good: no time limit, and the 5-minute trigger starts it again if it ended.
+  { name: 'FreeMotion agent', job: 'agent', triggers: ['New-ScheduledTaskTrigger -AtLogOn -User $env:USERNAME', 'New-ScheduledTaskTrigger -Once -At (Get-Date).Date -RepetitionInterval (New-TimeSpan -Minutes 5)'], hours: 0, optIn: true },
 ];
 const NIGHT_TASK = TASKS.find((t) => t.job === 'night').name;
 const ps = (script) => spawnSync('powershell.exe', ['-NoProfile', '-NonInteractive', '-Command', script], { encoding: 'utf8', windowsHide: true });
 
-function install() {
+export function install({ only } = {}) {
   const python = spawnSync(PYTHON, ['-c', 'import sys; print(sys.executable)'], { encoding: 'utf8' }).stdout?.trim();
   if (!python) { console.error(`no python found (${PYTHON}); pass --python <path>`); process.exit(1); }
   const q = (s) => `'${String(s).replace(/'/g, "''")}'`;
-  for (const t of TASKS) {
+  for (const t of TASKS.filter((x) => (only ? x.job === only : !x.optIn))) {
     const argument = `--headless "${NODE}" "${join(ROOT, 'freemotion-night/scheduled.mjs')}" ${t.job} --python "${python}" --bash "${BASH}"`;
     const script = 'try { ' + [
       `$a = New-ScheduledTaskAction -Execute 'conhost.exe' -Argument ${q(argument)} -WorkingDirectory ${q(ROOT)}`,
       `$t = @(${t.triggers.map((x) => `(${x})`).join(', ')})`,
-      `$s = New-ScheduledTaskSettingsSet -StartWhenAvailable -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -ExecutionTimeLimit (New-TimeSpan -Hours ${t.hours || 8}) -MultipleInstances IgnoreNew`,
+      `$s = New-ScheduledTaskSettingsSet -StartWhenAvailable -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -ExecutionTimeLimit (New-TimeSpan -Hours ${t.hours ?? 8}) -MultipleInstances IgnoreNew`,
       `Register-ScheduledTask -TaskPath '\\career-ops\\' -TaskName ${q(t.name)} -Action $a ${t.triggers.length ? '-Trigger $t ' : ''}-Settings $s -Force -ErrorAction Stop | Out-Null`,
       `'ok'`,
     ].join('; ') + ` } catch { 'ERROR: ' + $_.Exception.Message }`;
@@ -152,13 +161,14 @@ export function nightEnv(argv, env = process.env) {
   const opt = (n) => { const i = argv.indexOf(n); return i >= 0 ? argv[i + 1] ?? '' : undefined; };
   const out = {};
   for (const k of NIGHT_ENV) if (env[k]) out[k] = env[k];
-  const set = { '--jobs': 'ROUND_JOBS', '--end': 'END_AT', '--every': 'EVERY_HOURS', '--drivers': 'DRIVER_ORDER' };
+  const set = { '--jobs': 'ROUND_JOBS', '--end': 'END_AT', '--every': 'EVERY_HOURS', '--drivers': 'DRIVER_ORDER', '--rounds': 'MAX_ROUNDS' };
   for (const [f, k] of Object.entries(set)) {
     const v = opt(f);
     if (v === undefined) continue;
     if (!v || v.startsWith('--')) throw new Error(`${f} needs a value`);
     out[k] = v;
   }
+  if (out.MAX_ROUNDS && !/^[1-9]\d*$/.test(out.MAX_ROUNDS)) throw new Error(`--rounds must be a number, not ${out.MAX_ROUNDS}`);
   if (out.ROUND_JOBS && !/^\d+$/.test(out.ROUND_JOBS)) throw new Error(`--jobs must be a number, not ${out.ROUND_JOBS}`);
   if (out.EVERY_HOURS && !/^\d+$/.test(out.EVERY_HOURS)) throw new Error(`--every must be whole hours, not ${out.EVERY_HOURS}`);
   if (out.END_AT && !/^\d{1,2}:\d{2}$/.test(out.END_AT)) throw new Error(`--end must look like 09:00, not ${out.END_AT}`);
@@ -166,24 +176,32 @@ export function nightEnv(argv, env = process.env) {
   return out;
 }
 
-function nightState() {
+export function nightState() {
   const r = ps(`$t = Get-ScheduledTask -TaskPath '\\career-ops\\' -TaskName '${NIGHT_TASK}' -ErrorAction SilentlyContinue; if ($t) { $t.State } else { 'missing' }`);
   return (r.stdout || '').trim() || 'missing';
 }
 
-function startNight() {
+/** Write the night's settings and start the night task; {ok, at} or {ok: false, error}. `by` marks who started it. */
+export function startNightTask({ env, mail = true, mailEvery, by }) {
   const state = nightState();
-  if (state === 'missing') { console.error(`The "${NIGHT_TASK}" task is not installed: run node freemotion-night/scheduled.mjs install`); process.exit(1); }
-  if (state === 'Running') { console.error(`A night is already running (task "${NIGHT_TASK}"). Log: tmp/fm/night/full-night.log. To end it after the round in hand: touch tmp/fm/night/stop-night`); process.exit(1); }
+  if (state === 'missing') return { ok: false, error: `The "${NIGHT_TASK}" task is not installed: run node freemotion-night/scheduled.mjs install` };
+  if (state === 'Running') return { ok: false, error: `A night is already running (task "${NIGHT_TASK}"). Log: tmp/fm/night/full-night.log. To end it after the round in hand: touch tmp/fm/night/stop-night` };
+  mkdirSync(dirname(NIGHT_START), { recursive: true });
+  const at = new Date().toISOString();
+  writeFileSync(NIGHT_START, JSON.stringify({ at, mail, mailEvery, ...(by ? { by } : {}), env }, null, 2));
+  const r = ps(`Start-ScheduledTask -TaskPath '\\career-ops\\' -TaskName '${NIGHT_TASK}' -ErrorAction Stop; 'ok'`);
+  if ((r.stdout || '').trim() !== 'ok') return { ok: false, error: `could not start the task: ${(r.stderr || r.stdout).trim().slice(0, 300)}` };
+  return { ok: true, at };
+}
+
+function startNight() {
   let env;
   try { env = nightEnv(args.slice(1)); } catch (e) { console.error(e.message); process.exit(1); }
-  mkdirSync(dirname(NIGHT_START), { recursive: true });
   const mi = args.indexOf('--mail-every');
   const mailEvery = mi >= 0 ? args[mi + 1] : undefined;
   if (mailEvery !== undefined && !/^\d+$/.test(mailEvery)) { console.error(`--mail-every must be a number, not ${mailEvery}`); process.exit(1); }
-  writeFileSync(NIGHT_START, JSON.stringify({ at: new Date().toISOString(), mail: !args.includes('--no-mail'), mailEvery, env }, null, 2));
-  const r = ps(`Start-ScheduledTask -TaskPath '\\career-ops\\' -TaskName '${NIGHT_TASK}' -ErrorAction Stop; 'ok'`);
-  if ((r.stdout || '').trim() !== 'ok') { console.error(`could not start the task: ${(r.stderr || r.stdout).trim().slice(0, 300)}`); process.exit(1); }
+  const r = startNightTask({ env, mail: !args.includes('--no-mail'), mailEvery });
+  if (!r.ok) { console.error(r.error); process.exit(1); }
   console.log(`Night started in the "${NIGHT_TASK}" task, outside this session: ${env.ROUND_JOBS || 50} jobs a round, every ${env.EVERY_HOURS || 5} h, last round from ${env.END_AT || '09:00'}${env.NO_SCAN ? ', no scan' : ''}${args.includes('--no-mail') ? ', no emails' : `, an email every ${mailEvery || 50} jobs and after each round`}.`);
   console.log('Log: tmp/fm/night/full-night.log · task log: tmp/fm/scheduled/night-<date>.log · stop after the round in hand: touch tmp/fm/night/stop-night');
 }
@@ -234,9 +252,8 @@ async function main() {
     // batch the same day hit the CAPTCHA after one request (2026-10-06), so the test runs here, at 06:00.
     const pool = step(log, 'make-pool', NODE, ['freemotion-night/make-pool.mjs', '--apec-max', String(APEC_MAX)]);
     if (/CAPTCHA/i.test(`${pool.stdout}${pool.stderr}`)) note(`APEC showed its CAPTCHA during the 06:00 scan at --apec-max ${APEC_MAX} (#25): lower APEC_MAX in freemotion-night/scheduled.mjs.`, `apec captcha ${today()}`);
+    // The reply check records what employers did and moves the tracker itself, without asking (user, 2026-10-08, 2026-10-25).
     const r = step(log, 'reply check', PYTHON, ['freemotion-night/inbox-replies.py']);
-    // Rejections found in email go into the tracker without asking (user, 2026-10-08).
-    if (/PROPOSED CHANGES \([1-9]/.test(r.stdout || '')) step(log, 'apply replies', PYTHON, ['freemotion-night/inbox-replies.py', '--apply', 'all']);
     for (const n of replyNotes(r.stdout || '')) note(n.text, n.key);
   } else if (cmd === 'loops') {
     startLoops(log);
@@ -248,15 +265,19 @@ async function main() {
     startNight();
   } else if (cmd === 'night') {
     await runNight(log);
+  } else if (cmd === 'burn') {
+    await (await import('./burn.mjs')).tick();
+  } else if (cmd === 'agent') {
+    await import('./hub-agent.mjs');   // runs until the task is stopped
   } else if (cmd === 'install') {
-    install();
+    install({ only: flag('--only') });
   } else if (cmd === 'uninstall') {
     for (const t of TASKS) { const r = ps(`Unregister-ScheduledTask -TaskPath '\\career-ops\\' -TaskName '${t.name}' -Confirm:$false; 'ok'`); console.log(`${t.name}: ${(r.stdout || '').trim() === 'ok' ? 'removed' : (r.stderr || '').trim().slice(0, 200)}`); }
   } else if (cmd === 'status') {
     const r = ps(`Get-ScheduledTask -TaskPath '\\career-ops\\' | ForEach-Object { $i = $_ | Get-ScheduledTaskInfo; '{0,-20} {1,-8} last {2} (result {3}) next {4}' -f $_.TaskName, $_.State, $i.LastRunTime, $i.LastTaskResult, $i.NextRunTime }`);
     console.log((r.stdout || r.stderr || '').trim() || 'no tasks');
   } else {
-    console.error('Usage: node freemotion-night/scheduled.mjs scan|loops|weekly|start-night|night|install|uninstall|status [--python <path>] [--bash <path>]');
+    console.error('Usage: node freemotion-night/scheduled.mjs scan|loops|weekly|start-night|night|burn|agent|install|uninstall|status [--python <path>] [--bash <path>]');
     process.exit(1);
   }
 }
