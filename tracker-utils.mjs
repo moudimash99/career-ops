@@ -8,7 +8,7 @@
  * copies — and every writer excludes every other writer through the same lock.
  */
 
-import { readFileSync, writeFileSync, renameSync, rmSync, mkdirSync, statSync, lstatSync, existsSync, realpathSync, chmodSync } from 'fs';
+import { readFileSync, writeFileSync, renameSync, rmSync, mkdirSync, statSync, lstatSync, existsSync, realpathSync, chmodSync, copyFileSync, unlinkSync } from 'fs';
 import { join, dirname, basename, resolve, relative, isAbsolute, sep } from 'path';
 import { createHash, randomUUID } from 'crypto';
 import { tmpdir } from 'os';
@@ -748,7 +748,15 @@ export function renameSyncWithRetry(tmpPath, path, rename = renameSync) {
       rename(tmpPath, path);
       return;
     } catch (err) {
-      if (!isRenameContention(err) || attempt >= RENAME_RETRY_DELAYS_MS.length) throw err;
+      if (!isRenameContention(err) || attempt >= RENAME_RETRY_DELAYS_MS.length) {
+        try {
+          copyFileSync(tmpPath, path);
+          unlinkSync(tmpPath);
+          return;
+        } catch {
+          throw err;
+        }
+      }
       sleepSync(RENAME_RETRY_DELAYS_MS[attempt]);
     }
   }

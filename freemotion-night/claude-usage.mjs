@@ -17,7 +17,7 @@
  */
 
 import { spawn } from 'child_process';
-import { appendFileSync, existsSync, mkdirSync, readdirSync } from 'fs';
+import { appendFileSync, existsSync, mkdirSync, readdirSync, readFileSync } from 'fs';
 import { homedir, tmpdir } from 'os';
 import { basename, dirname, join } from 'path';
 import { fileURLToPath } from 'url';
@@ -41,7 +41,7 @@ export function parseWindows(streamJson) {
 }
 
 /** One tiny call on the account in `dir`; resolves {windows, error}. */
-function probe(dir) {
+export function probe(dir) {
   return new Promise((res) => {
     const args = ['-p', 'OK', '--model', 'haiku', '--system-prompt', 'Reply OK.', '--tools', '', '--strict-mcp-config',
       '--no-session-persistence', '--output-format', 'stream-json', '--verbose'];
@@ -60,13 +60,28 @@ function probe(dir) {
   });
 }
 
+/** In a run (DRIVER_ORDER set): is this driver left out, or out now (tmp/fm/night/out/<driver>)? Its account
+ *  then gets no call, not even this tiny one (burn.mjs keeps accounts untouched until a date). */
+function idle(label, env = process.env) {
+  if (!env.DRIVER_ORDER) return false;
+  if (!env.DRIVER_ORDER.split(/\s+/).includes(label)) return true;
+  try { return Number(readFileSync(join(ROOT, 'tmp/fm/night/out', label), 'utf8').trim()) * 1000 > Date.now(); } catch { return false; }
+}
+
 /** [{label, dir}] to check. */
 function accounts(all) {
   const home = homedir();
   const own = process.env.CLAUDE_CONFIG_DIR || join(home, '.claude');
-  if (!all) return [{ label: 'sonnet', dir: own }, { label: 'sonnet1', dir: secondClaudeDir() }];
+  if (!all) return [{ label: 'sonnet', dir: own }, { label: 'sonnet1', dir: secondClaudeDir() }].filter((a) => !idle(a.label));
   const dirs = [join(home, '.claude'), ...readdirSync(home).filter((d) => /^\.claude-account\d+$/.test(d)).sort().map((d) => join(home, d))];
   return dirs.filter((d) => existsSync(join(d, '.credentials.json'))).map((dir) => ({ label: '', dir }));
+}
+
+/** Append one reading to tmp/fm/usage/claude-windows.tsv (time, folder, 5-hour %, week %, resets). */
+export function logWindows(dir, w) {
+  mkdirSync(join(ROOT, 'tmp/fm/usage'), { recursive: true });
+  const now = new Date().toISOString().slice(0, 19) + 'Z';
+  appendFileSync(join(ROOT, 'tmp/fm/usage/claude-windows.tsv'), [now, basename(dir), w.fiveHour?.pct ?? '', w.week?.pct ?? '', w.fiveHour?.resetsAt ?? '', w.week?.resetsAt ?? ''].join('\t') + '\n');
 }
 
 /** "week 12% (resets lun. 19 22:00) · 5 hours 6% (resets mar. 13 13:20)". */

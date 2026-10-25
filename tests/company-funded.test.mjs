@@ -337,11 +337,12 @@ try {
       Object.defineProperty(redirect, 'url', { value: String(url) });
       return redirect;
     }
+    // Dated a few days back from today: discoverFundedCompanies keeps only the last `months` from the real clock.
     const res = new Response(`<?xml version="1.0"?><rss><channel>
         <item>
           <title>Acme raises $25M Series A</title>
           <link>https://techcrunch.com/acme</link>
-          <pubDate>Wed, 15 Jul 2026 12:00:00 +0000</pubDate>
+          <pubDate>${new Date(Date.now() - 5 * 86400000).toUTCString()}</pubDate>
           <description>Acme raises funding.</description>
         </item>
       </channel></rss>`, {

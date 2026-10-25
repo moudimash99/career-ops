@@ -1267,6 +1267,7 @@ test('every recursive walker over this checkout consults the shared predicate', 
     ['plugin-audit.mjs:walk', 'audits a plugin tree, which is not this repository’s source'],
     ['test-all.mjs:walkMjs', 'deny-list security scan over plugins/; a marked dir must not be able to opt out'],
     ['tests/doctor-read-only.test.mjs:snapshot', 'snapshots an isolated temporary data fixture; every created file must be visible to the no-write assertion'],
+    ['freemotion-night/hub-records.mjs:newest', 'walks Codex’s own session store (~/.codex/sessions) for its newest file, never this repository'],
   ]);
 
   const walkers = findRecursiveWalkers(

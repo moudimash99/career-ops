@@ -93,6 +93,7 @@ const day = (iso) => { const d = new Date(iso); return Number.isNaN(+d) ? iso : 
 
 if (isMainModule(import.meta.url)) {
   const argv = process.argv.slice(2);
+  if (argv.includes('--help') || argv.includes('-h')) { console.log('Usage: node freemotion-night/agy-usage.mjs [--since <ISO>]'); process.exit(0); }
   const since = argv.includes('--since') ? argv[argv.indexOf('--since') + 1] : null;
   const now = readUsage();
   if (!now.length) { console.log('allowance: agy unavailable (agy -p /usage gave no limits)'); process.exit(0); }

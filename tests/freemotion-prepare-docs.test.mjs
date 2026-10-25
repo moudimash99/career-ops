@@ -13,7 +13,7 @@ import { pass, fail, rmSync } from './helpers.mjs';
 import {
   DOCS_END, DOCS_START, applyToSheet, contactLine, cvEmail, docsBlock, genericCvPath, patchSheet, prepareDocs, summary, syncSent,
 } from '../freemotion-night/prepare-docs.mjs';
-import { chainWriter, webWriter, WRITER_ORDER } from '../lib/doc-writers.mjs';
+import { ALERT_HOURS, alertOnce, chainWriter, pipe, webWriter, WEB_EVENTS, WRITER_ORDER } from '../lib/doc-writers.mjs';
 import { foldLedger, readLedger } from '../lib/cv-experiment.mjs';
 import { LETTER_SPEC } from '../lib/letter-experiment.mjs';
 import { savePostingTexts } from '../lib/posting-text.mjs';
@@ -74,10 +74,34 @@ const check = (label, actual, expected) => {
     const back = Number(readFileSync(outFile('gemini-web'), 'utf8')) * 1000 - Date.now();
     check('at its limit a site is marked out for about 3 hours', [/limit/.test(limitMsg), back > 2.9 * 3600e3 && back < 3.1 * 3600e3], [true, true]);
 
-    for (let i = 0; i < 2; i++) await errOf(webWriter('chatgpt', { run: answers({ code: 2, out: '', err: 'web-llm: chatgpt: signed out' }), root: web })('ctx'));
+    const mails = [];
+    const alert = (root, site, subject, body) => alertOnce(root, site, subject, body, { send: (_, s, b) => mails.push({ s, b }) });
+    for (let i = 0; i < 2; i++) await errOf(webWriter('chatgpt', { run: answers({ code: 2, out: '', err: 'web-llm: chatgpt: signed out' }), root: web, alert })('ctx'));
     const inbox = readFileSync(join(web, 'data/agent-inbox.md'), 'utf8').split('\n').filter(Boolean);
     check('signed out: marked out for a day and ONE inbox note to sign in again',
       [existsSync(outFile('chatgpt-web')), inbox.length, /chatgpt is signed out: run `python lib\/web-llm\.py signin`/.test(inbox[0])], [true, 1, true]);
+    check('a failing site sends ONE email in its alert window, saying what to do',
+      [mails.length, mails[0]?.s, /web-llm\.py signin/.test(mails[0]?.b)], [1, 'FM: chatgpt-web failed (signed-out)', true]);
+    const stamp = join(web, 'tmp/fm/night/alerts/gemini-web');
+    rmSync(stamp, { force: true });   // the limit above was reported already (with no night-mail.py here, no email)
+    const outBefore = readFileSync(outFile('gemini-web'), 'utf8');
+    await errOf(webWriter('gemini', { run: answers({ code: 1, out: '', err: 'APIError: Unknown API error code: 1096' }), root: web, alert })('ctx'));
+    check('another site has its own alert window; an unknown failure is not marked out',
+      [mails.length, mails[1]?.s, readFileSync(outFile('gemini-web'), 'utf8') === outBefore], [2, 'FM: gemini-web failed (error)', true]);
+    writeFileSync(stamp, String(Date.now() - (ALERT_HOURS + 1) * 3600e3));
+    check('after the alert window the site is reported again', alertOnce(web, 'gemini-web', 's', 'b', { send: () => {} }), true);
+    await errOf(webWriter('chatgpt', { run: answers({ code: -2, out: '', err: 'timed out after 5 min' }), root: web, alert })('ctx'));
+    const timeoutBack = Number(readFileSync(outFile('chatgpt-web'), 'utf8')) * 1000 - Date.now();
+    check('a site that times out sits out about an hour', timeoutBack > 0.9 * 3600e3 && timeoutBack < 1.1 * 3600e3, true);
+    const events = readFileSync(join(web, WEB_EVENTS), 'utf8').trim().split('\n').map((l) => l.split('\t'));
+    check('every website call is one line of data/web-llm-events.tsv',
+      [events[0].join(' '), events.slice(1).map((e) => `${e[1]} ${e[2]}`)],
+      ['at site result seconds detail', ['gemini ok', 'chatgpt ok', 'gemini limit', 'chatgpt signed-out', 'chatgpt signed-out', 'gemini error', 'chatgpt timeout']]);
+
+    // The 2026-10-23 hang: the shell's child keeps the pipes open after the shell is gone.
+    const t0 = Date.now();
+    const hung = await pipe(`"${process.execPath}" -e "require('child_process').spawn(process.execPath, ['-e', 'setTimeout(() => {}, 60000)'], { stdio: 'inherit' }); setTimeout(() => {}, 60000)"`, '', { timeoutMs: 1500 });
+    check('a call whose child hangs ends at its time limit, child and all', [hung.code, /timed out/.test(hung.err), Date.now() - t0 < 10000], [-2, true, true]);
   } finally { rmSync(web, { recursive: true, force: true }); }
   const calls = [];
   const writers = {

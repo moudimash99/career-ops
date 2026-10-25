@@ -17,6 +17,7 @@
 #                the run also needs, so it is capped: at most SONNET_MAX_PER_WINDOW jobs (default 8) in
 #                any 5 hours. One 5-hour window held ~18 Sonnet jobs on 2026-09-30, so 8 leaves a buffer.
 # touch tmp/fm/night/stop: the run stops before its next job (the job in hand finishes).
+# tmp/fm/night/skip: posting URLs, one per line, that the run passes over ("job N: skipped by you").
 # When a driver reports its limit, it is marked out until its reset (tmp/fm/night/out/<driver> holds
 # the epoch) and the same job goes to the next one. When every driver is out, the run WAITS for the
 # first reset (checking at least hourly) instead of stopping.
@@ -201,8 +202,9 @@ run_sonnet1() {
 run_driver() {  # <driver> <num>
   case $1 in
     sonnet1) run_sonnet1 $2 ;;
-    agy) run_agy $2 "" agy ;;
-    agy-sonnet) run_agy $2 "$AGY_SONNET_MODEL" agy-sonnet ;;
+    # The agy model test (freemotion-night/agy-jobs.mjs): each agy job draws its model, Flash High or Medium.
+    agy) AGY_ASKED=$(node freemotion-night/agy-jobs.mjs arm 2>/dev/null); run_agy $2 "$AGY_ASKED" agy ;;
+    agy-sonnet) AGY_ASKED=$AGY_SONNET_MODEL; run_agy $2 "$AGY_SONNET_MODEL" agy-sonnet ;;
     codex) run_codex $2 ;;
     copilot) run_copilot $2 ;;
     sonnet) run_sonnet $2 ;;
@@ -255,6 +257,8 @@ limit_reset() {
 for n in "$@"; do
   if [ -f tmp/fm/night/stop ]; then rm -f tmp/fm/night/stop; echo "note: stop file found before job $n; stopping"; break; fi
   u=$(url_of $n)
+  # tmp/fm/night/skip: one posting URL per line, taken out of the round (the dashboard's queue, or a blacklisted company).
+  if [ -f tmp/fm/night/skip ] && grep -qxF "$u" tmp/fm/night/skip; then echo "job $n: skipped by you"; continue; fi
   prev=$(result_of "$u")
   # Retry jobs that only failed because a limit or the network cut them off; skip everything else that has a result.
   note=$(awk -F'\t' -v u="$u" -v r="$RUN" '$2==u && $8==r {o=$9} END {print o}' data/freemotion-submissions.tsv)
@@ -285,6 +289,8 @@ for n in "$@"; do
     case $d in agy|agy-sonnet) node freemotion-night/agent-log.mjs --job $n --since "$start" --follow --out "tmp/fm/night/actions-$n.log" & follower=$! ;; esac
     run_driver $d $n
     [ -n "$follower" ] && { sleep 2; kill $follower 2>/dev/null; wait $follower 2>/dev/null; }
+    # What the agy job did (model, tool calls, failed ones) into data/agy-jobs.tsv, before agy forgets it.
+    case $d in agy|agy-sonnet) node freemotion-night/agy-jobs.mjs record $n $d "$AGY_ASKED" || true ;; esac
     reset=$(limit_reset $d $n)
     if [ -n "$reset" ] && [ "$(result_of "$u")" != submitted ]; then
       mark_out $d $reset "limit hit on job $n"
