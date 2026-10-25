@@ -62,7 +62,8 @@
   function answerOf(j) {
     const r = j.reply;
     if (!r) return { level: '', rejected: false, first: null, firstPos: null };
-    const evs = r.history.filter((h) => h.to !== 'Applied').map((h) => ({ at: h.at, pos: !!POSITIVE[h.to], rej: h.to === 'Rejected' }))
+    // From the status history only rejections and interviews: its Responded and Assessment moves include ones later corrected.
+    const evs = r.history.filter((h) => h.to === 'Rejected' || POSITIVE[h.to] && !/^(Responded|Assessment)$/.test(h.to)).map((h) => ({ at: h.at, pos: h.to !== 'Rejected', rej: h.to === 'Rejected' }))
       .concat(r.reactions.filter((x) => !NOT_ANSWER[x.level]).map((x) => ({ at: new Date(x.date + 'T12:00').getTime(), pos: lrank(x.level) >= lrank('contacted'), rej: x.level === 'rejected' })));
     const first = evs.length ? Math.min(...evs.map((e) => e.at)) : null, pos = evs.filter((e) => e.pos);
     return { level: r.level, rejected: evs.some((e) => e.rej), first, firstPos: pos.length ? Math.min(...pos.map((e) => e.at)) : null };
@@ -173,7 +174,7 @@
 
   const S = {
     route: 'overview', machine: null,
-    jobs: [], runs: [], queue: [], tasks: [], pool: [], poolTotal: 0, drivers: [], alerts: [], scans: [], replies: [], reactions: [], activity: [],
+    jobs: [], runs: [], queue: [], tasks: [], pool: [], poolTotal: 0, drivers: [], alerts: [], scans: [], replies: [], reactions: [], tracked: [], activity: [],
     prefs: { roundSize: 50, work: { days: [1, 2, 3, 4, 5], from: '09:00', to: '18:00' }, blacklist: [] }, pd: null, burn: false, burnRaw: {}, flags: {},
     run: { state: 'idle' },
     f: {
@@ -234,11 +235,14 @@
       if (!r.url) continue;
       const at = new Date(r.date + 'T12:00').getTime(), cur = entry(r.url);
       cur.history.push({ to: r.to, at, source: r.source });
-      reach(cur, r.to === 'Rejected' ? 'rejected' : r.to === 'Interview' || r.to === 'Offer' || r.to === 'Hired' ? 'interview' : POSITIVE[r.to] ? 'positive' : null, at);
+      // A positive answer comes from the reactions below: the status history also holds moves later corrected.
+      reach(cur, r.to === 'Rejected' ? 'rejected' : r.to === 'Interview' || r.to === 'Offer' || r.to === 'Hired' ? 'interview' : null, at);
     }
     S.replies = replies.filter((r) => r.to !== 'Applied' && r.url).sort((a, b) => (a.date < b.date ? 1 : -1));
     // Reactions: the furthest each application got, read from the employers' emails or told by you.
     S.reactions = mine('reaction').sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
+    // Every sent application in the tracker, the night runs' and the ones before them.
+    S.tracked = mine('application');
     for (const x of S.reactions.slice().reverse()) {
       if (!x.url) continue;
       const at = new Date(x.date + 'T12:00').getTime(), cur = entry(x.url);
@@ -1185,6 +1189,27 @@
     const dPos = facts.filter((x) => x.firstPos).map((x) => Math.max(0, days(x.j.end, x.firstPos)));
     const fmtDays = (v) => (v == null ? '—' : v < 1 ? 'under a day' : Math.round(v) + (Math.round(v) === 1 ? ' day' : ' days'));
     const rateBar = (k, n, d) => `<span class="fit rate${n < 20 ? ' thin' : ''}"${n < 20 ? ' data-tip="Fewer than 20 sent: the rate can swing a lot"' : ''}><span class="fit-b"><b style="width:${n ? Math.min(100, 100 * k / n) : 0}%"></b></span><span class="mono">${pct(k, n, d)}</span></span>`;
+    // Every application in the tracker, not only the night runs': how many reached a person.
+    const tr = S.tracked.filter((a) => new Date(a.date + 'T12:00').getTime() >= from);
+    const lvOf = new Map();
+    for (const x of S.reactions) if (x.num != null && x.level !== 'rejected' && lrank(x.level) > lrank(lvOf.get(x.num))) lvOf.set(x.num, x.level);
+    const reachedA = (a, l) => lrank(lvOf.get(a.num)) >= lrank(l) || (l === 'interview' && /^(Interview|Offer|Hired)$/.test(a.status));
+    const firstDay = tr.length ? Math.min(...tr.map((a) => new Date(a.date + 'T12:00').getTime())) : now;
+    const spanDays = Math.max(1, Math.round((now - (from || firstDay)) / DAY));
+    const trRej = tr.filter((a) => a.status === 'Rejected').length;
+    const trOld = tr.filter((a) => now - new Date(a.date + 'T12:00').getTime() >= 12 * DAY);
+    const trPerson = tr.filter((a) => reachedA(a, 'contacted')), trInt = tr.filter((a) => reachedA(a, 'interview')).length;
+    const BENCH = 0.02, expected = Math.round(tr.length * BENCH);
+    const coM = new Map();
+    for (const a of tr) { const c = coM.get(a.company) || coM.set(a.company, { name: a.company, n: 0, rej: 0, person: 0 }).get(a.company); c.n++; if (a.status === 'Rejected') c.rej++; if (reachedA(a, 'contacted')) c.person++; }
+    const cos = [...coM.values()].sort((a, b) => b.n - a.n), top2 = cos.slice(0, 2).reduce((s, c) => s + c.n, 0);
+    const coTable = cos.length ? `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Company</th><th class="num">Sent</th><th class="opt">Share of all</th><th>Rejected</th><th class="num">A person</th></tr></thead><tbody>${cos.slice(0, 10).map((c) => `<tr>
+      <td>${coLink(c.name)}</td><td class="num">${num(c.n)}</td><td class="opt">${rateBar(c.n, tr.length, 1)}</td><td>${rateBar(c.rej, c.n)}</td><td class="num">${c.person || '—'}</td></tr>`).join('')}</tbody></table></div>`
+      : empty('chart', 'Nothing sent in this range', 'Pick a longer range.');
+    const trackCard = `<div class="tiles small">${tileStatic('Sent, all applications', num(tr.length), Math.round(tr.length / spanDays) + ' a day, to ' + num(coM.size) + ' companies')}${tileStatic('Rejected', pct(trRej, tr.length), pct(trOld.filter((a) => a.status === 'Rejected').length, trOld.length) + ' of those sent 12+ days ago')}${tileStatic('A person got in touch', pct(trPerson.length, tr.length, 2), num(trPerson.length) + (trPerson.length === 1 ? ' application' : ' applications') + ', ' + num(trInt) + ' interviews')}${tileStatic('At a usual 2%', '~' + num(expected), 'contacts a rough rate for cold online applications would bring')}</div>
+      <div class="grid g-2">${card('Where they went', coTable, { sub: 'The 10 companies sent the most. ' + (tr.length ? 'The top two took ' + pct(top2, tr.length) + ' of everything sent.' : ''), flush: !!cos.length })}
+      ${card('Who got in touch', trPerson.length ? `<ul class="props">${trPerson.sort((a, b) => (a.date < b.date ? 1 : -1)).map((a) => `<li><div class="pr-h"><span class="pr-k">${lpill(lvOf.get(a.num))}${a.status === 'Rejected' ? pill('neutral', 'Rejected later') : ''}</span><span class="muted">sent ${esc(dayLabel(new Date(a.date + 'T12:00').getTime()))}</span></div><div class="pr-f"><span>${coLink(a.company)}<span class="muted"> · ${esc(a.role)} · #${a.num}</span></span></div></li>`).join('')}</ul>` : empty('mail', 'Nobody yet in this range', 'A call or message from a person shows here, read from the emails or told by you.'),
+        { sub: 'Applications where a person called or wrote, from the emails or a call you told about' })}</div>`;
     const group = (keyOf, label) => { const m = new Map(); for (const x of facts) { const k = keyOf(x.j); if (k == null) continue; (m.get(k) || m.set(k, []).get(k)).push(x); } return [...m].map(([k, xs]) => ({ k, label: label(k), n: xs.length,
       ans: xs.filter((x) => x.first).length, pos: xs.filter((x) => x.firstPos).length, rej: xs.filter((x) => x.rejected).length, med: median(xs.filter((x) => x.first).map((x) => days(x.j.end, x.first))) })); };
     const monday = (t) => { const d = new Date(sod(t)); d.setDate(d.getDate() - ((d.getDay() + 6) % 7)); return d.getTime(); };
@@ -1205,7 +1230,9 @@
       + (inRange.length > shown.length ? `<p class="muted card-foot">The latest 200 of ${num(inRange.length)}. Pick a shorter range to see older ones.</p>` : '')
       : empty('mail', f.lv === 'positive' ? 'No positive reply in this range' : 'No reaction in this range', 'Each round ends with the reply check, which reads the new emails.');
     return pageHead('Results', 'What employers did with the applications. Only applications at least 2 days old count, so each one had time for an answer.', seg('f.results.range', f.range, [['7d', '7 days'], ['30d', '30 days'], ['all', 'All']], 'Time range')) +
-      `<div class="tiles small">${tileStatic('Sent', num(sentAll), num(st.n) + ' old enough to judge')}${tileStatic('Got an answer', pct(st.answered, st.n), num(st.answered) + ' answers')}${tileStatic('Positive answers', pct(st.positive, st.n, 1), num(st.positive) + ' replies or interviews')}${tileStatic('Time to an answer', fmtDays(median(dFirst)), 'median; a positive one: ' + fmtDays(median(dPos)))}</div>
+      `<h2 class="sec-h">Every application</h2><p class="muted sec-sub">From the tracker, the night runs’ and the ones before them${S.tracked.length ? ', since ' + esc(shortDay(Math.min(...S.tracked.map((a) => new Date(a.date + 'T12:00').getTime())))) : ''}. Counted by the day each was added.</p>${trackCard}
+      <h2 class="sec-h">Night runs</h2><p class="muted sec-sub">The applications the night runs sent, from Sep 21. Only those at least 2 days old count.</p>
+      <div class="tiles small">${tileStatic('Sent', num(sentAll), num(st.n) + ' old enough to judge')}${tileStatic('Got an answer', pct(st.answered, st.n), num(st.answered) + ' answers')}${tileStatic('Positive answers', pct(st.positive, st.n, 1), num(st.positive) + ' replies or interviews')}${tileStatic('Time to an answer', fmtDays(median(dFirst)), 'median; a positive one: ' + fmtDays(median(dPos)))}</div>
       <div class="grid g-3">${card('From sent to offer', funnel, { sub: 'Each bar counts applications whose furthest step is that one or a later one. A rejection after a call still counts the call.', cls: 'span-2' })}${card('Latest answers', repBody, { sub: 'Read from the employers’ emails by the model, or told by you' })}</div>
       ${card('Replies from employers', reactTable, { sub: 'The model reads each application email once and quotes the words it went by (hover the text). The tracker status follows by itself.', right: seg('f.results.lv', f.lv, [['positive', 'Positive'], ['seen', 'No rejections'], ['all', 'All']], 'Which replies: positive only, everything but rejections, or all'), flush: !!shown.length })}
       <div class="grid g-2">${card('By week sent', cohortTable(weeks, 'Sent in'), { sub: 'Each week’s applications and what came back from them so far. Recent weeks have had less time.', flush: true })}

@@ -613,7 +613,7 @@ export function pool(root) {
 }
 
 // ── replies: the tracker's status changes ────────────────────────────────
-/** Tracker row number → { url, company, role, status }. */
+/** Tracker row number → { url, date, company, role, fit, status }. */
 function trackerIndex(root) {
   return cached(root, 'data/applications.md', (t) => {
     const m = new Map();
@@ -621,10 +621,21 @@ function trackerIndex(root) {
       const c = l.split('|').map((x) => x.trim());
       if (!/^\d+$/.test(c[1] || '')) continue;
       const url = (/\((https?:\/\/[^)]+)\)/.exec(c[10] || '') || [])[1] || (/(https?:\/\/\S+)/.exec(c[10] || '') || [])[1] || '';
-      m.set(+c[1], { url, company: c[3], role: c[4], status: c[6] });
+      const fit = parseFloat(c[5]);
+      m.set(+c[1], { url, date: c[2], company: c[3], role: c[4], fit: Number.isFinite(fit) ? fit : null, status: c[6] });
     }
     return m;
   }, new Map());
+}
+
+// ── applications: every tracker row that was sent, the night runs' or not ──
+const SENT_STATES = new Set(['Applied', 'Responded', 'Assessment', 'Interview', 'Offer', 'Hired', 'Rejected']);
+export function applications(root) {
+  const out = [];
+  for (const [num, r] of trackerIndex(root)) {
+    if (SENT_STATES.has(r.status)) out.push({ t: 'application', k: String(num), d: { num, date: r.date, company: r.company, role: r.role, fit: r.fit, status: r.status, url: r.url } });
+  }
+  return out;
 }
 export function replies(root) {
   const urls = trackerIndex(root);
@@ -684,6 +695,7 @@ export function collect(root, now = Date.now()) {
     ...pool(root),
     ...replies(root),
     ...reactions(root),
+    ...applications(root),
   ];
   return recs;
 }
