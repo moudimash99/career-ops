@@ -69,7 +69,8 @@
     return { level: r.level, rejected: evs.some((e) => e.rej), first, firstPos: pos.length ? Math.min(...pos.map((e) => e.at)) : null };
   }
   /** One cell: the furthest step, else Rejected, else nothing yet. */
-  const replyCell = (j) => { if (!isSent(j)) return '<span class="muted">—</span>'; const a = answerOf(j); return a.level ? lpill(a.level) : a.rejected ? lpill('rejected') : '<span class="muted nowrap">No answer yet</span>'; };
+  // A rejection wins over a step that was no answer (viewed, a screening): "Viewed" then a no reads Rejected.
+  const replyCell = (j) => { if (!isSent(j)) return '<span class="muted">—</span>'; const a = answerOf(j); return a.rejected && (!a.level || NOT_ANSWER[a.level]) ? lpill('rejected') : a.level ? lpill(a.level) : '<span class="muted nowrap">No answer yet</span>'; };
   const coLink = (name) => `<button type="button" class="link" data-act="openCompany" data-arg="${esc(name)}">${esc(name)}</button>`;
 
   // ---- Icons -----------------------------------------------------------------------------------
@@ -178,8 +179,8 @@
     prefs: { roundSize: 50, work: { days: [1, 2, 3, 4, 5], from: '09:00', to: '18:00' }, blacklist: [] }, pd: null, burn: false, burnRaw: {}, flags: {},
     run: { state: 'idle' },
     f: {
-      apps: { q: '', range: '30d', results: [], reply: '', site: '', driver: '', run: '', sort: 'start', dir: -1, page: 1, size: 25 },
-      runs: { range: '30d' }, results: { range: '30d', lv: 'positive' },
+      apps: { q: '', range: '30d', from: '', to: '', results: [], reply: '', site: '', driver: '', run: '', sort: 'start', dir: -1, page: 1, size: 25 },
+      runs: { range: '30d' }, results: { range: '30d', from: '', to: '', site: '', driver: '', lv: 'positive' },
       alerts: { tab: 'open', sev: '', sel: [] }, activity: { actor: '', q: '' }, queue: { tab: 'next' },
     },
     ui: { nav: false, blInput: '', chart: {}, errors: {}, compact: window.innerWidth < 640, files: {} },
@@ -243,6 +244,7 @@
     S.reactions = mine('reaction').sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
     // Every sent application in the tracker, the night runs' and the ones before them.
     S.tracked = mine('application');
+    S.agyCost = (setting('agyCost') || { list: [] }).list;
     for (const x of S.reactions.slice().reverse()) {
       if (!x.url) continue;
       const at = new Date(x.date + 'T12:00').getTime(), cur = entry(x.url);
@@ -349,7 +351,7 @@
   function cmdLabel(c) {
     const a = c.args || {};
     switch (c.action) {
-      case 'burn': return a.on ? 'Turn the burn timer on' : 'Turn the burn timer off';
+      case 'burn': return a.on ? 'Turn auto-apply on' : 'Turn auto-apply off';
       case 'stop-after-job': return a.on ? 'Stop after the job in hand' : 'Keep the round going';
       case 'stop-now': return 'Stop the job now';
       case 'start-round': return 'Start a round of ' + a.jobs;
@@ -396,8 +398,21 @@
     for (const j of rj) drivers[j.driver] = (drivers[j.driver] || 0) + 1;
     return { jobs: rj.length, sent, mins, drivers: Object.entries(drivers).sort((a, b) => b[1] - a[1]) };
   }
-  function replyStats(a, b) {
-    const old = S.jobs.filter((j) => isSent(j) && j.end >= a && j.end < b && Date.now() - j.end > 2 * DAY);
+  /** A filter's period, [from, to) in ms: its own dates win over the range buttons. */
+  const dayStart = (s) => new Date(s + 'T00:00').getTime();
+  function period(f) {
+    if (f.from || f.to) return [f.from ? dayStart(f.from) : 0, f.to ? dayStart(f.to) + DAY : Infinity];
+    return [rangeStart(f.range), Infinity];
+  }
+  /** The range buttons plus a from/to pair of dates; picking a button clears the dates. */
+  function rangeCtl(base, f, opts, label) {
+    const custom = !!(f.from || f.to), today = new Date(sod(Date.now())).toLocaleDateString('en-CA');
+    const id = base.replace(/\W+/g, '-');
+    return `<div class="range-ctl"><div class="seg" role="radiogroup" aria-label="${esc(label || 'Time range')}">${opts.map(([v, l]) => `<button type="button" role="radio" aria-checked="${!custom && f.range === v}" data-act="setRange" data-arg="${base}=${v}">${esc(l)}</button>`).join('')}</div>
+      <span class="dates${custom ? ' on' : ''}"><label><span class="sr">From</span><input type="date" id="${id}-from" value="${esc(f.from || '')}" max="${today}" data-model="${base}.from" aria-label="From date"></label><span class="muted">to</span><label><span class="sr">To</span><input type="date" id="${id}-to" value="${esc(f.to || '')}" max="${today}" data-model="${base}.to" aria-label="To date"></label></span></div>`;
+  }
+  function replyStats(a, b, keep) {
+    const old = S.jobs.filter((j) => isSent(j) && j.end >= a && j.end < b && Date.now() - j.end > 2 * DAY && (!keep || keep(j)));
     const answered = old.filter((j) => j.reply && j.reply.outcome).length;
     const interviews = old.filter((j) => j.reply && j.reply.outcome === 'interview').length;
     const positive = old.filter((j) => j.reply && (j.reply.outcome === 'interview' || j.reply.outcome === 'positive')).length;
@@ -406,14 +421,31 @@
   }
 
   // ---- Drivers: one status rule for all --------------------------------------------------------
-  // What the burn timer and run.sh decided, read from the same fields for every driver.
+  // What auto-apply and run.sh decided, read from the same fields for every driver.
+  // One rule per driver (lib/driver-rules.mjs on the PC), picked in the driver's panel.
+  const RULES = {
+    full: ['Full allowance', 'Takes jobs until its own limit; run.sh hands the job on when it hits one.'],
+    burn: ['Burn what is left', 'Kept for writing CVs and letters. It applies only with what would go unused, starting late enough that the rest of its week is used up just by the reset.'],
+    reserve: ['Keep a reserve', 'Comes after the others, and takes jobs only while it keeps its share of each window.'],
+    monthly: ['Spread over the month', 'Takes a job only when its share of the month’s credits allows.'],
+    schedule: ['On schedule', 'An account you work on: in working hours it applies only so that its 5-hour window reaches the buffer at the reset; outside working hours, at once.'],
+  };
+  /** The panel's fields for a driver's rule, and the rule they make. */
+  const ddOf = (d) => { const r = d.rule || { kind: 'full' }; return { id: d.id, kind: r.kind, week: r.week ?? 50, five: r.five_hour ?? 30, mpp: r.minutes_per_pct ?? 20, margin: r.margin_minutes ?? 60, credits: r.credits_per_job ?? 10, until: r.until || null, from: d.from ? new Date(d.from).toLocaleDateString('en-CA') : '' }; };
+  function ruleArgs(dd) {
+    const r = { id: dd.id, kind: dd.kind, from: dd.from || null };
+    if (dd.kind === 'reserve') Object.assign(r, { week: +dd.week, five_hour: +dd.five });
+    if (dd.kind === 'burn') Object.assign(r, { minutes_per_pct: +dd.mpp, margin_minutes: +dd.margin });
+    if (dd.kind === 'monthly') r.credits_per_job = +dd.credits;
+    if (dd.kind === 'schedule') r.until = dd.until;
+    return r;
+  }
   function rule(d) {
-    if (d.scheduled) return { k: 'scheduled', label: 'On schedule', text: 'Applies only so that its 5-hour window reaches the buffer at the reset; outside working hours, at once.' + (d.until ? ' Until ' + when(d.until) + '.' : '') };
-    if (d.monthly) return { k: 'monthly', label: 'Spread over the month', text: 'Takes a job only when its share of the month’s credits allows.' };
-    if (d.lastResort && d.lastHours) return { k: 'lastHours', label: 'Last resort, week’s end', text: 'Comes last, and only in the last ' + d.lastHours + ' hours before its week resets.' };
-    if (d.lastResort) return { k: 'reserve', label: 'Last resort', text: 'Comes after the others, and only while it keeps its reserve.' };
-    if (d.from) return { k: 'from', label: 'Waits for a date', text: 'Left alone until ' + when(d.from) + '.' };
-    return { k: 'plain', label: 'Full allowance', text: 'Takes jobs until its own limit; run.sh hands the job on when it hits one.' };
+    const r = d.rule || { kind: 'full' }, [label, text] = RULES[r.kind] || RULES.full;
+    const more = r.kind === 'burn' ? ` It counts ${r.minutes_per_pct} min of applying per % of its week, plus ${r.margin_minutes} min.`
+      : r.kind === 'monthly' ? ` About ${r.credits_per_job} credits a job.` : r.kind === 'schedule' && d.until ? ' Until ' + when(d.until) + '.' : '';
+    const wait = d.from && d.from > Date.now() ? ' Left alone until ' + when(d.from) + '.' : '';
+    return { k: r.kind === 'schedule' ? 'scheduled' : r.kind, label, text: text + more + wait };
   }
   function status(d) {
     const now = Date.now(), why = d.why || '';
@@ -426,13 +458,14 @@
       if (/left alone until/.test(why)) return { k: 'waiting', tone: 'neutral', label: 'Not yet', why: cap(why) + '.' };
       if (/credits used this month/.test(why)) return { k: 'limit', tone: 'bad', label: 'At limit', why: cap(why) + '. Resets ' + when(d.paused) + '.' };
       if (/spread over the month/.test(why)) return { k: 'pace', tone: 'warn', label: 'Ahead of pace', why: cap(why) + '.' };
+      if (/kept for CVs and letters/.test(why)) return { k: 'kept', tone: 'neutral', label: 'Kept for writing', why: cap(why) + '.' };
       if (/stays for|stays yours|kept until/.test(why)) return { k: 'reserve', tone: 'warn', label: 'Holding reserve', why: cap(why) + '.' };
       if (/working hours|on schedule|the most for now/.test(why)) return { k: 'work', tone: 'neutral', label: 'Your hours', why: cap(why) + '.' };
       if (/no reading|could not be read/.test(why)) {
         const a = S.alerts.find((x) => x.auto && x.state !== 'resolved' && d.account && x.detail.includes(d.account));
-        return { k: 'unknown', tone: 'bad', label: 'Cannot read', why: a ? 'The burn timer cannot read it: ' + a.detail.replace(/^could not read [^:]+: /, '') : 'The burn timer has no reading of its windows, so it keeps it out.' };
+        return { k: 'unknown', tone: 'bad', label: 'Cannot read', why: a ? 'Auto-apply cannot read it: ' + a.detail.replace(/^could not read [^:]+: /, '') : 'Auto-apply has no reading of its windows, so it keeps it out.' };
       }
-      return { k: 'paused', tone: 'neutral', label: 'Paused', why: cap(why || 'paused by the burn timer') + '. Until ' + when(d.paused) + '.' };
+      return { k: 'paused', tone: 'neutral', label: 'Paused', why: cap(why || 'paused by auto-apply') + '. Until ' + when(d.paused) + '.' };
     }
     for (const w of WINDOWS) { const x = d.windows[w.k]; if (x && x.reset > now && x.used >= 100) return { k: 'limit', tone: 'bad', label: 'At limit', why: w.label + ' used up. Resets ' + when(x.reset) + '.' }; }
     return { k: 'ready', tone: 'ok', label: 'Ready', why: why ? cap(why) + '.' : 'Can take the next job.' };
@@ -473,7 +506,7 @@
     if (path === 'f.alerts.tab' || path === 'f.alerts.sev') S.f.alerts.sel = [];
   }
   function goApps(filter) {
-    S.f.apps = Object.assign({ q: '', range: '30d', results: [], reply: '', site: '', driver: '', run: '', sort: 'start', dir: -1, page: 1, size: S.f.apps.size }, filter);
+    S.f.apps = Object.assign({ q: '', range: '30d', from: '', to: '', results: [], reply: '', site: '', driver: '', run: '', sort: 'start', dir: -1, page: 1, size: S.f.apps.size }, filter);
     S.drawer = null;
     location.hash = 'applications';
   }
@@ -481,6 +514,7 @@
   const A = {
     go: (r) => { S.drawer = null; S.modal = null; location.hash = r; },
     set: (arg) => { const i = arg.indexOf('='); setPath(arg.slice(0, i), arg.slice(i + 1)); },
+    setRange: (arg) => { const i = arg.indexOf('='), base = arg.slice(0, i); setPath(base + '.range', arg.slice(i + 1)); setPath(base + '.from', ''); setPath(base + '.to', ''); },
     nav: () => { S.ui.nav = !S.ui.nav; },
     theme: (t) => {
       theme = t;
@@ -544,6 +578,7 @@
     sort: (k) => { const f = S.f.apps; if (f.sort === k) f.dir = -f.dir; else { f.sort = k; f.dir = k === 'start' || k === 'fit' || k === 'mins' ? -1 : 1; } f.page = 1; },
     toggleResult: (k) => { const f = S.f.apps; f.results = f.results.includes(k) ? f.results.filter((x) => x !== k) : f.results.concat(k); f.page = 1; },
     clearApps: () => { goApps({}); },
+    clearResults: () => { Object.assign(S.f.results, { range: '30d', from: '', to: '', site: '', driver: '' }); },
     page: (d) => { S.f.apps.page = Math.max(1, S.f.apps.page + +d); window.scrollTo(0, 0); },
     goApps: (k) => {
       if (k === 'today') goApps({ range: 'today', results: ['sent'] });
@@ -551,16 +586,16 @@
       else if (k === 'run') { const id = S.run.state !== 'idle' && S.run.id ? S.run.id : S.run.lastRun ? S.run.lastRun.id : ''; goApps({ range: 'all', run: id }); }
       else if (k.startsWith('run:')) goApps({ range: 'all', run: k.slice(4) });
       else if (k.startsWith('driver:')) goApps({ range: '7d', driver: k.slice(7) });
-      else if (k.startsWith('site:')) goApps({ range: S.f.results.range === 'all' ? 'all' : '30d', site: k.slice(5) });
+      else if (k.startsWith('site:')) goApps({ range: S.f.results.range, from: S.f.results.from, to: S.f.results.to, driver: S.f.results.driver, site: k.slice(5) });
       else if (k.startsWith('q:')) goApps({ range: 'all', q: k.slice(2) });
-      else if (k.startsWith('reply:')) goApps({ range: S.f.results.range, results: ['sent'], reply: k.slice(6) });
+      else if (k.startsWith('reply:')) goApps({ range: S.f.results.range, from: S.f.results.from, to: S.f.results.to, site: S.f.results.site, driver: S.f.results.driver, results: ['sent'], reply: k.slice(6) });
     },
 
     // drawers
     openJob: (uid) => { S.drawer = { type: 'job', id: uid }; },
     openRun: (id) => { S.drawer = { type: 'run', id }; },
     openCompany: (name) => { S.drawer = { type: 'company', id: name }; },
-    openDriver: (id) => { const d = driverById(id); if (!d) return; S.drawer = { type: 'driver', id }; S.dd = { id, week: d.reserve.week, five: d.reserve.five }; S.ui.errors = {}; },
+    openDriver: (id) => { const d = driverById(id); if (!d) return; S.drawer = { type: 'driver', id }; S.dd = ddOf(d); S.ui.errors = {}; },
     getFile: (arg) => {
       const [kind, n] = arg.split(':');
       if (S.ui.files[arg] && S.ui.files[arg].state === 'wait') return;
@@ -579,12 +614,15 @@
     },
     saveDriver: () => {
       const dd = S.dd, e = {}, d = driverById(dd.id);
-      for (const k of ['week', 'five']) { const v = +dd[k]; if (!(Number.isInteger(v) && v >= 0 && v <= 90)) e['rsv-' + k] = 'A whole number from 0 to 90.'; }
+      const int = (k, lo, hi, msg) => { const v = +dd[k]; if (!(String(dd[k]).trim() !== '' && Number.isInteger(v) && v >= lo && v <= hi)) e['dd-' + k] = msg; };
+      if (dd.kind === 'reserve') { int('week', 0, 90, 'A whole number from 0 to 90.'); int('five', 0, 90, 'A whole number from 0 to 90.'); }
+      if (dd.kind === 'burn') { int('mpp', 1, 240, 'A whole number from 1 to 240.'); int('margin', 0, 1440, 'A whole number from 0 to 1440.'); }
+      if (dd.kind === 'monthly') int('credits', 1, 100, 'A whole number from 1 to 100.');
       S.ui.errors = e;
       if (Object.keys(e).length) { toast('Fix the highlighted fields', { tone: 'bad' }); return; }
-      if (+dd.week === d.reserve.week && +dd.five === d.reserve.five) { S.drawer = null; S.dd = null; toast('Nothing changed'); return; }
-      const before = { id: d.id, week: d.reserve.week, five_hour: d.reserve.five };
-      command('settings', { reserve: { id: d.id, week: +dd.week, five_hour: +dd.five } }, { label: 'Save ' + d.id, undo: () => command('settings', { reserve: before }) });
+      const now = ruleArgs(dd), was = ruleArgs(ddOf(d));
+      if (JSON.stringify(now) === JSON.stringify(was)) { S.drawer = null; S.dd = null; toast('Nothing changed'); return; }
+      command('settings', { rule: now }, { label: 'Save ' + d.id + ': ' + RULES[now.kind][0].toLowerCase(), undo: () => command('settings', { rule: was }) });
       S.drawer = null; S.dd = null;
     },
 
@@ -851,7 +889,7 @@
     if (r.state === 'running') return pill(r.stopAfter ? 'warn' : 'info', r.stopAfter ? 'Stops after this job' : 'Running · job ' + (r.done + 1) + ' of ' + r.planned);
     if (r.state === 'choosing') return pill('info', 'Starting a round');
     if (r.state === 'between') return pill('info', 'Between rounds');
-    return pill('neutral', S.burn ? 'Idle · burn timer on' : 'Idle');
+    return pill('neutral', S.burn ? 'Idle · auto-apply on' : 'Idle');
   }
   function vTop() {
     const today = sentIn(sod(Date.now()), Date.now() + DAY);
@@ -894,13 +932,13 @@
   function dailyTable(days) {
     return `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Day</th><th class="num">Sent</th><th class="num">Not sent</th><th class="num">Sent rate</th></tr></thead><tbody>${days.slice().reverse().map((d, i) => `<tr><td>${i === 0 ? 'Today' : dayLabel(d.t)}</td><td class="num">${d.sent}</td><td class="num">${d.other}</td><td class="num">${pct(d.sent, d.sent + d.other)}</td></tr>`).join('')}</tbody></table></div>`;
   }
-  const byWho = (by) => (by === 'Burn timer' ? 'the burn timer' : by === 'You' ? 'you' : (by || 'someone').toLowerCase());
+  const byWho = (by) => (by === 'Auto-apply' || by === 'Burn timer' ? 'auto-apply' : by === 'You' ? 'you' : (by || 'someone').toLowerCase());
   function runPanel() {
     const r = S.run, now = Date.now();
     const startBtn = btn('Start a round', 'askStart', { kind: 'primary', icon: 'play', disabled: !online() || !!pending('start-round'), busy: !!pending('start-round'), tip: offlineTip() });
     if (r.state === 'idle' || r.state === 'between') {
       const last = r.lastRun, ls = last ? runStats(last.id) : null;
-      const next = S.burn ? 'The burn timer is on: it looks every 10 minutes and starts a round of ' + S.prefs.roundSize + ' when no run is going and a driver may apply.' : 'The burn timer is off, so nothing starts by itself.';
+      const next = S.burn ? 'Auto-apply is on: it looks every 10 minutes and starts a round of ' + S.prefs.roundSize + ' when no run is going and a driver may apply.' : 'Auto-apply is off, so nothing starts by itself.';
       return card('', `<div class="rp"><div class="rp-top">${pill('neutral', r.state === 'between' ? 'Between rounds' : 'Idle')}<span class="muted">${num(S.poolTotal)} postings in the pool${S.poolAt ? ', ranked ' + when(S.poolAt) : ''}</span></div>
         <h2 class="rp-title">${r.state === 'between' ? 'The night run waits for its next round' : 'No round is running'}</h2>${last ? `<p class="rp-sub">Last round ${esc(last.id)} ended ${when(last.end)}: ${ls.sent} sent of ${plural(ls.jobs, 'job')}. ${esc(ENDED[last.ended].note)}</p>` : ''}
         <p class="rp-sub">${next}</p><div class="rp-a">${startBtn}${last ? btn('Open round ' + last.id, 'openRun', { arg: last.id }) : ''}</div></div>`, { cls: 'span-2 run-card' });
@@ -930,7 +968,7 @@
     const line = (title, desc, ctl) => `<div class="ctl"><div><b>${title}</b><span>${desc}</span></div>${ctl}</div>`;
     const wait = (c) => (c ? ' <em class="pend">' + esc(statusWord(c)) + '…</em>' : '');
     return card('Controls', `<div class="ctls">
-      ${line('Burn timer' + wait(pb), S.burn ? 'On. When no run is going, it starts a round within 10 minutes.' : 'Off. Rounds start only when you start them.', sw(S.burn, 'toggleBurn', 'Burn timer', { busy: !!pb, disabled: !online(), tip: offlineTip() }))}
+      ${line('Auto-apply' + wait(pb), S.burn ? 'On. When no run is going, it starts a round within 10 minutes.' : 'Off. Rounds start only when you start them.', sw(S.burn, 'toggleBurn', 'Auto-apply', { busy: !!pb, disabled: !online(), tip: offlineTip() }))}
       ${line('Stop after this job' + wait(ps), running ? (r.stopAfter ? 'The round ends when the job in hand ends.' : 'Let the job in hand finish, then end the round.') : 'Only while a round is running.', sw(r.stopAfter, 'toggleStopAfter', 'Stop after this job', { disabled: !running || !online(), busy: !!ps, tip: offlineTip() }))}
       </div><div class="ctl-a">${btn('Start a round', 'askStart', { kind: 'primary', icon: 'play', disabled: running || !online(), busy: !!pending('start-round'), tip: running ? 'A round is running. Start one when it ends.' : offlineTip() })}${btn(pn ? 'Stopping…' : 'Stop now', 'askStopNow', { kind: 'danger', icon: 'stop', disabled: r.state !== 'running' || !online(), busy: !!pn, tip: r.state === 'running' ? offlineTip() : 'No job is running' })}</div>`,
     { sub: 'Each change goes to the PC and shows here once the PC has done it.' });
@@ -957,7 +995,7 @@
       const per = r.done ? (now - r.start) / (r.done + 0.5) : 10 * MIN;
       ev.push({ t: r.stopAfter ? now + per * 0.5 : now + per * (r.planned - r.done - 0.5), text: r.stopAfter ? 'Round ' + r.id + ' stops after this job' : 'Round ' + r.id + ' should end' });
     }
-    if (S.burn && r.state === 'idle') { const t = Math.ceil(now / (10 * MIN)) * 10 * MIN; ev.push({ t, text: 'The burn timer looks again (it starts a round if a driver may apply)' }); }
+    if (S.burn && r.state === 'idle') { const t = Math.ceil(now / (10 * MIN)) * 10 * MIN; ev.push({ t, text: 'Auto-apply looks again (it starts a round if a driver may apply)' }); }
     // Calendar days (setDate), so a clock change never shifts the time.
     const at = (hm, dow) => { const [h, m] = hm.split(':').map(Number); const d = new Date(now); d.setHours(h, m, 0, 0); while (d.getTime() <= now || (dow != null && d.getDay() !== dow)) { d.setDate(d.getDate() + 1); d.setHours(h, m, 0, 0); } return d.getTime(); };
     // The tasks' real next runs, as Windows reports them; the usual times only when none was read.
@@ -982,7 +1020,7 @@
     if (!c) {
       const last = r.lastRun;
       const txt = r.state === 'choosing' ? 'Round ' + esc(r.id || '') + ' is choosing its jobs. The first one starts in a few minutes.'
-        : (last ? 'Round ' + esc(last.id) + ' ended ' + when(last.end) + '. ' : '') + (S.burn ? 'The burn timer starts the next one when a driver may apply.' : 'The burn timer is off.');
+        : (last ? 'Round ' + esc(last.id) + ' ended ' + when(last.end) + '. ' : '') + (S.burn ? 'Auto-apply starts the next one when a driver may apply.' : 'Auto-apply is off.');
       return pageHead('Live job', 'Follow the job in hand as the driver works.') + card('', empty('pulse', r.state === 'choosing' ? 'Starting a round' : 'No job is running', txt,
         btn('Start a round', 'askStart', { kind: 'primary', icon: 'play', disabled: r.state !== 'idle' || !online(), tip: offlineTip() }) + (last ? btn('Open round ' + last.id, 'openRun', { arg: last.id }) : '')));
     }
@@ -1067,9 +1105,10 @@
   // A search looks through every application, not only the time range, and through what the employers wrote.
   const REPLY_F = { positive: (a) => lrank(a.level) >= lrank('contacted'), answered: (a) => !!a.first, rejected: (a) => a.rejected, none: (a) => !a.first };
   function appsFiltered(skipResults) {
-    const f = S.f.apps, q = fold(f.q.trim()), from = f.run || q ? 0 : rangeStart(f.range);
+    // A search looks at every date, unless dates of its own are picked.
+    const f = S.f.apps, q = fold(f.q.trim()), [from, to] = f.run || (q && !f.from && !f.to) ? [0, Infinity] : period(f);
     const said = (j) => (j.reply ? j.reply.reactions.map((x) => x.who + ' ' + x.summary).join(' ') : '');
-    return S.jobs.filter((j) => j.end >= from && (!f.run || j.round === f.run) && (!f.site || j.site === f.site) && (!f.driver || j.driver === f.driver)
+    return S.jobs.filter((j) => j.end >= from && j.end < to && (!f.run || j.round === f.run) && (!f.site || j.site === f.site) && (!f.driver || j.driver === f.driver)
       && (skipResults || !f.results.length || f.results.includes(j.result))
       && (!f.reply || (isSent(j) && REPLY_F[f.reply](answerOf(j))))
       && (!q || fold(j.company + ' ' + j.role + ' ' + j.place + ' ' + j.id + ' ' + j.siteName + ' ' + said(j)).includes(q)));
@@ -1094,12 +1133,12 @@
     list.sort((a, b) => (k(a) < k(b) ? -1 : k(a) > k(b) ? 1 : 0) * f.dir || b.end - a.end);
     const pages = Math.max(1, Math.ceil(list.length / f.size)); if (f.page > pages) f.page = pages;
     const from = (f.page - 1) * f.size, shown = list.slice(from, from + f.size), sent = list.filter(isSent).length;
-    const active = f.q || f.results.length || f.reply || f.site || f.driver || f.run || f.range !== '30d';
+    const active = f.q || f.results.length || f.reply || f.site || f.driver || f.run || f.range !== '30d' || f.from || f.to;
     const th = (label, kk, cls) => { const on = f.sort === kk; return `<th class="${cls || ''}" aria-sort="${on ? (f.dir > 0 ? 'ascending' : 'descending') : 'none'}"><button type="button" class="th-sort${on ? ' on' : ''}" data-act="sort" data-arg="${kk}">${label}${icon(on && f.dir > 0 ? 'up' : 'down')}</button></th>`; };
     const drivers = [...new Set(S.jobs.map((j) => j.driver))].sort();
     const filters = `<div class="filters">
       <div class="search inline">${icon('search')}<input id="apps-q" type="search" placeholder="Company, role, place or job number" aria-label="Search applications" value="${esc(f.q)}" data-model="f.apps.q" autocomplete="off"></div>
-      ${f.q && !f.run ? '<span class="muted al-auto">Searching every application, any date</span>' : f.run ? `<span class="chip lead">Round ${esc(f.run)}<button type="button" class="chip-x" data-act="set" data-arg="f.apps.run=" aria-label="Remove the round filter">${icon('x')}</button></span>` : seg('f.apps.range', f.range, [['today', 'Today'], ['7d', '7 days'], ['30d', '30 days'], ['all', 'All']], 'Time range')}
+      ${f.run ? `<span class="chip lead">Round ${esc(f.run)}<button type="button" class="chip-x" data-act="set" data-arg="f.apps.run=" aria-label="Remove the round filter">${icon('x')}</button></span>` : rangeCtl('f.apps', f, [['today', 'Today'], ['7d', '7 days'], ['30d', '30 days'], ['all', 'All']]) + (f.q && !f.from && !f.to ? '<span class="muted al-auto">Searching every date; pick dates to narrow it</span>' : '')}
       <label class="sel"><span class="sr">Site</span><select id="apps-site" data-model="f.apps.site"><option value="">All sites</option>${sites().map(([id, name]) => `<option value="${esc(id)}"${f.site === id ? ' selected' : ''}>${esc(name)}</option>`).join('')}</select></label>
       <label class="sel"><span class="sr">Reply</span><select id="apps-reply" data-model="f.apps.reply"><option value="">Any reply</option>${[['positive', 'Positive reply (contacted or further)'], ['answered', 'Any answer'], ['rejected', 'Rejected'], ['none', 'No answer yet']].map(([v, l]) => `<option value="${v}"${f.reply === v ? ' selected' : ''}>${l}</option>`).join('')}</select></label>
       <label class="sel"><span class="sr">Driver</span><select id="apps-driver" data-model="f.apps.driver"><option value="">All drivers</option>${drivers.map((d) => `<option value="${esc(d)}"${f.driver === d ? ' selected' : ''}>${esc(drvName(d))}</option>`).join('')}</select></label>
@@ -1139,20 +1178,20 @@
     const agySteps = tsteps.series.find((x) => x.key === 'agy');
     const stepsCard = card('agy: steps per sent job', agySteps ? (showS ? trendTable(tsteps.days, [agySteps], (v) => String(Math.round(v))) : trendChart(tsteps.days, [agySteps], { fmt: (v) => String(Math.round(v)), label: 'agy steps per sent job, daily median', narrow: true })) : empty('runs', 'No agy step log in 30 days', ''),
       { sub: 'One step is one “next, because” line in agy’s log. Each takes about 8 seconds, so more steps means a longer job.', right: seg('ui.chart.steps', showS ? 'true' : '', [['', 'Chart'], ['true', 'Table']], 'View') });
-    // The agy model test: every agy job draws Flash High or Medium (agy-jobs.mjs); jobs from before it ran on the default.
-    const modelName = (m) => ({ 'gemini-3.8-flash-high': 'Flash High', 'gemini-3.8-flash-medium': 'Flash Medium', 'gemini-3.8-flash-low': 'Flash Low', 'claude-sonnet-4-6': 'Claude Sonnet 4.6' }[m] || m || 'unknown');
+    // The agy model test: every agy job draws one of the test's models (agy-jobs.mjs); jobs from before it ran on the default.
+    const modelName = (m) => { const g = /^gemini-([\d.]+)-flash-(high|medium|low)$/.exec(m || ''); return g ? `Flash ${g[1]} ${cap(g[2])}` : ({ 'claude-sonnet-4-6': 'Claude Sonnet 4.6' }[m] || m || 'unknown'); };
+    const costOf = (m) => S.agyCost.find((c) => c.model === m);
     const mg = {};
     for (const j of S.jobs) {
       if (!j.agy || !(j.agy.model || j.agy.asked)) continue;   // no model seen: agy stopped before its first answer
       const k = (j.agy.asked ? '1' : '0') + (j.agy.model || j.agy.asked);
-      const g = mg[k] ||= { k, label: modelName(j.agy.model || j.agy.asked) + (j.agy.asked ? '' : ' (before the test)'), jobs: 0, sent: 0, mins: [], tools: [], calls: 0, fails: 0 };
+      const g = mg[k] ||= { k, model: j.agy.model || j.agy.asked, label: modelName(j.agy.model || j.agy.asked) + (j.agy.asked ? '' : ' (before the test)'), jobs: 0, sent: 0, mins: [], tools: [], calls: 0, fails: 0 };
       g.jobs++; g.calls += j.agy.tools; g.fails += j.agy.fails;
       if (isSent(j)) { g.sent++; g.mins.push((j.end - j.start) / MIN); g.tools.push(j.agy.tools); }
     }
     const mrows = Object.values(mg).filter((g) => g.jobs >= 3).sort((a, b) => b.k.localeCompare(a.k));
-    const testing = mrows.some((g) => g.k[0] === '1');
-    const modelCard = card('agy model test', mrows.length ? `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Model</th><th class="num">Jobs</th><th class="num">Sent rate</th><th class="num">Time per sent job</th><th class="num opt">Tool calls per sent job</th><th class="num opt">Failed tool calls</th></tr></thead><tbody>${mrows.map((g) => `<tr><td>${esc(g.label)}</td><td class="num">${num(g.jobs)}</td><td class="num">${pct(g.sent, g.jobs)}</td><td class="num">${g.mins.length ? fmtMin(median(g.mins)) : '—'}</td><td class="num opt">${g.tools.length ? Math.round(median(g.tools)) : '—'}</td><td class="num opt">${pct(g.fails, g.calls, 1)}</td></tr>`).join('')}</tbody></table></div>` : empty('runs', 'No agy job recorded yet', ''),
-      { sub: (testing ? 'Each agy job draws Gemini 3.8 Flash High or Medium, 50/50.' : 'From the next round, each agy job draws Gemini 3.8 Flash High or Medium, 50/50.') + ' Times and tool calls are medians over sent jobs. A model needs about 30 sent jobs before the difference means much.', cls: 'span-3' });
+    const modelCard = card('agy model test', mrows.length ? `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Model</th><th class="num">Jobs</th><th class="num">Sent rate</th><th class="num">Time per sent job</th><th class="num opt">Tool calls per sent job</th><th class="num opt">Failed tool calls</th><th class="num">Week per job</th></tr></thead><tbody>${mrows.map((g) => `<tr><td>${esc(g.label)}</td><td class="num">${num(g.jobs)}</td><td class="num">${pct(g.sent, g.jobs)}</td><td class="num">${g.mins.length ? fmtMin(median(g.mins)) : '—'}</td><td class="num opt">${g.tools.length ? Math.round(median(g.tools)) : '—'}</td><td class="num opt">${pct(g.fails, g.calls, 1)}</td><td class="num">${(() => { const c = g.k[0] === '1' && costOf(g.model); return c && c.perJob != null ? `<span${c.intervals < 20 ? ` class="muted" data-tip="From ${c.intervals} readings only: rough"` : ''}>${Math.max(0, c.perJob).toFixed(2)}%</span>` : '—'; })()}</td></tr>`).join('')}</tbody></table></div>` : empty('runs', 'No agy job recorded yet', ''),
+      { sub: 'Each agy job draws one of the newest Gemini Flash levels (now Medium or Low, 50/50; High did as well as Medium). Times and tool calls are medians over sent jobs. Week per job: what one job takes of agy’s Gemini week, from its readings every 30 minutes; grey while it rests on few readings. A model needs about 30 sent jobs before the difference means much.', cls: 'span-3' });
     return pageHead('Runs', 'Each round of applications, from its start to how it ended.', seg('f.runs.range', f.range, [['7d', '7 days'], ['30d', '30 days'], ['all', 'All']], 'Time range')) +
       `<div class="grid g-3">${timeCard}${stepsCard}${modelCard}</div><div class="tiles small">${tileStatic('Rounds ended', num(list.length), early + ' ended early')}${tileStatic('Sent per round', list.length ? (sent / list.length).toFixed(1) : '—', 'average')}${tileStatic('Sent rate', pct(sent, jobs), num(sent) + ' of ' + num(jobs) + ' jobs')}${tileStatic('Time per job', allMins.length ? dur(sum(allMins) / jobs) : '—', 'average, documents included')}</div>` +
       card('', rows.length ? `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Round</th><th>Started</th><th class="opt">Started by</th><th class="num opt">Took</th><th class="num">Jobs</th><th class="num">Sent</th><th class="num opt">Sent rate</th><th class="opt">Drivers</th><th>How it ended</th></tr></thead><tbody>${rows.join('')}</tbody></table></div>` : empty('runs', 'No rounds in this range', 'Pick a longer range.'), { flush: true });
@@ -1160,8 +1199,9 @@
 
   // ---- Results ---------------------------------------------------------------------------------
   function vResults() {
-    const f = S.f.results, now = Date.now(), from = rangeStart(f.range), st = replyStats(from, now);
-    const sentAll = S.jobs.filter((j) => isSent(j) && j.end >= from).length;
+    const f = S.f.results, now = Date.now(), [from, to] = period(f), end = Math.min(to, now);
+    const keep = (j) => (!f.site || j.site === f.site) && (!f.driver || j.driver === f.driver), st = replyStats(from, end, keep);
+    const sentAll = S.jobs.filter((j) => isSent(j) && j.end >= from && j.end < end && keep(j)).length;
     const funnel = hbars([
       { label: 'Sent, 2+ days ago', v: st.n, cls: 'o1', tip: 'Applications old enough to have an answer' },
       { label: 'Got an answer', v: st.answered, cls: 'o2', tip: pct(st.answered, st.n, 1) + ' of sent: rejections, replies and interviews' },
@@ -1169,7 +1209,7 @@
     ], { cls: 'funnel' });
     const by = (k, arms) => arms.map((a) => [a, st.old.filter((j) => j[k].arm === a)]);
     const siteRows = sites().map(([id, name]) => {
-      const tried = S.jobs.filter((j) => j.site === id && j.end >= from), sent = st.old.filter((j) => j.site === id);
+      const tried = S.jobs.filter((j) => j.site === id && j.end >= from && j.end < end && keep(j)), sent = st.old.filter((j) => j.site === id);
       return { id, name, tried: tried.length, sentRate: pct(tried.filter(isSent).length, tried.length), n: sent.length,
         ans: sent.filter((j) => j.reply && j.reply.outcome).length, pos: sent.filter((j) => j.reply && (j.reply.outcome === 'interview' || j.reply.outcome === 'positive')).length };
     }).filter((x) => x.tried).sort((a, b) => b.n - a.n || b.tried - a.tried);
@@ -1190,12 +1230,14 @@
     const fmtDays = (v) => (v == null ? '—' : v < 1 ? 'under a day' : Math.round(v) + (Math.round(v) === 1 ? ' day' : ' days'));
     const rateBar = (k, n, d) => `<span class="fit rate${n < 20 ? ' thin' : ''}"${n < 20 ? ' data-tip="Fewer than 20 sent: the rate can swing a lot"' : ''}><span class="fit-b"><b style="width:${n ? Math.min(100, 100 * k / n) : 0}%"></b></span><span class="mono">${pct(k, n, d)}</span></span>`;
     // Every application in the tracker, not only the night runs': how many reached a person.
-    const tr = S.tracked.filter((a) => new Date(a.date + 'T12:00').getTime() >= from);
+    // A site or driver filter keeps the tracker rows a night-run job of that site or driver sent.
+    const keptUrls = f.site || f.driver ? new Set(S.jobs.filter((j) => isSent(j) && keep(j)).map((j) => j.url)) : null;
+    const tr = S.tracked.filter((a) => { const t = new Date(a.date + 'T12:00').getTime(); return t >= from && t < end && (!keptUrls || keptUrls.has(a.url)); });
     const lvOf = new Map();
     for (const x of S.reactions) if (x.num != null && x.level !== 'rejected' && lrank(x.level) > lrank(lvOf.get(x.num))) lvOf.set(x.num, x.level);
     const reachedA = (a, l) => lrank(lvOf.get(a.num)) >= lrank(l) || (l === 'interview' && /^(Interview|Offer|Hired)$/.test(a.status));
     const firstDay = tr.length ? Math.min(...tr.map((a) => new Date(a.date + 'T12:00').getTime())) : now;
-    const spanDays = Math.max(1, Math.round((now - (from || firstDay)) / DAY));
+    const spanDays = Math.max(1, Math.round((end - (from || firstDay)) / DAY));
     const trRej = tr.filter((a) => a.status === 'Rejected').length;
     const trOld = tr.filter((a) => now - new Date(a.date + 'T12:00').getTime() >= 12 * DAY);
     const trPerson = tr.filter((a) => reachedA(a, 'contacted')), trInt = tr.filter((a) => reachedA(a, 'interview')).length;
@@ -1206,7 +1248,7 @@
     const coTable = cos.length ? `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Company</th><th class="num">Sent</th><th class="opt">Share of all</th><th>Rejected</th><th class="num">A person</th></tr></thead><tbody>${cos.slice(0, 10).map((c) => `<tr>
       <td>${coLink(c.name)}</td><td class="num">${num(c.n)}</td><td class="opt">${rateBar(c.n, tr.length, 1)}</td><td>${rateBar(c.rej, c.n)}</td><td class="num">${c.person || '—'}</td></tr>`).join('')}</tbody></table></div>`
       : empty('chart', 'Nothing sent in this range', 'Pick a longer range.');
-    const trackCard = `<div class="tiles small">${tileStatic('Sent, all applications', num(tr.length), Math.round(tr.length / spanDays) + ' a day, to ' + num(coM.size) + ' companies')}${tileStatic('Rejected', pct(trRej, tr.length), pct(trOld.filter((a) => a.status === 'Rejected').length, trOld.length) + ' of those sent 12+ days ago')}${tileStatic('A person got in touch', pct(trPerson.length, tr.length, 2), num(trPerson.length) + (trPerson.length === 1 ? ' application' : ' applications') + ', ' + num(trInt) + ' interviews')}${tileStatic('At a usual 2%', '~' + num(expected), 'contacts a rough rate for cold online applications would bring')}</div>
+    const trackCard = `<div class="tiles small">${tileStatic('Sent, all applications', num(tr.length), (tr.length / spanDays < 10 ? (tr.length / spanDays).toFixed(1) : Math.round(tr.length / spanDays)) + ' a day, to ' + plural(coM.size, 'company', 'companies'))}${tileStatic('Rejected', pct(trRej, tr.length), pct(trOld.filter((a) => a.status === 'Rejected').length, trOld.length) + ' of those sent 12+ days ago')}${tileStatic('A person got in touch', pct(trPerson.length, tr.length, 2), num(trPerson.length) + (trPerson.length === 1 ? ' application' : ' applications') + ', ' + num(trInt) + ' interviews')}${tileStatic('At a usual 2%', '~' + num(expected), 'contacts a rough rate for cold online applications would bring')}</div>
       <div class="grid g-2">${card('Where they went', coTable, { sub: 'The 10 companies sent the most. ' + (tr.length ? 'The top two took ' + pct(top2, tr.length) + ' of everything sent.' : ''), flush: !!cos.length })}
       ${card('Who got in touch', trPerson.length ? `<ul class="props">${trPerson.sort((a, b) => (a.date < b.date ? 1 : -1)).map((a) => `<li><div class="pr-h"><span class="pr-k">${lpill(lvOf.get(a.num))}${a.status === 'Rejected' ? pill('neutral', 'Rejected later') : ''}</span><span class="muted">sent ${esc(dayLabel(new Date(a.date + 'T12:00').getTime()))}</span></div><div class="pr-f"><span>${coLink(a.company)}<span class="muted"> · ${esc(a.role)} · #${a.num}</span></span></div></li>`).join('')}</ul>` : empty('mail', 'Nobody yet in this range', 'A call or message from a person shows here, read from the emails or told by you.'),
         { sub: 'Applications where a person called or wrote, from the emails or a call you told about' })}</div>`;
@@ -1221,7 +1263,7 @@
       : empty('chart', 'Nothing sent in this range', 'Pick a longer range.');
     // Every reaction in the range: the positive ones by default.
     const LV = { positive: (x) => lrank(x.level) >= lrank('contacted'), seen: (x) => x.level !== 'rejected', all: () => true };
-    const inRange = S.reactions.filter((x) => new Date(x.date + 'T12:00').getTime() >= from && (LV[f.lv] || LV.positive)(x));
+    const inRange = S.reactions.filter((x) => { const t = new Date(x.date + 'T12:00').getTime(); return t >= from && t < end && (!keptUrls || keptUrls.has(x.url)); }).filter((x) => (LV[f.lv] || LV.positive)(x));
     const shown = inRange.slice(0, 200);
     const reactTable = shown.length ? `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Date</th><th>Application</th><th>Reached</th><th class="opt">Who</th><th>What they said</th><th class="opt">From</th></tr></thead><tbody>${shown.map((x) => `<tr>
         <td class="nowrap">${esc(dayLabel(new Date(x.date + 'T12:00').getTime()))}</td><td>${posting(x)}</td>
@@ -1229,7 +1271,12 @@
         <td><span${x.evidence ? ` data-tip="${esc('“' + x.evidence + '”')}"` : ''}>${esc(x.summary || (x.evidence ? '“' + x.evidence + '”' : '—'))}</span></td><td class="opt muted nowrap">${esc(who(x))}</td></tr>`).join('')}</tbody></table></div>`
       + (inRange.length > shown.length ? `<p class="muted card-foot">The latest 200 of ${num(inRange.length)}. Pick a shorter range to see older ones.</p>` : '')
       : empty('mail', f.lv === 'positive' ? 'No positive reply in this range' : 'No reaction in this range', 'Each round ends with the reply check, which reads the new emails.');
-    return pageHead('Results', 'What employers did with the applications. Only applications at least 2 days old count, so each one had time for an answer.', seg('f.results.range', f.range, [['7d', '7 days'], ['30d', '30 days'], ['all', 'All']], 'Time range')) +
+    const rf = f.site || f.driver || f.from || f.to || f.range !== '30d';
+    const rfilters = `<div class="filters res-filters">${rangeCtl('f.results', f, [['7d', '7 days'], ['30d', '30 days'], ['all', 'All']])}
+      <label class="sel"><span class="sr">Site</span><select id="res-site" data-model="f.results.site"><option value="">All sites</option>${sites().map(([id, name]) => `<option value="${esc(id)}"${f.site === id ? ' selected' : ''}>${esc(name)}</option>`).join('')}</select></label>
+      <label class="sel"><span class="sr">Driver</span><select id="res-driver" data-model="f.results.driver"><option value="">All drivers</option>${[...new Set(S.jobs.map((j) => j.driver))].sort().map((d) => `<option value="${esc(d)}"${f.driver === d ? ' selected' : ''}>${esc(drvName(d))}</option>`).join('')}</select></label>
+      ${rf ? btn('Clear filters', 'clearResults', { kind: 'ghost', sm: true, icon: 'x' }) : ''}</div>`;
+    return pageHead('Results', 'What employers did with the applications.') + rfilters +
       `<h2 class="sec-h">Every application</h2><p class="muted sec-sub">From the tracker, the night runs’ and the ones before them${S.tracked.length ? ', since ' + esc(shortDay(Math.min(...S.tracked.map((a) => new Date(a.date + 'T12:00').getTime())))) : ''}. Counted by the day each was added.</p>${trackCard}
       <h2 class="sec-h">Night runs</h2><p class="muted sec-sub">The applications the night runs sent, from Sep 21. Only those at least 2 days old count.</p>
       <div class="tiles small">${tileStatic('Sent', num(sentAll), num(st.n) + ' old enough to judge')}${tileStatic('Got an answer', pct(st.answered, st.n), num(st.answered) + ' answers')}${tileStatic('Positive answers', pct(st.positive, st.n, 1), num(st.positive) + ' replies or interviews')}${tileStatic('Time to an answer', fmtDays(median(dFirst)), 'median; a positive one: ' + fmtDays(median(dPos)))}</div>
@@ -1247,17 +1294,17 @@
   function vDrivers() {
     const rows = S.drivers.map((d) => {
       const s = status(d), t = driverToday(d), ru = rule(d), pd = pending('driver', (a) => a.id === d.id);
-      const rsv = d.lastResort && !d.lastHours ? WINDOWS.filter((w) => d.reserve[w.k]).map((w) => w.col + ' ' + d.reserve[w.k] + '%') : [];
+      const rsv = d.rule && d.rule.kind === 'reserve' ? WINDOWS.filter((w) => d.reserve[w.k]).map((w) => w.col + ' ' + d.reserve[w.k] + '%') : [];
       return `<tr class="row-link" tabindex="0" data-act="openDriver" data-arg="${d.id}">
         <td class="num mono">${d.priority || '—'}</td>
         <td class="cell-main"><b class="mono">${d.id}</b><span>${esc(d.service)}</span></td>
         <td class="st-cell">${spill(s)}<span class="cell-note muted" data-tip="${esc(s.why)}">${esc(s.why)}</span></td>
-        ${WINDOWS.map((w) => `<td class="mcell opt">${meter(d.windows[w.k], d.lastResort && !d.lastHours ? d.reserve[w.k] : 0, true)}</td>`).join('')}
+        ${WINDOWS.map((w) => `<td class="mcell opt">${meter(d.windows[w.k], d.rule && d.rule.kind === 'reserve' ? d.reserve[w.k] : 0, true)}</td>`).join('')}
         <td class="opt nowrap"><span class="cell-line" data-tip="${esc(ru.text)}">${esc(ru.label)}</span>${rsv.length ? `<span class="cell-sub">keeps ${esc(rsv.join(', '))}</span>` : ''}</td>
         <td class="num nowrap">${plural(t.jobs, 'job')}<span class="cell-sub">${t.sent} sent</span></td>
         <td class="act-col">${btn('', 'toggleDriver', { arg: d.id, icon: d.off ? 'play' : 'stop', sm: true, busy: !!pd, disabled: d.expired || !online(), aria: (d.off ? 'Turn on ' : 'Turn off ') + d.id, tip: d.expired ? 'Its time with the timer ended' : !online() ? offlineTip() : d.off ? 'Turn on: it may take jobs again' : 'Turn off: it takes no new job' })}</td></tr>`;
     }).join('');
-    return pageHead('Drivers', 'The agents that apply. Each round tries them in this order: the one whose week resets soonest first, last-resort drivers after. Each follows its rule, read from the burn timer’s settings.') +
+    return pageHead('Drivers', 'The agents that apply. Each round tries them in this order: the one whose week resets soonest first, burn and reserve drivers after them. Pick a driver to see or change its rule.') +
       card('', `<div class="tbl-wrap"><table class="tbl drivers"><thead><tr><th class="num">Order</th><th>Driver</th><th>Status</th>${WINDOWS.map((w) => `<th class="opt">${w.col}</th>`).join('')}<th class="opt">Rule</th><th class="num">Today</th><th class="act-col"><span class="sr">Turn on or off</span></th></tr></thead><tbody>${rows}</tbody></table></div>
       <div class="card-foot keys"><span><i class="k-used"></i>Used</span><span><i class="k-rsv"></i>Reserve, kept back</span><span class="muted">— means no reading of that kind: the service has no such limit, or it does not report it</span></div>`, { flush: true });
   }
@@ -1283,8 +1330,8 @@
       <div class="al-a">${acts}</div></li>`;
     }).join('');
     const head = list.length ? `<div class="al-head"><label class="cb"><input type="checkbox" id="al-all" ${f.sel.length && f.sel.length === list.length ? 'checked' : ''} data-act="selAllAlerts"><span>Select all</span></label>${seg('f.alerts.sev', f.sev, [['', 'All'], ['critical', 'Critical'], ['warning', 'Warning'], ['info', 'Info']], 'Severity')}</div>` : '';
-    const msg = { open: ['check', 'No open alerts', 'Problems from runs, scans and the burn timer show up here.'], snoozed: ['clock', 'Nothing snoozed', 'Snoozed alerts come back by themselves after a day.'], resolved: ['check', 'Nothing resolved in the last 30 days', 'Alerts you resolve stay here.'] }[f.tab];
-    return pageHead('Alerts', 'Problems that need a person: the agent inbox and the burn timer’s warnings. Resolve what you fixed; snooze what can wait.') + tabs + bulk +
+    const msg = { open: ['check', 'No open alerts', 'Problems from runs, scans and auto-apply show up here.'], snoozed: ['clock', 'Nothing snoozed', 'Snoozed alerts come back by themselves after a day.'], resolved: ['check', 'Nothing resolved in the last 30 days', 'Alerts you resolve stay here.'] }[f.tab];
+    return pageHead('Alerts', 'Problems that need a person: the agent inbox and auto-apply’s warnings. Resolve what you fixed; snooze what can wait.') + tabs + bulk +
       card('', list.length ? head + `<ul class="alerts">${items}</ul>` : (f.sev ? empty('search', 'No ' + SEV[f.sev].label.toLowerCase() + ' alerts here', 'Show all severities instead.', btn('Show all', 'set', { arg: 'f.alerts.sev=', kind: 'primary' })) : empty(msg[0], msg[1], msg[2])), { flush: true });
   }
 
@@ -1314,7 +1361,7 @@
     const blRows = S.prefs.blRows || [];
     const body = [
       section('Rounds', 'When rounds start and how much each one applies to.',
-        `<div class="field row"><div><b>Burn timer${pb ? ' <em class="pend">' + esc(statusWord(pb)) + '…</em>' : ''}</b><span class="help">${S.burn ? 'On: when no run is going, a round starts within 10 minutes.' : 'Off: rounds start only by hand.'} Applies at once.</span></div>${sw(S.burn, 'toggleBurn', 'Burn timer', { busy: !!pb, disabled: !online(), tip: offlineTip() })}</div>
+        `<div class="field row"><div><b>Auto-apply${pb ? ' <em class="pend">' + esc(statusWord(pb)) + '…</em>' : ''}</b><span class="help">${S.burn ? 'On: when no run is going, a round starts within 10 minutes.' : 'Off: rounds start only by hand.'} Applies at once.</span></div>${sw(S.burn, 'toggleBurn', 'Auto-apply', { busy: !!pb, disabled: !online(), tip: offlineTip() })}</div>
         <div class="fields">${field('roundSize', 'Jobs per round', `<div class="in-unit"><input id="pf-roundSize" type="number" inputmode="numeric" min="1" max="200" value="${esc(p.roundSize)}" data-model="pd.roundSize"${e.roundSize ? ' aria-invalid="true" aria-describedby="pf-roundSize-err"' : ''}><span>jobs</span></div>`, 'A running round keeps its size.')}</div>`),
       section('Working hours', 'While you work, your own Claude account applies only on schedule, so you keep enough of it.',
         `<div class="field${e.workDays ? ' has-err' : ''}"><span class="lbl">Days</span><div class="days" role="group" aria-label="Working days">${[1, 2, 3, 4, 5, 6, 0].map((d) => `<button type="button" aria-pressed="${p.work.days.includes(d)}" data-act="pdDay" data-arg="${d}">${DAYS[d]}</button>`).join('')}</div>${e.workDays ? `<span class="err">${e.workDays}</span>` : ''}</div>
@@ -1409,15 +1456,21 @@
     const dd = S.dd, d = driverById(dd.id);
     if (!d) return '';
     const s = status(d), t = driverToday(d), e = S.ui.errors, ru = rule(d), pd = pending('driver', (a) => a.id === d.id);
-    const usage = WINDOWS.map((w) => `<div class="use"><span class="use-l">${w.label}</span>${d.windows[w.k] ? meter(d.windows[w.k], ru.k === 'reserve' ? d.reserve[w.k] : 0) + `<span class="muted use-r">${winNow(d.windows[w.k]).stale ? 'Reset ' : 'Resets '}${when(d.windows[w.k].reset)} · read ${when(d.windows[w.k].at)}</span>` : '<span class="muted">No reading of this kind.</span>'}</div>`).join('');
-    const reserve = ru.k === 'reserve' ? `<h4>Reserve: share of each window it never uses</h4><div class="fields">${[['week', 'Weekly allowance'], ['five', '5-hour window']].map(([k, l]) => `<div class="field${e['rsv-' + k] ? ' has-err' : ''}"><label for="dd-${k}">${l}</label><div class="in-unit"><input id="dd-${k}" type="number" min="0" max="90" value="${esc(dd[k])}" data-model="dd.${k}"><span>%</span></div>${e['rsv-' + k] ? `<span class="err">${e['rsv-' + k]}</span>` : ''}</div>`).join('')}</div>` : '';
+    const usage = WINDOWS.map((w) => `<div class="use"><span class="use-l">${w.label}</span>${d.windows[w.k] ? meter(d.windows[w.k], dd.kind === 'reserve' ? +dd[w.k] || 0 : 0) + `<span class="muted use-r">${winNow(d.windows[w.k]).stale ? 'Reset ' : 'Resets '}${when(d.windows[w.k].reset)} · read ${when(d.windows[w.k].at)}</span>` : '<span class="muted">No reading of this kind.</span>'}</div>`).join('');
+    const num = (k, label, unit, help) => `<div class="field${e['dd-' + k] ? ' has-err' : ''}"><label for="dd-${k}">${label}</label><div class="in-unit"><input id="dd-${k}" type="number" inputmode="numeric" value="${esc(dd[k])}" data-model="dd.${k}"><span>${unit}</span></div>${e['dd-' + k] ? `<span class="err">${e['dd-' + k]}</span>` : help ? `<span class="help">${help}</span>` : ''}</div>`;
+    const params = dd.kind === 'reserve' ? `<div class="fields">${num('week', 'Keeps of its week', '%')}${num('five', 'Keeps of its 5 hours', '%')}</div>`
+      : dd.kind === 'burn' ? `<div class="fields">${num('mpp', 'Applying per % of its week', 'min', 'How long applications take to use 1% of its week. Codex: about 6; a Claude account: about 37.')}${num('margin', 'Margin before the reset', 'min')}</div>`
+      : dd.kind === 'monthly' ? `<div class="fields">${num('credits', 'Credits a job', 'credits')}</div>`
+      : dd.kind === 'schedule' ? `<p class="muted">${dd.until ? 'Until ' + esc(when(Date.parse(dd.until))) + '; after that the account is left out.' : 'No end date.'} Working hours are on the Preferences page.</p>` : '';
+    const ruleForm = `<div class="field"><label for="dd-kind">How it takes jobs</label><label class="sel"><select id="dd-kind" data-model="dd.kind">${Object.entries(RULES).map(([k, [l]]) => `<option value="${k}"${dd.kind === k ? ' selected' : ''}>${esc(l)}</option>`).join('')}</select></label><span class="help">${esc(RULES[dd.kind] ? RULES[dd.kind][1] : '')}</span></div>${params}
+      <div class="field"><label for="dd-from">Left alone until</label><input id="dd-from" type="date" value="${esc(dd.from || '')}" data-model="dd.from"><span class="help">Empty: no wait. Until that day it takes no job, whatever its rule.</span></div>`;
     return `<div class="dr-h"><div><span class="eyebrow">Driver${d.priority ? ' · tried ' + ['first', 'second', 'third', 'fourth', 'fifth', 'sixth'][d.priority - 1] : ''}</span><h2 id="dr-title" class="mono">${d.id}</h2><p>${esc(d.service)}${d.account ? ' · ' + esc(d.account) : ''}</p></div>${btn('', 'closeDrawer', { icon: 'x', aria: 'Close', kind: 'ghost' })}</div>
       <div class="dr-b" data-keep="drawer"><div class="dr-res">${spill(s)}<span class="muted">${esc(s.why)}</span></div>
       <div class="dr-acts">${btn('Show its jobs, 7 days', 'goApps', { arg: 'driver:' + d.id, icon: 'table', sm: true })}${btn(d.off ? 'Turn on' : 'Turn off', 'toggleDriver', { arg: d.id, icon: d.off ? 'play' : 'stop', sm: true, busy: !!pd, disabled: d.expired || !online(), tip: d.expired ? 'Its time with the timer ended' : offlineTip() })}</div>
       <h3>Usage</h3><div class="uses">${usage}</div>
       <dl class="kv two">${[['Jobs today', t.jobs + ' (' + t.sent + ' sent)'], ['Jobs, 7 days', t.week + ' (' + pct(t.weekSent, t.week) + ' sent)'], ['Time per job, 7 days', t.week ? dur(t.mins) : '—'], ['Writes documents', d.writes ? 'Yes, CVs and letters' : 'No']].map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join('')}</dl>
-      <h3>Rule</h3><p><b>${esc(ru.label)}.</b> ${esc(ru.text)}</p>${reserve}
-      </div>${reserve ? `<div class="dr-f">${btn('Cancel', 'closeDrawer')}${btn('Save changes', 'saveDriver', { kind: 'primary', icon: 'check', disabled: !online(), tip: offlineTip() })}</div>` : ''}`;
+      <h3>Rule</h3><p><b>${esc(ru.label)}.</b> ${esc(ru.text)}</p>${d.expired ? '' : ruleForm}
+      </div>${d.expired ? '' : `<div class="dr-f">${btn('Cancel', 'closeDrawer')}${btn('Save changes', 'saveDriver', { kind: 'primary', icon: 'check', disabled: !online(), tip: offlineTip() })}</div>`}`;
   }
   function vDrawer() {
     const d = S.drawer;
@@ -1460,6 +1513,16 @@
   // ---- Render ----------------------------------------------------------------------------------
   const VIEWS = { overview: vOverview, live: vLive, queue: vQueue, applications: vApps, runs: vRuns, results: vResults, drivers: vDrivers, alerts: vAlerts, activity: vActivity, preferences: vPrefs };
   const $ = (s) => document.querySelector(s);
+  // The drawer drawn last: a redraw of the same drawer (new data every few seconds) must not slide it in again.
+  let lastDrawer = { key: '', html: '' };
+  function drawDrawer(html) {
+    const key = S.drawer ? S.drawer.type + ':' + S.drawer.id : '';
+    if (html === lastDrawer.html) return;
+    const root = $('#drawer-root');
+    root.innerHTML = html;
+    if (key && key === lastDrawer.key) root.querySelectorAll('.drawer, .scrim').forEach((el) => { el.style.animation = 'none'; });
+    lastDrawer = { key, html };
+  }
   function render() {
     const a = document.activeElement, fid = a && a.id;
     let sel = null;
@@ -1470,7 +1533,7 @@
     $('#top').innerHTML = vTop();
     const gate = vGate();
     $('#main').innerHTML = gate || offlineBanner() + VIEWS[S.route]();
-    $('#drawer-root').innerHTML = gate ? '' : vDrawer();
+    drawDrawer(gate ? '' : vDrawer());
     $('#modal-root').innerHTML = gate ? '' : vModal();
     renderToasts();
     document.body.classList.toggle('nav-open', S.ui.nav);

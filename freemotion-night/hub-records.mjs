@@ -7,18 +7,20 @@
  *   job      one per finished job: company, role, site, driver, times, result, documents
  *   round    one per "===== round" in full-night.log, plus the round running now
  *   driver   one per driver in burn-settings.json: windows, reserve, pause, why
- *   alert    open and done items of data/agent-inbox.md, and the burn timer's repeated warnings
+ *   alert    open and done items of data/agent-inbox.md, and auto-apply's repeated warnings
  *   scan     one per row of data/scan-runs.tsv
  *   pool     the ranked pool (pool.json) and this round's list (list.json), one record each
  *   reply    tracker status changes from data/status-log.tsv, tied to a job by its URL
  *   reaction one per employer reaction in data/reactions.tsv (inbox-replies.py): its level, who, what they said
  *   live     the job in hand: its phase and its last actions (agy's actions-<N>.log)
  *   setting  burn-settings.json and the blacklist, one record each
- *   event    what the logs said: notes, round starts and ends, burn timer lines
+ *   event    what the logs said: notes, round starts and ends, auto-apply lines
  *
  * Files are re-read only when their size or mtime changed (`cached`), and full-night.log (7 MB and
  * growing) only from where the last read stopped.
  */
+import { ruleOf, comesLast } from '../lib/driver-rules.mjs';
+import { weekCost } from './agy-jobs.mjs';
 import { existsSync, openSync, readFileSync, readSync, readdirSync, closeSync, statSync } from 'fs';
 import { homedir } from 'os';
 import { join } from 'path';
@@ -291,9 +293,9 @@ export function rounds(root, now = Date.now()) {
       const m = /(\d{4}-\d\d-\d\d) (\d\d:\d\d)/.exec(l);
       const start = m ? new Date(`${m[1]}T${m[2]}`).getTime() : null;
       const byBurn = start != null && burn.some((b) => Math.abs(b - start) < 20 * 60000);
-      night = { no: ++nightSeq, start, by: byBurn ? 'Burn timer' : 'You', done: false };
+      night = { no: ++nightSeq, start, by: byBurn ? 'Auto-apply' : 'You', done: false };
       cur = null;
-      events.push({ t: start, actor: byBurn ? 'System' : 'You', text: byBurn ? 'The burn timer started a run' : 'A night run started' });
+      events.push({ t: start, actor: byBurn ? 'System' : 'You', text: byBurn ? 'Auto-apply started a run' : 'A night run started' });
     } else if (l.startsWith('=====') && night) {
       close('finished');
       const start = clockAfter(l, night.start) || night.start;
@@ -468,11 +470,11 @@ function weekResets(root, s) {
   return out;
 }
 export function driverOrder(s, resets, now = Date.now()) {
-  const expired = (d) => s.scheduled?.[d]?.until && now >= Date.parse(s.scheduled[d].until);
-  const last = s.last_resort || [];
-  const firsts = (s.drivers || []).filter((d) => !expired(d) && !last.includes(d)).map((d, i) => ({ d, i, r: resets[d] ?? Infinity }))
+  const expired = (d) => { const r = ruleOf(s, d); return r.kind === 'schedule' && r.until && now >= Date.parse(r.until); };
+  const last = (d) => comesLast(s, d);
+  const firsts = (s.drivers || []).filter((d) => !expired(d) && !last(d)).map((d, i) => ({ d, i, r: resets[d] ?? Infinity }))
     .sort((a, b) => a.r - b.r || a.i - b.i).map((x) => x.d);
-  return { order: firsts.concat((s.drivers || []).filter((d) => last.includes(d))), expired: (s.drivers || []).filter(expired) };
+  return { order: firsts.concat((s.drivers || []).filter(last)), expired: (s.drivers || []).filter(expired) };
 }
 
 export function drivers(root, now = Date.now()) {
@@ -504,16 +506,16 @@ export function drivers(root, now = Date.now()) {
     }
     let outUntil = null;
     try { const e = +readFileSync(join(root, NIGHT, 'out', id), 'utf8').trim(); if (e * 1000 > now) outUntil = e * 1000; } catch { /* none */ }
-    const rsv = s.reserve?.[id] || {};
+    const rule = ruleOf(s, id);
     out.push({
       t: 'driver', k: id, d: {
         id, service: SERVICE[id] || id, priority: plan.order.includes(id) ? plan.order.indexOf(id) + 1 : null, listed: i + 1,
         expired: plan.expired.includes(id), off: (s.off || []).includes(id), account: s.accounts?.[id] || null,
-        windows: { five, week, month }, reserve: { five: rsv.five_hour || 0, week: rsv.week || 0, month: 0 },
-        lastHours: rsv.last_hours || null,
-        from: s.not_before?.[id] ? ms(s.not_before[id]) : null, until: s.scheduled?.[id]?.until ? ms(s.scheduled[id].until) : null,
-        scheduled: !!s.scheduled?.[id], workHours: !!s.scheduled?.[id], monthly: (s.monthly || []).includes(id),
-        lastResort: (s.last_resort || []).includes(id), writes: id === 'codex',
+        windows: { five, week, month }, rule,
+        reserve: rule.kind === 'reserve' ? { five: rule.five_hour, week: rule.week, month: 0 } : { five: 0, week: 0, month: 0 },
+        from: s.not_before?.[id] ? ms(s.not_before[id]) : null, until: rule.kind === 'schedule' && rule.until ? ms(rule.until) : null,
+        scheduled: rule.kind === 'schedule', workHours: rule.kind === 'schedule', monthly: rule.kind === 'monthly',
+        lastResort: comesLast(s, id), writes: id === 'codex',
         paused: st.paused?.[id] ? st.paused[id] * 1000 : null, why: st.why?.[id] || null, outUntil,
         noRead: st.noRead?.[id] || null,
       },
@@ -563,7 +565,7 @@ export function alerts(root, now = Date.now()) {
     return list;
   }, []);
   for (const a of inbox) out.push({ t: 'alert', k: a.id, d: a });
-  // The burn timer's repeated warnings: one alert per distinct message, counted.
+  // Auto-apply's repeated warnings: one alert per distinct message, counted.
   const burnWarn = cached(root, 'tmp/fm/burn/burn.log', (t) => {
     const g = new Map();
     for (const l of t.split(/\r?\n/)) {
@@ -581,8 +583,8 @@ export function alerts(root, now = Date.now()) {
     const acct = /could not read (\S+?):/.exec(w.text);
     out.push({ t: 'alert', k: 'BU-' + hash(w.text.slice(0, 160)), d: {
       id: 'BU-' + hash(w.text.slice(0, 160)), state: stale ? 'resolved' : 'open', sev: /disabled|signed out/i.test(w.text) ? 'critical' : 'warning',
-      title: acct ? `The burn timer cannot read ${acct[1]}` : w.text.slice(0, 90), detail: w.text, first: w.first, last: w.last, count: w.count,
-      source: 'Burn timer', auto: true, resolvedAt: stale ? w.last : null,
+      title: acct ? `Auto-apply cannot read ${acct[1]}` : w.text.slice(0, 90), detail: w.text, first: w.first, last: w.last, count: w.count,
+      source: 'Auto-apply', auto: true, resolvedAt: stale ? w.last : null,
     } });
   }
   return out;
@@ -696,6 +698,8 @@ export function collect(root, now = Date.now()) {
     ...replies(root),
     ...reactions(root),
     ...applications(root),
+    // What an agy job costs of the Gemini week, per model (least squares over agy's readings).
+    { t: 'setting', k: 'agyCost', d: { list: weekCost(root) } },
   ];
   return recs;
 }
